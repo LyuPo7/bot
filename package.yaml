@@ -1,0 +1,77 @@
+name:                bot
+version:             0.1.0.0
+github:              "githubuser/bot"
+license:             BSD3
+author:              "Author name here"
+maintainer:          "example@example.com"
+copyright:           "2021 Author name here"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/bot#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- http-conduit
+- http-types
+- http-client-tls
+- http-client
+- bytestring
+- text
+- lens
+- lens-aeson
+- aeson
+- HDBC >=2.4
+- HDBC-sqlite3 >= 2.3.3.0
+- directory
+- http-api-data
+- transformers
+- time
+- hformat
+- data-default
+- mtl
+- containers
+
+library:
+  source-dirs: src
+
+executables:
+  bot-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - bot
+    - http-conduit
+    - http-types
+    - http-client-tls
+    - http-client
+    - bytestring
+    - text
+    - lens
+    - lens-aeson
+    - aeson
+    - HDBC >=2.4
+    - HDBC-sqlite3 >= 2.3.3.0
+tests:
+  bot-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - bot
