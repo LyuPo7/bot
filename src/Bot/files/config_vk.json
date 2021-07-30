@@ -1,0 +1,8 @@
+{
+   "bot_api": "vk",
+   "bot_token": "e898d06d42ad252127024a7bb6c9b02ec53e4e6ed3d6e257ebadcf0b3b74cb9648a51d1eee69965faad63",
+   "bot_initial_reply_number": 3,
+   "bot_question": "How many replies do you prefer to get?",
+   "bot_description": "Hi! I'm echo-bot=)",
+   "bot_group_id": 205828081
+}

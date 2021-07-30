@@ -1,10 +1,10 @@
 name:                bot
 version:             0.1.0.0
-github:              "githubuser/bot"
+github:              "LyuPo7/bot"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2021 Author name here"
+author:              "LyuPo"
+maintainer:          "lport@frtk.ru"
+copyright:           "2021 LyuPo"
 
 extra-source-files:
 - README.md
@@ -43,14 +43,19 @@ dependencies:
 
 library:
   source-dirs: src
+  ghc-options: 
+    - -Wall 
+    - -Werror 
 
 executables:
   bot-exe:
-    main:                Main.hs
-    source-dirs:         app
-    ghc-options:
-    - -threaded
-    - -rtsopts
+    main: Main.hs
+    source-dirs: app
+    ghc-options: 
+    - -Wall 
+    - -Werror 
+    - -threaded 
+    - -rtsopts 
     - -with-rtsopts=-N
     dependencies:
     - bot

@@ -7,11 +7,11 @@ cabal-version: 1.12
 name:           bot
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/bot#readme>
-homepage:       https://github.com/githubuser/bot#readme
-bug-reports:    https://github.com/githubuser/bot/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2021 Author name here
+homepage:       https://github.com/LyuPo7/bot#readme
+bug-reports:    https://github.com/LyuPo7/bot/issues
+author:         LyuPo
+maintainer:     lport@frtk.ru
+copyright:      2021 LyuPo
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -21,28 +21,31 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/bot
+  location: https://github.com/LyuPo7/bot
 
 library
   exposed-modules:
-      Config
-      DB
-      Exception
-      Logger
-      LoggerIO
-      Settings
-      Tele.Parser
-      Tele.Requests
-      Tele.Run
-      Tele.Types
-      Vk.Parser
-      Vk.Requests
-      Vk.Run
-      Vk.Types
+      Bot.Config
+      Bot.DB
+      Bot.Exception
+      Bot.Logger
+      Bot.LoggerIO
+      Bot.Settings
+      Bot.Tele.Parser.Data
+      Bot.Tele.Parser.Parser
+      Bot.Tele.Request.Data
+      Bot.Tele.Request.Requests
+      Bot.Tele.Run
+      Bot.Vk.Parser.Data
+      Bot.Vk.Parser.Parser
+      Bot.Vk.Request.Data
+      Bot.Vk.Request.Requests
+      Bot.Vk.Run
   other-modules:
       Paths_bot
   hs-source-dirs:
       src
+  ghc-options: -Wall -Werror
   build-depends:
       HDBC >=2.4
     , HDBC-sqlite3 >=2.3.3.0
@@ -72,7 +75,7 @@ executable bot-exe
       Paths_bot
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HDBC >=2.4
     , HDBC-sqlite3 >=2.3.3.0

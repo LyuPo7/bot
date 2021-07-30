@@ -1,0 +1,26 @@
+[
+    {
+        "update_id":847797406,
+        "message":{
+            "message_id":12,
+            "from":{
+                "id":390135483,
+                "is_bot":false,
+                "first_name":"Lyuba",
+                "last_name":"Portnova",
+                "username":"LyuPo",
+                "language_code":"es"
+                },
+            "chat":{
+                "id":390135483,
+                "first_name":"Lyuba",
+                "last_name":"Portnova",
+                "username":"LyuPo",
+                "type":"private"
+                },
+            "date":1625471717,
+            "text":"/help"
+        }
+    }
+]
+
