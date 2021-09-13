@@ -1,0 +1,14 @@
+{
+    "api_settings" : 
+        {
+            "bot_api": "telegram",
+            "bot_token": "1688182700:AAHcaPS9PZ9pS29T5TOLXNeC8BqDvCckZVg",
+            "bot_initial_reply_number": 3,
+            "bot_question": "How many replies do you prefer to get?",
+            "bot_description": "Hi! I'm echo-bot=)"
+        },
+    "logger_settings" :
+        {
+            "verbocity": "debug"
+        }
+}

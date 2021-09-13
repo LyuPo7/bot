@@ -26,21 +26,27 @@ source-repository head
 library
   exposed-modules:
       Bot.Config
-      Bot.DB
+      Bot.DB.DBQueries
+      Bot.DB.DBSpec
       Bot.Exception
       Bot.Logger
-      Bot.LoggerIO
       Bot.Settings
       Bot.Tele.Parser.Data
       Bot.Tele.Parser.Parser
+      Bot.Tele.Parser.ParserSpec
       Bot.Tele.Request.Data
       Bot.Tele.Request.Requests
+      Bot.Tele.Request.RequestsSpec
       Bot.Tele.Run
+      Bot.Tele.RunSpec
       Bot.Vk.Parser.Data
       Bot.Vk.Parser.Parser
+      Bot.Vk.Parser.ParserSpec
       Bot.Vk.Request.Data
       Bot.Vk.Request.Requests
+      Bot.Vk.Request.RequestsSpec
       Bot.Vk.Run
+      Bot.Vk.RunSpec
   other-modules:
       Paths_bot
   hs-source-dirs:
@@ -56,6 +62,7 @@ library
     , data-default
     , directory
     , hformat
+    , hspec
     , http-api-data
     , http-client
     , http-client-tls
@@ -65,8 +72,10 @@ library
     , lens-aeson
     , mtl
     , text
+    , text-show
     , time
     , transformers
+    , utf8-string
   default-language: Haskell2010
 
 executable bot-exe
@@ -87,6 +96,7 @@ executable bot-exe
     , data-default
     , directory
     , hformat
+    , hspec
     , http-api-data
     , http-client
     , http-client-tls
@@ -96,18 +106,22 @@ executable bot-exe
     , lens-aeson
     , mtl
     , text
+    , text-show
     , time
     , transformers
+    , utf8-string
   default-language: Haskell2010
 
 test-suite bot-test
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: Test.hs
   other-modules:
-      Paths_bot
+      TestBot.Parser
+      TestBot.Config
+      TestBot.Run
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HDBC >=2.4
     , HDBC-sqlite3 >=2.3.3.0
@@ -118,7 +132,9 @@ test-suite bot-test
     , containers
     , data-default
     , directory
+    , hedgehog >=0.5 && <1.1
     , hformat
+    , hspec
     , http-api-data
     , http-client
     , http-client-tls
@@ -127,7 +143,13 @@ test-suite bot-test
     , lens
     , lens-aeson
     , mtl
+    , tasty
+    , tasty-golden
+    , tasty-hedgehog
+    , tasty-hspec
     , text
+    , text-show
     , time
     , transformers
+    , utf8-string
   default-language: Haskell2010

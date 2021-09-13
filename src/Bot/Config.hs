@@ -1,40 +1,55 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric, OverloadedStrings, RecordWildCards #-}
 
 module Bot.Config where
 
 import qualified Data.ByteString.Lazy as B
-
-import Data.Text (Text)
+import qualified Data.Aeson as A
 import GHC.Generics (Generic)
-import Data.Aeson (camelTo2, eitherDecode)
-import Data.Aeson.Types (ToJSON(..), FromJSON(..), genericToJSON, defaultOptions, fieldLabelModifier, genericParseJSON)
+import qualified Control.Exception as Exc
 
--- | Bot Config
+import qualified Bot.Exception as E
+import qualified Bot.Settings as Settings
+import qualified Bot.Logger as Logger
+
+-- | General Bot Config
 data Config = Config {
-    botApi :: Text,
-    botToken :: Text,
-    botInitialReplyNumber :: Integer,
-    botQuestion :: Text,
-    botDescription :: Text,
-    botGroupId :: Maybe Integer
-} deriving (Show,Generic)
+  cSettings :: Settings.Config,
+  cLogger :: Logger.Config
+} deriving (Show, Generic, Eq)
 
-instance FromJSON Config where
-  parseJSON = genericParseJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' }
+instance A.FromJSON Config where
+    parseJSON = A.withObject "General Config" $ \o ->
+        Config
+            <$> o A..: "api_settings"
+            <*> o A..: "logger_settings"
 
-instance ToJSON Config where
-  toJSON = genericToJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' }
+-- | Get settings from config
+getConfig :: IO Config
+getConfig = do
+  conf <- readConfig
+  let config = (parseConfig conf) >>= checkConfig
+  case config of
+    Right cnfg -> return cnfg
+    Left err -> Exc.throwIO err
 
+checkConfig :: Config -> Either E.BotError Config
+checkConfig config 
+  | not $ elem (Settings.botApi cSet) ["vk", "telegram"] = Left $ E.ParseConfigError "Incorrect field 'bot_api' in config.json"
+  | Settings.botInitialReplyNumber cSet < 0 = Left $ E.ParseConfigError "Incorrect field in config.json: 'bot_initial_reply_number' < 0"
+  | Settings.botInitialReplyNumber cSet > 5 = Left $ E.ParseConfigError "Incorrect field in config.json: 'bot_initial_reply_number' > 5"
+  | not $ elem (Logger.cVerbocity cLog) [Just Logger.Debug, Just Logger.Info, Just Logger.Warning, Just Logger.Error, Nothing] = Left $ E.ParseConfigError "Incorrect field 'verbocity' in config.json"
+  | otherwise = Right config where
+      cLog = cLogger config
+      cSet = cSettings config
+
+-- | Read the config JSON file.
+readConfig :: IO B.ByteString
+readConfig = B.readFile Settings.configFile
+      
 -- | Config parser
-parseConfig :: IO B.ByteString -> IO Config
+parseConfig :: B.ByteString -> Either E.BotError Config
 parseConfig config = do
-  -- Get JSON data and decode it
-  d <- (eitherDecode <$> config) :: IO (Either String Config)
+  let d = A.eitherDecode config :: Either String Config
   case d of
-    Left err -> do
-      fail err --main = toTry `catchIOError` handler
-    Right ps -> do
-      --logDebug logh "Poll response was successfully parsed."
-      return ps
+    Left err -> Left $ E.ParseConfigError $ err
+    Right ps -> Right ps

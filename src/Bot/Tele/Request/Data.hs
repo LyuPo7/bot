@@ -2,15 +2,13 @@
 
 module Bot.Tele.Request.Data where
 
-import qualified Data.ByteString.Char8 as BC
-
 import Data.Text (Text)
 import GHC.Generics (Generic)
 import Data.Aeson (camelTo2)
 import Data.Aeson.Types (ToJSON(..), FromJSON(..), genericToJSON, defaultOptions, fieldLabelModifier, genericParseJSON)
 
 -- | Types for RequestOptions requests
-newtype TeleRequest = TeleRequest { getRequest :: BC.ByteString }
+newtype TeleRequest = TeleRequest { getRequest :: Text }
 
 -- | Tele Requests
 getUpdates :: TeleRequest
@@ -126,3 +124,49 @@ instance FromJSON InlineKeyboardButton where
 instance ToJSON InlineKeyboardButton where
   toJSON = genericToJSON defaultOptions {
     fieldLabelModifier = camelTo2 '_' . drop 13 }
+
+-- | Default methods for Requests
+createGetUpdates :: Maybe Integer -> RequestOptions
+createGetUpdates updateId = GetUpdates {
+  updates_offset = updateId,
+  updates_limit = Nothing,
+  updates_timeout = Nothing,
+  updates_allowedUpdates = Just ["message"]
+}
+
+createSendMessage :: Integer -> Text -> RequestOptions
+createSendMessage chatId text = SendMessage {
+  sendMes_chatId = chatId,
+  sendMes_text = text,
+  sendMes_disableNotification = Nothing,
+  sendMes_replyToMessageId = Nothing
+}
+
+createCopyMessage :: Integer -> Integer -> RequestOptions
+createCopyMessage chatId messageId = CopyMessage { 
+  copwMes_chatId = chatId,
+  copwMes_fromChatId = chatId,
+  copwMes_messageId = messageId
+}
+
+createQueryMessage :: Integer -> Text -> InlineKeyboardMarkup -> RequestOptions
+createQueryMessage chatId question markupIn = QueryMessage {
+  sendQue_chatId = chatId,
+  sendQue_text = question,
+  sendQue_disableNotification = Nothing,
+  sendQue_replyToMessageId = Nothing,
+  sendQue_replyMarkup = Just markupIn
+}
+
+createButton :: Text -> Text -> InlineKeyboardButton
+createButton text callback = InlineKeyboardButton {
+  inlineButton_text = text,
+  inlineButton_callbackData = Just callback
+}
+
+createKeyboard :: [[InlineKeyboardButton]] -> InlineKeyboardMarkup
+createKeyboard buttons = InlineKeyboardMarkup {
+  inlineMarkup_keyboard = buttons,
+  inlineMarkup_oneTimeKeyboard = Just True,
+  inlineMarkup_resizeKeyboard = Just True
+}

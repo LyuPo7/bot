@@ -1,17 +1,35 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, DeriveGeneric #-}
 
 module Bot.Settings where
 
 import Data.Text (Text, pack)
-import qualified Data.ByteString.Lazy as B
-import qualified Data.ByteString.Char8 as BC
+import GHC.Generics (Generic)
+import Data.Aeson (camelTo2, parseJSON, toJSON)
+import Data.Aeson.Types (ToJSON, FromJSON, genericToJSON, defaultOptions, fieldLabelModifier, genericParseJSON)
 
-import Bot.Config
-import Bot.Tele.Request.Data()
+import Bot.Tele.Request.Data ()
+
+-- | Bot Config Settings
+data Config = Config {
+    botApi :: Text,
+    botToken :: Text,
+    botInitialReplyNumber :: Integer,
+    botQuestion :: Text,
+    botDescription :: Text,
+    botGroupId :: Maybe Integer
+} deriving (Show, Generic, Eq)
+
+instance FromJSON Config where
+  parseJSON = genericParseJSON defaultOptions {
+    fieldLabelModifier = camelTo2 '_' }
+
+instance ToJSON Config where
+  toJSON = genericToJSON defaultOptions {
+    fieldLabelModifier = camelTo2 '_' }
 
 -- | Types for Settings
 -- | Host
-newtype Host = Host { getHost :: BC.ByteString }
+newtype Host = Host { getHost :: Text }
 
 -- | Bot commands
 startMessage, helpMessage, repeatMessage :: Text
@@ -35,12 +53,6 @@ vkVersion = pack "5.80"
 
 -- | Config file
 configFile :: FilePath
-configFile = "src/Bot/files/config_tele.json"
-
--- | Read the config JSON file.
-getConfig :: IO B.ByteString
-getConfig = B.readFile configFile
-
--- | Get settings from config
-config :: IO Config
-config = parseConfig getConfig
+configFile = "src/Bot/files/confighier_tele.json"
+--configFile = "src/Bot/files/confighier_vvk.json"
+-- configFile = "src/Bot/files/confighier_vk.json"

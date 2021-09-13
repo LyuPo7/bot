@@ -40,6 +40,9 @@ dependencies:
 - data-default
 - mtl
 - containers
+- text-show
+- utf8-string
+- hspec
 
 library:
   source-dirs: src
@@ -70,13 +73,23 @@ executables:
     - aeson
     - HDBC >=2.4
     - HDBC-sqlite3 >= 2.3.3.0
+
 tests:
   bot-test:
-    main:                Spec.hs
+    main:                Test.hs
     source-dirs:         test
+    other-modules: [TestBot.Parser, TestBot.Config, TestBot.Run]
     ghc-options:
+    - -Wall 
+    - -Werror 
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
     - bot
+    - hspec
+    - tasty
+    - tasty-hspec
+    - tasty-hedgehog
+    - hedgehog >= 0.5 && < 1.1
+    - tasty-golden

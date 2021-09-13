@@ -2,21 +2,30 @@
 
 module Bot.Tele.Parser.Parser where
 
-import qualified Data.ByteString.Lazy.Char8 as L8
+import Data.ByteString.Lazy.Char8 (ByteString)
 import Data.Aeson (eitherDecode)
+import qualified Data.Text as T
 
-import qualified Bot.Logger as BL
-import Bot.Tele.Parser.Data (UpdateData(..))
+import Bot.Tele.Parser.ParserSpec (Handle(..))
+import qualified Bot.Logger as Logger
+import Bot.Tele.Parser.Data
+
+withHandleIO :: Logger.Handle IO -> (Handle IO -> IO a) -> IO a
+withHandleIO logger f = do
+  let handle = Handle logger
+  f handle
 
 {-- | UpdateData parser --}
-parseUpdateData :: BL.Handle -> IO L8.ByteString -> IO UpdateData
-parseUpdateData logh response = do
-  -- decode JSON 
-  d <- (eitherDecode <$> response) :: IO (Either String UpdateData)
+parseUpdateData :: Monad m => Handle m -> ByteString -> m UpdateData
+parseUpdateData handle response = do
+  let logh = hLogger handle
+      -- decode JSON 
+      d = (eitherDecode response) :: (Either String UpdateData)
   case d of
     Left err -> do
-      BL.logError logh $ "Couldn't parse UpdateData: " ++ err
+      Logger.logError logh $ ("Couldn't parse UpdateData: " <> (T.pack err))
       return UpdateData {ok = True, result = []}
     Right ps -> do
-      BL.logDebug logh "UpdateData was successfully parsed."
+      Logger.logDebug logh "UpdateData was successfully parsed."
       return ps
+

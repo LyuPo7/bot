@@ -7,6 +7,20 @@ import GHC.Generics (Generic)
 import Data.Aeson (camelTo2)
 import Data.Aeson.Types (ToJSON(..), FromJSON(..), genericToJSON, defaultOptions, fieldLabelModifier, genericParseJSON)
 
+-- Synonims
+type UserID = Integer
+type GroupID = Integer
+type UpdateID = Integer
+type MessageID = Integer
+type PeerId = Integer
+type RepNum = Integer
+type Mode = Text
+type Version = Text
+type Token = Text
+type Description = Text
+type FileType = Text
+type FilePathT = Text
+
 -- | UpdateData
 data UpdateData = UpdateData {
   ts :: Text, -- Time stamp.
@@ -31,7 +45,7 @@ instance ToJSON Update where
 
 -- | Users
 data Users = Users {
-  user_id :: Integer, -- user ID. 
+  user_id :: UserID, -- user ID. 
   user_firstName :: Text, -- User's first name.
   user_lastName :: Text, -- User's last name
   user_deactivated :: Text, -- returns if a profile is deleted or blocked. Gets the value deleted or banned. Keep in mind that in this case no additional fields are returned.
@@ -49,9 +63,9 @@ instance ToJSON Users where
 
 -- | Message
 data Message = Message {
-  message_messageId :: Maybe Integer, -- Message ID. (Not returned for forwarded messages).
+  message_messageId :: Maybe MessageID, -- Message ID. (Not returned for forwarded messages).
   message_date :: Integer, -- date (in Unixtime) when the message was sent.
-  message_userId :: Integer, -- Message author ID.
+  message_userId :: UserID, -- Message author ID.
   message_readState :: Maybe Integer, -- Message status (0 — not read, 1 — read). (Not returned for forwarded messages.)
   message_out :: Maybe Integer, -- Message type (0 — received, 1 — sent). (Not returned for forwarded messages.)
   message_title :: Maybe Text, -- Title of message or chat. 
@@ -137,7 +151,7 @@ data Photo = Photo {
   photo_id :: Integer, -- Photo ID.
   photo_albumId :: Integer, -- Photo album ID.
   photo_ownerId :: Integer, -- Photo owner ID.
-  photo_userId :: Maybe Integer, -- ID of the user who uploaded the photo (if the photo is uploaded in community).
+  photo_userId :: Maybe UserID, -- ID of the user who uploaded the photo (if the photo is uploaded in community).
   photo_text :: Text, -- Description text.
   photo_date :: Integer, -- Date when the photo has been added in Unixtime. 
   photo_width :: Integer, -- Width of the original photo in px. 

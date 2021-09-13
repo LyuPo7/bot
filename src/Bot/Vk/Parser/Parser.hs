@@ -3,73 +3,86 @@
 module Bot.Vk.Parser.Parser where
 
 import qualified Data.ByteString.Lazy.Char8 as L8
+import qualified Data.Text as T
 import Data.Aeson (eitherDecode)
 import System.IO.Error ()
-   
-import qualified Bot.Logger as BL
-import Bot.Vk.Parser.Data (PollResponse(..), UpdateData(..), UploadUrlResponse(..), UploadFileResponse(..), UploadObjectResponse(..))
+
+import Bot.Vk.Parser.ParserSpec (Handle(..))
+import qualified Bot.Logger as Logger
+import Bot.Vk.Parser.Data (Server(..), PollResponse(..), UpdateData(..), UploadUrlResponse(..), UploadFileResponse(..), UploadObjectResponse(..))
+
+withHandleIO :: Logger.Handle IO -> (Handle IO -> IO a) -> IO a
+withHandleIO logger f = do
+  let handle = Handle logger
+  f handle
 
 {-- | PollResponse parser --}
-parsePollResponse :: BL.Handle -> IO L8.ByteString -> IO PollResponse
-parsePollResponse logh response = do
-  -- decode JSON 
-  d <- (eitherDecode <$> response) :: IO (Either String PollResponse)
+parsePollResponse :: Monad m => Handle m -> L8.ByteString -> m PollResponse
+parsePollResponse handle response = do
+  let logh = hLogger handle
+      -- decode JSON 
+      d = (eitherDecode response) :: Either String PollResponse
   case d of
     Left err -> do
-      BL.logError logh $ "Couldn't parse poll response: " ++ err
-      fail err --main = toTry `catchIOError` handler
+      Logger.logError logh $ "Couldn't parse poll response: " <> T.pack err
+      let server = Server "" "" 0
+      return $ PollResponse server
     Right ps -> do
-      BL.logDebug logh "Poll response was successfully parsed."
+      Logger.logDebug logh "Poll response was successfully parsed."
       return ps
 
 {-- | UpdateData parser --}
-parseUpdateData :: BL.Handle -> IO L8.ByteString -> IO UpdateData
-parseUpdateData logh response = do
-  -- decode JSON 
-  d <- (eitherDecode <$> response) :: IO (Either String UpdateData)
+parseUpdateData :: Monad m => Handle m -> L8.ByteString -> m UpdateData
+parseUpdateData handle response = do
+  let logh = hLogger handle
+      -- decode JSON 
+      d = (eitherDecode response) :: Either String UpdateData
   case d of
     Left err -> do
-      BL.logError logh $ "Couldn't parse UpdateData: " ++ err
+      Logger.logError logh $ "Couldn't parse UpdateData: " <> T.pack err
       return UpdateData {ts = "0", updates = []}
     Right ps -> do
-      BL.logDebug logh "UpdateData was successfully parsed."
+      Logger.logDebug logh "UpdateData was successfully parsed."
       return ps
   
 {-- | UploadUrlResponse parser --}
-parseUploadUrl :: BL.Handle -> IO L8.ByteString -> IO UploadUrlResponse
-parseUploadUrl logh response = do
-  -- decode JSON 
-  d <- (eitherDecode <$> response) :: IO (Either String UploadUrlResponse)
+parseUploadUrl :: Monad m => Handle m -> L8.ByteString -> m UploadUrlResponse
+parseUploadUrl handle response = do
+  let logh = hLogger handle
+      -- decode JSON 
+      d = (eitherDecode response) :: Either String UploadUrlResponse
   case d of
     Left err -> do
-      BL.logError logh $ "Couldn't parse UploadUrlResponse: " ++ err
+      Logger.logError logh $ "Couldn't parse UploadUrlResponse: " <> T.pack err
       return UploadUrlResponse {upUrlResponse_response = Nothing}
     Right ps -> do
-      BL.logDebug logh "UploadUrlResponse was successfully parsed."
+      Logger.logDebug logh "UploadUrlResponse was successfully parsed."
       return ps
 
 {-- | UploadFileResponse parser --}
-parseUploadFile :: BL.Handle -> IO L8.ByteString -> IO UploadFileResponse
-parseUploadFile logh response = do
-  -- decode JSON 
-  d <- (eitherDecode <$> response) :: IO (Either String UploadFileResponse)
+parseUploadFile :: Monad m => Handle m -> L8.ByteString -> m UploadFileResponse
+parseUploadFile handle response = do
+  let logh = hLogger handle
+      -- decode JSON 
+      d = (eitherDecode response) :: Either String UploadFileResponse
   case d of
     Left err -> do
-      BL.logError logh $ "Couldn't parse parseUploadFile: " ++ err
+      Logger.logError logh $ "Couldn't parse parseUploadFile: " <> T.pack err
       return UploadFileResponse {upFileResponse_file = Nothing}
     Right ps -> do
-      BL.logDebug logh "UploadFileResponse was successfully parsed."
+      Logger.logDebug logh "UploadFileResponse was successfully parsed."
       return ps
 
 {-- | UploadObjectResponse parser --}
-parseUploadObject :: BL.Handle -> IO L8.ByteString -> IO UploadObjectResponse
-parseUploadObject logh response = do
-  -- decode JSON 
-  d <- (eitherDecode <$> response) :: IO (Either String UploadObjectResponse)
+parseUploadObject :: Monad m => Handle m -> L8.ByteString -> m UploadObjectResponse
+parseUploadObject handle response = do
+  let logh = hLogger handle
+      -- decode JSON 
+      d = (eitherDecode response) :: Either String UploadObjectResponse
   case d of
     Left err -> do
-      BL.logError logh $ "Couldn't parse parseUploadObject: " ++ err
+      Logger.logError logh $ "Couldn't parse parseUploadObject: " <> T.pack err
       return UploadObjectResponse {upObjResponse_response = []}
     Right ps -> do
-      BL.logDebug logh "UploadObjectResponse was successfully parsed."
+      Logger.logDebug logh "UploadObjectResponse was successfully parsed."
       return ps

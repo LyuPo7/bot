@@ -2,7 +2,6 @@
 
 module Bot.Vk.Request.Data where
 
-import qualified Data.ByteString.Char8 as BC
 import qualified Web.FormUrlEncoded as Url
 
 import Data.Text (Text)
@@ -10,8 +9,10 @@ import GHC.Generics (Generic)
 import Data.Aeson (camelTo2)
 import Data.Aeson.Types (ToJSON(..), FromJSON(..), genericToJSON, defaultOptions, fieldLabelModifier, genericParseJSON)
 
+import Bot.Vk.Parser.Data
+
 -- | type for RequestOptions requests
-newtype VkRequest = VkRequest { getRequest :: BC.ByteString }
+newtype VkRequest = VkRequest { getRequest :: Text }
 
 data GetLongPollServer = GetLongPollServer {
     pollServer_groupId :: Integer, -- Id of bot group.
@@ -144,3 +145,38 @@ saveDoc = VkRequest "docs.save"
 
 createPoll :: VkRequest
 createPoll = VkRequest "polls.create"
+
+-- | Default methods for Requests
+getPollServer :: GroupID -> Token -> Version -> GetLongPollServer
+getPollServer groupId token vkVersion = GetLongPollServer { 
+  pollServer_groupId = groupId,
+  pollServer_accessToken = token,
+  pollServer_v = vkVersion
+}
+
+defaultMessage :: UserID -> Token -> Version -> SendMessage
+defaultMessage userId token vkVersion = SendMessage { 
+  sendMessag_accessToken = token,
+  sendMessag_userId = userId,
+  sendMessag_message = "",
+  sendMessag_v = vkVersion,
+  sendMessag_attachment = Nothing,
+  sendMessag_stickerId = Nothing,
+  sendMessag_lat = Nothing,
+  sendMessag_long = Nothing
+}
+
+getLink :: PeerId -> FileType -> Version -> Token -> GetUploadLink
+getLink peerId fileType vkVersion token = GetUploadLink {
+  getUplLink_peerId = peerId,
+  getUplLink_type = fileType,
+  getUplLink_v = vkVersion,
+  getUplLink_accessToken = token
+}
+
+saveNewDoc :: FilePathT -> Token -> Version -> SaveDoc
+saveNewDoc file token vkVersion = SaveDoc {
+  saveDocSer_file = file,
+  saveDocSer_accessToken = token,
+  saveDocSer_v = vkVersion
+}
