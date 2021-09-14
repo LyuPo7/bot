@@ -7,34 +7,33 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  stack:
+    name: stack / ghc ${{ matrix.ghc }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        stack: ["2.7.1"]
+        ghc: ["8.10.4"]
 
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-haskell@v1
-      with:
-        ghc-version: '8.10.4'
-        cabal-version: '3.2'
+      if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
-    - name: Cache
-      uses: actions/cache@v1
-      env:
-        cache-name: cache-cabal
+    - uses: haskell/actions/setup@v1
+      name: Setup Haskell Stack
       with:
-        path: ~/.cabal
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+        ghc-version: ${{ matrix.ghc }}
+        stack-version: ${{ matrix.stack }}
 
-    - name: Install dependencies
-      run: |
-        cabal update
-        cabal build --only-dependencies --enable-tests --enable-benchmarks
+    - uses: actions/cache@v1
+      name: Cache ~/.stack
+      with:
+        path: ~/.stack
+        key: ${{ runner.os }}-${{ matrix.ghc }}-stack
+
     - name: Build
-      run: cabal build --enable-tests --enable-benchmarks all
-    - name: Run tests
-      run: cabal test all
+      run: |
+        stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks
+    - name: Test
+      run: |
+        stack test --system-ghc

@@ -6,8 +6,8 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Hedgehog (Gen, Property, property, (===), forAll)
 
-import qualified Hedgehog.Gen       as Gen
-import qualified Hedgehog.Range     as Range
+import qualified Hedgehog.Gen as Gen
+import qualified Hedgehog.Range as Range
 
 import Bot.Config
 import qualified Bot.Logger as Logger
