@@ -4,21 +4,22 @@ module Bot.Tele.Request.Requests where
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as L8
-
-import Data.Text (Text, unpack, pack, concat)
+import qualified Control.Exception as Exc
+import qualified Data.Text as T
+import Data.Text (Text)
 import GHC.Generics ()
 import Data.Aeson (encode)
 import Network.HTTP.Client (newManager, parseRequest, httpLbs, responseStatus, responseBody, RequestBody(..), Request(..))
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types.Status (statusCode)
-import qualified Control.Exception as Exc
 
 import qualified Bot.Exception as E
-import Bot.Tele.Request.RequestsSpec (Handle(..))
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
+import Bot.Tele.Request.RequestsSpec (Handle(..))
 import Bot.Tele.Request.Data
 import Bot.Tele.Parser.Data
+import Bot.Util (convert)
 
 withHandleIO :: Logger.Handle IO-> Settings.Config -> (Handle IO -> IO a) -> IO a
 withHandleIO logger config f = do
@@ -33,9 +34,9 @@ makeRequest handle teleRequest options = do
       token = Settings.botToken config
       hostApi = Settings.getHost Settings.apiTele
       methodApi = getRequest teleRequest
-      api = Data.Text.concat [hostApi, token, methodApi]
+      api = T.concat [hostApi, token, methodApi]
   manager <- newManager tlsManagerSettings
-  initialRequest <- parseRequest $ unpack api
+  initialRequest <- parseRequest $ T.unpack api
   let request = initialRequest { 
     method = "POST",
     requestBody = RequestBodyLBS $ encode options,
@@ -102,6 +103,3 @@ sendQueryNumber handle chatId question = do
       query = createQueryMessage chatId question markupIn
   Logger.logInfo logh $ "Question was sended to chat with id: " <> convert chatId
   makeRequest handle sendMessage query
-
-convert :: Show a => a -> Text
-convert = pack . show

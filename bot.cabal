@@ -39,6 +39,7 @@ library
       Bot.Tele.Request.RequestsSpec
       Bot.Tele.Run
       Bot.Tele.RunSpec
+      Bot.Util
       Bot.Vk.Parser.Data
       Bot.Vk.Parser.Parser
       Bot.Vk.Parser.ParserSpec

@@ -2,12 +2,13 @@
 
 module Bot.Settings where
 
-import Data.Text (Text, pack)
+import qualified Data.Aeson.Types as A
+import Data.Text (Text)
 import GHC.Generics (Generic)
+import Data.Aeson.Types (ToJSON, FromJSON)
 import Data.Aeson (camelTo2, parseJSON, toJSON)
-import Data.Aeson.Types (ToJSON, FromJSON, genericToJSON, defaultOptions, fieldLabelModifier, genericParseJSON)
 
-import Bot.Tele.Request.Data ()
+import Bot.Tele.Request.Data()
 
 -- | Bot Config Settings
 data Config = Config {
@@ -20,12 +21,12 @@ data Config = Config {
 } deriving (Show, Generic, Eq)
 
 instance FromJSON Config where
-  parseJSON = genericParseJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' }
+  parseJSON = A.genericParseJSON A.defaultOptions {
+    A.fieldLabelModifier = camelTo2 '_' }
 
 instance ToJSON Config where
-  toJSON = genericToJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' }
+  toJSON = A.genericToJSON A.defaultOptions {
+    A.fieldLabelModifier = camelTo2 '_' }
 
 -- | Types for Settings
 -- | Host
@@ -33,14 +34,14 @@ newtype Host = Host { getHost :: Text }
 
 -- | Bot commands
 startMessage, helpMessage, repeatMessage :: Text
-startMessage = pack "/start" -- initialize chat with new User;
-helpMessage = pack "/help"   -- request bot description;
-repeatMessage = pack "/repeat" -- request for change reply number;
+startMessage = "/start" -- initialize chat with new User;
+helpMessage = "/help"   -- request bot description;
+repeatMessage = "/repeat" -- request for change reply number;
 
 -- | Bot modes
 reply, answer :: Text
-reply = pack "reply" -- in this mode: Bot replies for every User's message;
-answer = pack "answer" -- in this mode: Bot tries to recieve new reply number from User;
+reply = "reply" -- in this mode: Bot replies for every User's message;
+answer = "answer" -- in this mode: Bot tries to recieve new reply number from User;
 
 -- | Api host
 apiTele, apiVk :: Host
@@ -49,7 +50,7 @@ apiVk = Host "https://api.vk.com/method/"
 
 -- | Api version
 vkVersion :: Text
-vkVersion = pack "5.80"
+vkVersion = "5.80"
 
 -- | Config file
 configFile :: FilePath

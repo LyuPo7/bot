@@ -3,18 +3,15 @@
 module Bot.Logger where
 
 import Prelude hiding (log)
-import qualified System.IO 
+import qualified System.IO as SIO
 import qualified Data.Text as T
+import qualified Data.Aeson as A
 import GHC.Generics (Generic)
 import Data.Text (Text)
-import TextShow
-import Control.Monad (when)
-import System.IO (hPutStrLn)
 import Data.Aeson.Types (FromJSON)
-import Data.Aeson (withText, parseJSON)
-import qualified Data.Aeson as A
+import TextShow (TextShow, showb, showt)
+import Control.Monad (when)
 import Data.Time (defaultTimeLocale, formatTime, getZonedTime)
--- import Control.Exception (bracket)
 
 -- | Types
 data Level
@@ -37,7 +34,7 @@ instance TextShow Level where
   showb Error = "[ERROR]"
 
 instance FromJSON Level where
-  parseJSON = withText "Config Logger" $ \t ->
+  parseJSON = A.withText "Config Logger" $ \t ->
     case t of
       "debug"   -> pure Debug
       "info"    -> pure Info
@@ -82,7 +79,7 @@ newHandleIO config = do
     }
 
 {-- | create Handle File --}
-newHandleIOF :: Config -> System.IO.Handle -> Handle IO
+newHandleIOF :: Config -> SIO.Handle -> Handle IO
 newHandleIOF config hFile = do
     let globalLevel = Debug
     Handle {
@@ -91,7 +88,7 @@ newHandleIOF config hFile = do
             when (level logMes >= globalLevel) $ do
                 let levelMes = level logMes
                 currentTime <- getTime
-                hPutStrLn hFile $ T.unpack ((renderColor levelMes <> showt levelMes <> resetColor) <> " | " <> currentTime <> " | " <> str)
+                SIO.hPutStrLn hFile $ T.unpack ((renderColor levelMes <> showt levelMes <> resetColor) <> " | " <> currentTime <> " | " <> str)
     }
   
 logDebug, logInfo, logWarning, logError :: Handle m -> Text -> m ()

@@ -2,10 +2,11 @@
 
 module Bot.Tele.Parser.Data where
 
+import qualified Data.Aeson.Types as A
+import Data.Aeson.Types (ToJSON(..), FromJSON(..))
+import Data.Aeson (camelTo2)
 import Data.Text (Text)
 import GHC.Generics (Generic)
-import Data.Aeson (camelTo2)
-import Data.Aeson.Types (ToJSON(..), FromJSON(..), genericToJSON, defaultOptions, fieldLabelModifier, genericParseJSON)
 
 -- Synonims
 type Status = Bool -- Responce status.
@@ -21,12 +22,12 @@ data Chat = Chat {
   } deriving (Show, Read, Eq, Generic) 
 
 instance FromJSON Chat where
-  parseJSON = genericParseJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' . drop 5 }
+  parseJSON = A.genericParseJSON A.defaultOptions {
+    A.fieldLabelModifier = camelTo2 '_' . drop 5 }
 
 instance ToJSON Chat where
-  toJSON = genericToJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' . drop 5 }
+  toJSON = A.genericToJSON A.defaultOptions {
+    A.fieldLabelModifier = camelTo2 '_' . drop 5 }
 
 -- | Message
 data Message = Message {
@@ -37,12 +38,12 @@ data Message = Message {
   } deriving (Show, Read, Eq, Generic)
 
 instance FromJSON Message where
-  parseJSON = genericParseJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' . drop 8 }
+  parseJSON = A.genericParseJSON A.defaultOptions {
+    A.fieldLabelModifier = camelTo2 '_' . drop 8 }
 
 instance ToJSON Message where
-  toJSON = genericToJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' . drop 8 }
+  toJSON = A.genericToJSON A.defaultOptions {
+    A.fieldLabelModifier = camelTo2 '_' . drop 8 }
 
 -- | MessageEntity
 data MessageEntity = MessageEntity {
@@ -50,12 +51,12 @@ data MessageEntity = MessageEntity {
   } deriving (Show, Read, Eq, Generic)
 
 instance FromJSON MessageEntity where
-  parseJSON = genericParseJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' . drop 11 }
+  parseJSON = A.genericParseJSON A.defaultOptions {
+    A.fieldLabelModifier = camelTo2 '_' . drop 11 }
 
 instance ToJSON MessageEntity where
-  toJSON = genericToJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' . drop 11 }
+  toJSON = A.genericToJSON A.defaultOptions {
+    A.fieldLabelModifier = camelTo2 '_' . drop 11 }
 
 -- | Update
 data Update = Update {
@@ -64,12 +65,12 @@ data Update = Update {
 } deriving (Show, Read, Eq, Generic)
 
 instance FromJSON Update where
-  parseJSON = genericParseJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' . drop 7 }
+  parseJSON = A.genericParseJSON A.defaultOptions {
+    A.fieldLabelModifier = camelTo2 '_' . drop 7 }
 
 instance ToJSON Update where
-  toJSON = genericToJSON defaultOptions {
-    fieldLabelModifier = camelTo2 '_' . drop 7 }
+  toJSON = A.genericToJSON A.defaultOptions {
+    A.fieldLabelModifier = camelTo2 '_' . drop 7 }
 
 -- | UpdateData
 data UpdateData = UpdateData {

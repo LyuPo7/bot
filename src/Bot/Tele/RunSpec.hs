@@ -3,8 +3,9 @@
 module Bot.Tele.RunSpec where
 
 import qualified Data.ByteString.Lazy.Char8 as L8
+import qualified Data.Text as T
+import Data.Text (Text)
 import Data.Maybe (fromMaybe)
-import Data.Text (Text, unpack, pack)
 import Text.Read (readMaybe)
 
 import qualified Bot.Logger as Logger
@@ -13,6 +14,7 @@ import qualified Bot.DB.DBSpec as DB
 import qualified Bot.Tele.Request.RequestsSpec as Req
 import qualified Bot.Tele.Parser.ParserSpec as Parser
 import Bot.Tele.Parser.Data
+import Bot.Util (convert)
 
 data Handle m = Handle {
     hLogger :: Logger.Handle m,
@@ -136,7 +138,7 @@ answerMode handle message = do
   let logh = hLogger handle
       messageId = message_messageId message
       chatId = chat_id $ message_chat message -- Extract chat_id from Message
-      messageText = unpack $ fromMaybe "" $ message_text message -- Extract text from Message
+      messageText = T.unpack $ fromMaybe "" $ message_text message -- Extract text from Message
   setMode handle chatId Settings.reply
   case (readMaybe messageText :: Maybe Integer) of -- Trying parse answer
     Just repNum -> do
@@ -146,6 +148,3 @@ answerMode handle message = do
     Nothing -> do
       Logger.logError logh "Couldn't parse User's answer!"
       return Nothing
-
-convert :: Show a => a -> Text
-convert = pack . show

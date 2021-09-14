@@ -2,9 +2,9 @@
 
 module Bot.Tele.Parser.Parser where
 
+import qualified Data.Text as T
 import Data.ByteString.Lazy.Char8 (ByteString)
 import Data.Aeson (eitherDecode)
-import qualified Data.Text as T
 
 import Bot.Tele.Parser.ParserSpec (Handle(..))
 import qualified Bot.Logger as Logger
@@ -28,4 +28,3 @@ parseUpdateData handle response = do
     Right ps -> do
       Logger.logDebug logh "UpdateData was successfully parsed."
       return ps
-

@@ -4,8 +4,8 @@ module Bot.Config where
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.Aeson as A
-import GHC.Generics (Generic)
 import qualified Control.Exception as Exc
+import GHC.Generics (Generic)
 
 import qualified Bot.Exception as E
 import qualified Bot.Settings as Settings
