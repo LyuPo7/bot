@@ -12,7 +12,7 @@ import qualified Bot.Tele.Parser.ParserSpec as ParserSpec
 import qualified Bot.Tele.Parser.Data as DParser
 
 import Test.Tasty.Hspec hiding (Spec)
-import Test.Hspec (Spec)
+import Test.Hspec
 
 spec_parseUpdateData :: B.ByteString -> B.ByteString -> B.ByteString -> Spec
 spec_parseUpdateData obj bstr bstrFail = describe "Testing update parse for telegram bot" $ do
