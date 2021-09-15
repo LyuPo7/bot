@@ -2,10 +2,7 @@
 
 module TestBot.Config where
 
-import Data.Text (Text)
-import qualified Data.Text as T
 import Hedgehog (Gen, Property, property, (===), forAll)
-
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
@@ -28,7 +25,7 @@ genValidLogConfig = Logger.Config
 genValidSetConfig :: Gen Settings.Config
 genValidSetConfig = Settings.Config
   <$> Gen.element ["vk", "telegram"]
-  <*> (convert <$> (Gen.string (Range.constant 10 15) Gen.ascii))
+  <*> Gen.text (Range.constant 10 15) Gen.ascii
   <*> (toInteger <$> (Gen.int (Range.constant 1 5)))
   <*> Gen.element ["Reps?"]
   <*> Gen.element ["Bot!"]
@@ -38,6 +35,3 @@ genValidConfig :: Gen Config
 genValidConfig = Config
   <$> genValidSetConfig
   <*> genValidLogConfig
-
-convert :: Show a => a -> Text
-convert = T.pack . show

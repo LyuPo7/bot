@@ -25,13 +25,13 @@ type FilePathT = Text
 data UpdateData = UpdateData {
   ts :: Text, -- Time stamp.
   updates :: [Update] -- Array of Updates.
-} deriving (Show, Generic, FromJSON, ToJSON)
+} deriving (Show, Read, Eq, Generic, FromJSON, ToJSON)
 
 -- | Update
 data Update = Update {
   update_type :: Text, -- Update type: "new_message", "reply_message", ... .
   update_object :: Message -- Message of Update.
- } deriving (Show,Generic)
+ } deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Update where
   parseJSON = genericParseJSON defaultOptions {
@@ -44,7 +44,7 @@ instance ToJSON Update where
 -- | Users
 data Users = Users {
   user_id :: UserID -- user ID.
-  } deriving (Show,Generic)
+  } deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Users where
   parseJSON = genericParseJSON defaultOptions {
@@ -62,7 +62,7 @@ data Message = Message {
   message_geo :: Maybe Geo, -- Information about location.  
   message_attachments :: Maybe [Attachment], -- Array of media-attachments.
   message_fwdMessages :: Maybe [Message] -- Array of forwarded messages (if any).
-  } deriving (Show,Generic)
+  } deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Message where
   parseJSON = genericParseJSON defaultOptions {
@@ -75,7 +75,7 @@ instance ToJSON Message where
 -- | Geo
 data Geo = Geo {
   geo_coordinates :: Text -- location coordinates.
-  } deriving (Show,Generic)
+  } deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Geo where
   parseJSON = genericParseJSON defaultOptions {
@@ -99,7 +99,7 @@ data Attachment = Attachment {
     attach_wallComment :: Maybe WallReply, -- Attached Wall comment.
     attach_sticker :: Maybe Sticker, -- Attached Sticker.
     attach_gift :: Maybe Gift -- Attached Gift.
-} deriving (Show,Generic)
+} deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Attachment where
   parseJSON = genericParseJSON defaultOptions {
@@ -114,7 +114,7 @@ data Photo = Photo {
   photo_id :: Integer, -- Photo ID.
   photo_ownerId :: Integer, -- Photo owner ID.
   photo_accessKey :: Text -- Field is returned with objects which could have specific privacy settings. 
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Photo where
   parseJSON = genericParseJSON defaultOptions {
@@ -129,7 +129,7 @@ data Video = Video {
   video_id :: Integer, -- Video ID.
   video_ownerId :: Integer, -- ID of the user or community that owns the video.
   video_accessKey :: Text -- Field is returned with objects which could have specific privacy settings. 
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Video where
   parseJSON = genericParseJSON defaultOptions {
@@ -143,7 +143,7 @@ instance ToJSON Video where
 data Audio = Audio {
   audio_id :: Integer, -- Audio ID.
   audio_ownerId :: Integer -- Audio owner ID.
-  } deriving (Show,Generic)
+  } deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Audio where
   parseJSON = genericParseJSON defaultOptions {
@@ -160,7 +160,7 @@ data Document = Document {
   document_title :: Text, -- Document title.
   document_url :: Text, -- Link to file. Note that links are bound to an IP address.
   document_accessKey :: Text -- Field is returned with objects which could have specific privacy settings. 
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Document where
   parseJSON = genericParseJSON defaultOptions {
@@ -172,8 +172,8 @@ instance ToJSON Document where
 
 -- | Link
 data Link = Link {
-  link_url :: Integer -- Link URL.
-  } deriving (Show,Generic) 
+  link_url :: Text -- Link URL.
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Link where
   parseJSON = genericParseJSON defaultOptions {
@@ -187,7 +187,7 @@ instance ToJSON Link where
 data Market = Market {
   market_id :: Integer, -- Market ID.
   market_ownerId :: Integer -- Market owner ID.
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Market where
   parseJSON = genericParseJSON defaultOptions {
@@ -201,7 +201,7 @@ instance ToJSON Market where
 data MarketAlbum = MarketAlbum {
   marketAl_id :: Integer, -- Market Collection ID.
   marketAl_ownerId :: Integer -- Market Collection owner ID.
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON MarketAlbum where
   parseJSON = genericParseJSON defaultOptions {
@@ -215,7 +215,7 @@ instance ToJSON MarketAlbum where
 data Wall = Wall {
   wall_id :: Integer, -- Wall ID.
   wall_ownerId :: Integer -- Wall owner ID.
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Wall where
   parseJSON = genericParseJSON defaultOptions {
@@ -229,7 +229,7 @@ instance ToJSON Wall where
 data WallReply = WallReply {
   wallRep_id :: Integer, -- Comment ID. 
   wallRep_ownerId :: Integer -- Comment author ID. 
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON WallReply where
   parseJSON = genericParseJSON defaultOptions {
@@ -242,7 +242,7 @@ instance ToJSON WallReply where
 -- | Sticker
 newtype Sticker = Sticker {
   sticker_id :: Integer -- Sticker ID. 
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Sticker where
   parseJSON = genericParseJSON defaultOptions {
@@ -255,7 +255,7 @@ instance ToJSON Sticker where
 -- | Gift
 newtype Gift = Gift {
   gift_id :: Integer -- Gift ID. 
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Gift where
   parseJSON = genericParseJSON defaultOptions {
@@ -270,7 +270,7 @@ data Server = Server {
   server_key :: Text, -- Key for requests.
   server_server :: Text, -- Requests server.
   server_ts :: Integer  -- Server time stamp.
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Server where
   parseJSON = genericParseJSON defaultOptions {
@@ -283,7 +283,7 @@ instance ToJSON Server where
 -- | PollResponse
 newtype PollResponse = PollResponse {
   pollResponse_response :: Server -- Server.
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON PollResponse where
   parseJSON = genericParseJSON defaultOptions {
@@ -296,7 +296,7 @@ instance ToJSON PollResponse where
 -- | UploadUrlResponse
 newtype UploadUrlResponse = UploadUrlResponse {
   upUrlResponse_response :: Maybe UploadUrl -- Url for uploading resource.
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON UploadUrlResponse where
   parseJSON = genericParseJSON defaultOptions {
@@ -309,7 +309,7 @@ instance ToJSON UploadUrlResponse where
 -- | UploadUrl
 newtype UploadUrl = UploadUrl {
   upUrl_uploadUrl :: Text -- Url.
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON UploadUrl where
   parseJSON = genericParseJSON defaultOptions {
@@ -321,8 +321,8 @@ instance ToJSON UploadUrl where
   
 -- | UploadFileResponse
 newtype UploadFileResponse = UploadFileResponse {
-  upFileResponse_file :: Maybe Text -- Uploade file responce
-  } deriving (Show,Generic) 
+  upFileResponse_file :: Maybe Text -- Uploade file response
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON UploadFileResponse where
   parseJSON = genericParseJSON defaultOptions {
@@ -335,7 +335,7 @@ instance ToJSON UploadFileResponse where
 -- | UploadObjectResponse
 newtype UploadObjectResponse = UploadObjectResponse {
   upObjResponse_response :: [UploadObject] -- Upload objects.
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON UploadObjectResponse where
   parseJSON = genericParseJSON defaultOptions {
@@ -350,7 +350,7 @@ data UploadObject = UploadObject {
   upObj_id :: Integer, -- Object ID.
   upObj_ownerId :: Integer, -- Object owner ID.
   upObj_url :: Text -- Link to Object. Note that links are bound to an IP address.
-  } deriving (Show,Generic) 
+  } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON UploadObject where
   parseJSON = genericParseJSON defaultOptions {
@@ -365,7 +365,7 @@ data Keyboard = Keyboard {
   keyboard_oneTime :: Maybe Bool, -- Hides the keyboard after the initial use.
   keyboard_buttons :: [[Button]], -- An array of button arrays.
   keyboard_inline :: Maybe Bool -- Shows the keyboard inside the message.(In this case, one_time parameter is not supported)
-} deriving (Show,Generic)
+} deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Keyboard where
   parseJSON = genericParseJSON defaultOptions {
@@ -379,7 +379,7 @@ instance ToJSON Keyboard where
 data Button = Button {
   button_action :: Action, -- An object that describes the type of action and its parameters.
   button_color :: Maybe Text -- Button color. This parameter is used only for buttons with the text type <- [primary,secondary,negative,positive]
-} deriving (Show,Generic)
+} deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Button where
   parseJSON = genericParseJSON defaultOptions {
@@ -394,7 +394,7 @@ data Action = Action {
   action_type :: Text, -- "callback", "text", ... .
   action_label :: Text, -- Button text. It is sent by the user to the chat after pressing
   action_payload :: Text -- Additional information. It is returned in the messages_new event inside the payload property.
-} deriving (Show,Generic)
+} deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Action where
   parseJSON = genericParseJSON defaultOptions {
@@ -407,4 +407,4 @@ instance ToJSON Action where
 -- | KeyboardData
 newtype KeyboardData = KeyboardData {
   keyboard :: Maybe Keyboard -- Keyboard responce.
-} deriving (Show, Generic, FromJSON, ToJSON)
+} deriving (Show, Read, Eq, Generic, FromJSON, ToJSON)

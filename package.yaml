@@ -79,7 +79,7 @@ tests:
   bot-test:
     main:                Test.hs
     source-dirs:         test
-    other-modules: [TestBot.Tele.Parser, TestBot.Config, TestBot.Tele.Run]
+    other-modules: [TestBot.Tele.Parser, TestBot.Config, TestBot.Tele.Run, TestBot.Vk.Parser]
     ghc-options:
     - -Wall 
     - -Werror 

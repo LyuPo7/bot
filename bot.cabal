@@ -65,6 +65,7 @@ library
     , containers
     , data-default
     , directory
+    , exceptions
     , hformat
     , hspec
     , http-api-data
@@ -99,6 +100,7 @@ executable bot-exe
     , containers
     , data-default
     , directory
+    , exceptions
     , hformat
     , hspec
     , http-api-data
@@ -123,6 +125,7 @@ test-suite bot-test
       TestBot.Tele.Parser
       TestBot.Config
       TestBot.Tele.Run
+      TestBot.Vk.Parser
   hs-source-dirs:
       test
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
@@ -136,6 +139,7 @@ test-suite bot-test
     , containers
     , data-default
     , directory
+    , exceptions
     , hedgehog >=0.5 && <1.1
     , hformat
     , hspec

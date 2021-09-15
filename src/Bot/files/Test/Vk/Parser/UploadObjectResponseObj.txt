@@ -1,0 +1,1 @@
+UploadObjectResponse {upObjResponse_response = [UploadObject {upObj_id = 123, upObj_ownerId = 12321, upObj_url = "https://lp.vk.com/link/12gh56"},UploadObject {upObj_id = 555, upObj_ownerId = 909089, upObj_url = "https://lp.vk.com/link/ad1f2ghjk"}]}

@@ -1,0 +1,1 @@
+UploadFileResponse {upFileResponse_file = Just "testFile"}
