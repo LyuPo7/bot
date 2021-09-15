@@ -103,3 +103,11 @@ sendQueryNumber handle chatId question = do
       query = createQueryMessage chatId question markupIn
   Logger.logInfo logh $ "Question was sended to chat with id: " <> convert chatId
   makeRequest handle sendMessage query
+
+{-- | St Bot Commands "/help", "/repeat--}
+setCommands :: Handle IO -> IO ()
+setCommands handle = do
+  let logh = hLogger handle
+      commands = createBotCommands
+  _ <- makeRequest handle setBotCommands commands
+  Logger.logInfo logh "Bot commands: '/help', '/repeat' were created."

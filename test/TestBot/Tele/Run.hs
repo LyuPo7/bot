@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TestBot.Run where
+module TestBot.Tele.Run where
 
 import Control.Monad.Identity
 import qualified Data.ByteString.Lazy.Char8 as L8
@@ -173,7 +173,8 @@ handle = Handle {
     sendTextMessage = \_ _ -> return (),
     sendEchoMessage = \_ _ -> return (),
     sendNEchoMessage = \_ _ _ -> return (),
-    sendQueryNumber = \_ _ -> return (L8.pack "5")
+    sendQueryNumber = \_ _ -> return (L8.pack "5"),
+    setCommands = return ()
 }
   
 

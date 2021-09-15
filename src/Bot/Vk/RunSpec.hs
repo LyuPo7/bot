@@ -7,11 +7,14 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import Data.Char (isDigit)
 import Data.Maybe (fromMaybe)
 import Data.Text (Text, unpack, pack)
+import Control.Monad.Catch (MonadThrow, throwM)
 
+import qualified Bot.Exception as E
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
 import qualified Bot.DB.DBSpec as DB
 import qualified Bot.Vk.Request.RequestsSpec as Req
+import qualified Bot.Vk.Request.AttachSpec as Attach
 import qualified Bot.Vk.Parser.ParserSpec as Parser
 import Bot.Vk.Parser.Data
 
@@ -21,8 +24,9 @@ data Handle m = Handle {
     hDb :: DB.Handle m,
     hReq :: Req.Handle m,
     hParser :: Parser.Handle m,
+    hAttach :: Attach.Handle m,
     
-    parsePollResponse :: L8.ByteString -> m PollResponse,
+    parsePollResponse :: L8.ByteString -> m (Either String PollResponse),
     parseUpdateData :: L8.ByteString -> m UpdateData,
     parseUploadUrl :: L8.ByteString -> m UploadUrlResponse,
     parseUploadFile :: L8.ByteString -> m UploadFileResponse,
@@ -44,15 +48,18 @@ data Handle m = Handle {
 }
 
 {-- | run Vk bot --}
-run :: Monad m => Handle m -> m ()
+run :: (MonadThrow m, Monad m) => Handle m -> m ()
 run handle = do
   let logh = hLogger handle
   Logger.logInfo logh "Bot api: vk"
   -- Connect to DB
   serverUp <- getServer handle
-  params <- parsePollResponse handle serverUp
-  let serverParams = pollResponse_response params
-  checkMode handle serverParams
+  serverE <- parsePollResponse handle serverUp
+  case serverE of
+    Left msg -> throwM $ E.ParseRequestError msg
+    Right params -> do
+      let serverParams = pollResponse_response params
+      checkMode handle serverParams
 
 checkMode :: Monad m => Handle m -> Server -> m ()
 checkMode handle serverParams = do
@@ -60,12 +67,12 @@ checkMode handle serverParams = do
       -- Extract server 
       server = server_server serverParams
       key = server_key serverParams
-  -- let ts = server_ts serverParams
+      tsCurrent = server_ts serverParams
   -- Get last successfully processed update from DB
   processedUpdId <- getLastSucUpdate handle
   -- Get updates from bot
   let newUpdId = fmap (+1) processedUpdId
-      tsDb = fromMaybe 0 newUpdId
+      tsDb = fromMaybe tsCurrent newUpdId
   Logger.logInfo logh ("Work with update: " <> convert tsDb)
   responseUp <- getUpdate handle server key tsDb
   updateData <- parseUpdateData handle responseUp
@@ -75,7 +82,7 @@ checkMode handle serverParams = do
     [] -> do
       Logger.logWarning logh "Where are no more updates for now!"
       Logger.logInfo logh "Waiting updates!"
-      checkMode handle serverParams
+      checkMode handle serverParams {server_ts = tsDb - 1}
     (x:_) -> do
       let updateType = update_type x -- Extract update_type from Update
           message = update_object x -- Extract Message from Update

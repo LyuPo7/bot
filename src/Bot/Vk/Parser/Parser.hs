@@ -9,7 +9,7 @@ import System.IO.Error ()
 
 import Bot.Vk.Parser.ParserSpec (Handle(..))
 import qualified Bot.Logger as Logger
-import Bot.Vk.Parser.Data (Server(..), PollResponse(..), UpdateData(..), UploadUrlResponse(..), UploadFileResponse(..), UploadObjectResponse(..))
+import Bot.Vk.Parser.Data (PollResponse(..), UpdateData(..), UploadUrlResponse(..), UploadFileResponse(..), UploadObjectResponse(..))
 
 withHandleIO :: Logger.Handle IO -> (Handle IO -> IO a) -> IO a
 withHandleIO logger f = do
@@ -17,7 +17,7 @@ withHandleIO logger f = do
   f handle
 
 {-- | PollResponse parser --}
-parsePollResponse :: Monad m => Handle m -> L8.ByteString -> m PollResponse
+parsePollResponse :: Monad m => Handle m -> L8.ByteString -> m (Either String PollResponse)
 parsePollResponse handle response = do
   let logh = hLogger handle
       -- decode JSON 
@@ -25,11 +25,10 @@ parsePollResponse handle response = do
   case d of
     Left err -> do
       Logger.logError logh $ "Couldn't parse poll response: " <> T.pack err
-      let server = Server "" "" 0
-      return $ PollResponse server
-    Right ps -> do
+      return d
+    Right _ -> do
       Logger.logDebug logh "Poll response was successfully parsed."
-      return ps
+      return d
 
 {-- | UpdateData parser --}
 parseUpdateData :: Monad m => Handle m -> L8.ByteString -> m UpdateData

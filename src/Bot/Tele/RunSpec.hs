@@ -36,7 +36,8 @@ data Handle m = Handle {
     sendTextMessage :: ChatID -> Text -> m (),
     sendEchoMessage :: ChatID -> MessageID -> m (),
     sendNEchoMessage :: ChatID -> MessageID -> RepNum -> m (),
-    sendQueryNumber :: ChatID -> Text -> m L8.ByteString
+    sendQueryNumber :: ChatID -> Text -> m L8.ByteString,
+    setCommands :: m ()
 }
 
 {-- | run Tele bot --}
@@ -44,6 +45,8 @@ run :: Monad m => Handle m -> m ()
 run handle = do
   let logh = hLogger handle
   Logger.logInfo logh "Bot api: telegram"
+  -- Set ommands for bot
+  setCommands handle
   -- Getting updates
   _ <- checkMode handle
   return ()

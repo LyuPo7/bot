@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TestBot.Parser where
+module TestBot.Tele.Parser where
 
 import Control.Monad.Identity
 import qualified Data.ByteString.Lazy as B

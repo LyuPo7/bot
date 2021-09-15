@@ -50,10 +50,10 @@ apiVk = Host "https://api.vk.com/method/"
 
 -- | Api version
 vkVersion :: Text
-vkVersion = "5.80"
+vkVersion = "5.81"
 
 -- | Config file
 configFile :: FilePath
-configFile = "src/Bot/files/confighier_tele.json"
---configFile = "src/Bot/files/confighier_vvk.json"
--- configFile = "src/Bot/files/confighier_vk.json"
+--configFile = "src/Bot/files/confighier_tele.json"
+configFile = "src/Bot/files/confighier_vk.json"
+-- configFile = "src/Bot/files/confighier_vvk.json"

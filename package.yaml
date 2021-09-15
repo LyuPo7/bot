@@ -43,6 +43,7 @@ dependencies:
 - text-show
 - utf8-string
 - hspec
+- exceptions
 
 library:
   source-dirs: src
@@ -78,7 +79,7 @@ tests:
   bot-test:
     main:                Test.hs
     source-dirs:         test
-    other-modules: [TestBot.Parser, TestBot.Config, TestBot.Run]
+    other-modules: [TestBot.Tele.Parser, TestBot.Config, TestBot.Tele.Run]
     ghc-options:
     - -Wall 
     - -Werror 

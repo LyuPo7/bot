@@ -170,3 +170,27 @@ createKeyboard buttons = InlineKeyboardMarkup {
   inlineMarkup_oneTimeKeyboard = Just True,
   inlineMarkup_resizeKeyboard = Just True
 }
+
+helpBotCommand :: BotCommand
+helpBotCommand = BotCommand {
+  botCom_command = "/help",
+  botCom_description = "Info message"
+}
+
+repBotCommand :: BotCommand
+repBotCommand = BotCommand {
+  botCom_command = "/repeat",
+  botCom_description = "Repeat settings"
+}
+
+defaultBotCommandScope :: BotCommandScope
+defaultBotCommandScope = BotCommandScopeDefault {
+  scopeDefault_type = "default"
+}
+
+createBotCommands :: RequestOptions
+createBotCommands = SetBotCommands {
+  setComm_commands = [helpBotCommand, repBotCommand],
+  setComm_scope = Just defaultBotCommandScope,
+  setComm_languageCode = Just ""
+}

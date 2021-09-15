@@ -34,6 +34,7 @@ withHandleIO logger config dbh reqh parserh f = do
     sendTextMessage = \chatId text -> Req.sendTextMessage reqh chatId text,
     sendEchoMessage = \chatId messageId -> Req.sendEchoMessage reqh chatId messageId,
     sendNEchoMessage = \chatId messageId repNum -> Req.sendNEchoMessage reqh chatId messageId repNum,
-    sendQueryNumber = \chatId text -> Req.sendQueryNumber reqh chatId text
+    sendQueryNumber = \chatId text -> Req.sendQueryNumber reqh chatId text,
+    setCommands = Req.setCommands reqh
   }
   f handle

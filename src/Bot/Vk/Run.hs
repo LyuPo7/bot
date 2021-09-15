@@ -9,17 +9,19 @@ import qualified Bot.Vk.Request.Requests as Req
 import qualified Bot.Vk.Parser.Parser as Parser
 import qualified Bot.DB.DBSpec as DBSpec
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
+import qualified Bot.Vk.Request.AttachSpec as AttachSpec
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import Bot.Vk.RunSpec (Handle(..))
 
-withHandleIO :: Logger.Handle IO -> Settings.Config -> DBSpec.Handle IO -> ReqSpec.Handle IO -> ParserSpec.Handle IO -> (Handle IO -> IO a) -> IO a
-withHandleIO logger config dbh reqh parserh f = do
+withHandleIO :: Logger.Handle IO -> Settings.Config -> DBSpec.Handle IO -> ReqSpec.Handle IO -> ParserSpec.Handle IO -> AttachSpec.Handle IO -> (Handle IO -> IO a) -> IO a
+withHandleIO logger config dbh reqh parserh attachh f = do
   let handle = Handle {
     hLogger = logger,
     cRun = config,
     hDb = dbh,
     hReq = reqh,
     hParser = parserh,
+    hAttach = attachh,
     
     parseUpdateData = \bstr -> Parser.parseUpdateData parserh bstr,
     parsePollResponse = \bstr -> Parser.parsePollResponse parserh bstr,
@@ -37,8 +39,9 @@ withHandleIO logger config dbh reqh parserh f = do
     sendNEchoMessage = \userId text mAtts mGeo repNum -> Req.sendNEchoMessage reqh userId text mAtts mGeo repNum,
     sendRepeatMessage = \userId -> Req.sendRepeatMessage reqh userId,
     sendHelpMessage = \userId -> Req.sendHelpMessage reqh userId,
-    updateAttachments = \mAtts -> Req.updateAttachments reqh mAtts,
     getUpdate = \text1 text2 int -> Req.getUpdate reqh text1 text2 int,
-    getServer = Req.getServer reqh
+    getServer = Req.getServer reqh,
+
+    updateAttachments = \mAtts -> AttachSpec.updateAttachments attachh mAtts
   }
   f handle

@@ -3,9 +3,9 @@ import Test.Tasty.Hspec
 import Test.Tasty.Hedgehog
 import qualified Data.ByteString.Lazy as B
 
-import TestBot.Parser
 import TestBot.Config
-import TestBot.Run
+import TestBot.Tele.Parser
+import TestBot.Tele.Run
 --import Props
 --import GoldenTests
 

@@ -43,7 +43,10 @@ library
       Bot.Vk.Parser.Data
       Bot.Vk.Parser.Parser
       Bot.Vk.Parser.ParserSpec
+      Bot.Vk.Request.Attach
+      Bot.Vk.Request.AttachSpec
       Bot.Vk.Request.Data
+      Bot.Vk.Request.Document
       Bot.Vk.Request.Requests
       Bot.Vk.Request.RequestsSpec
       Bot.Vk.Run
@@ -117,9 +120,9 @@ test-suite bot-test
   type: exitcode-stdio-1.0
   main-is: Test.hs
   other-modules:
-      TestBot.Parser
+      TestBot.Tele.Parser
       TestBot.Config
-      TestBot.Run
+      TestBot.Tele.Run
   hs-source-dirs:
       test
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N

@@ -14,6 +14,7 @@ import qualified Bot.Tele.Parser.Parser as TParser
 import qualified Bot.Tele.Run as Tele
 import qualified Bot.Tele.RunSpec as STele
 import qualified Bot.Vk.Request.Requests as VReq
+import qualified Bot.Vk.Request.Attach as VAttach
 import qualified Bot.Vk.Parser.Parser as VParser
 import qualified Bot.Vk.Run as Vk
 import qualified Bot.Vk.RunSpec as SVk
@@ -39,7 +40,8 @@ main = Exc.handle errorHandler $ do
         DB.withHandleIO hLogger cSet $ \hDb ->
         VParser.withHandleIO hLogger $ \hParser ->
         VReq.withHandleIO hLogger cSet hParser $ \hReq ->
-        Vk.withHandleIO hLogger cSet hDb hReq hParser $ \hVk ->
+        VAttach.withHandleIO hLogger hParser hReq $ \hAttach ->
+        Vk.withHandleIO hLogger cSet hDb hReq hParser hAttach $ \hVk ->
         SVk.run hVk
     _ -> do
       Logger.logError logh "Incorrect field 'bot_api' in config.json"
