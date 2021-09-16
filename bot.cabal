@@ -127,6 +127,7 @@ test-suite bot-test
       TestBot.Tele.Run
       TestBot.Vk.Parser
       TestBot.Vk.Attach
+      TestBot.Vk.Request
   hs-source-dirs:
       test
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N

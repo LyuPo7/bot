@@ -7,6 +7,7 @@ import TestBot.Config
 import qualified TestBot.Tele.Parser as TeleParser
 import qualified TestBot.Vk.Parser as VkParser
 import qualified TestBot.Vk.Attach as VkAttach
+import qualified TestBot.Vk.Request as VkReq
 import TestBot.Tele.Run
 --import Props
 --import GoldenTests
@@ -57,7 +58,8 @@ main = do
                VkAttach.spec_updateAttachment,
                VkAttach.spec_updateAttachments,
                VkAttach.spec_attachmentToString,
-               VkAttach.spec_attachmentsToQuery
+               VkAttach.spec_attachmentsToQuery,
+               VkReq.spec_returnStickerId
              ]
   defaultMain (testGroup "All Tests" [
                   testGroup "Specs" specs,
