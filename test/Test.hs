@@ -6,6 +6,7 @@ import qualified Data.ByteString.Lazy as B
 import TestBot.Config
 import qualified TestBot.Tele.Parser as TeleParser
 import qualified TestBot.Vk.Parser as VkParser
+import qualified TestBot.Vk.Attach as VkAttach
 import TestBot.Tele.Run
 --import Props
 --import GoldenTests
@@ -52,7 +53,11 @@ main = do
                VkParser.spec_parsePollResponse objServerVk bstrServerVk,
                VkParser.spec_parseUploadUrl objUpUrlVk bstrUpUrlVk bstrUpUrlFailVk,
                VkParser.spec_parseUploadFile objUpFileVk bstrUpFileVk bstrUpFileFailVk,
-               VkParser.spec_parseUploadObject objUpObjVk bstrUpObjVk bstrUpObjFailVk
+               VkParser.spec_parseUploadObject objUpObjVk bstrUpObjVk bstrUpObjFailVk,
+               VkAttach.spec_updateAttachment,
+               VkAttach.spec_updateAttachments,
+               VkAttach.spec_attachmentToString,
+               VkAttach.spec_attachmentsToQuery
              ]
   defaultMain (testGroup "All Tests" [
                   testGroup "Specs" specs,

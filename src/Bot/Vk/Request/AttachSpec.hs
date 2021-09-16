@@ -22,10 +22,10 @@ data Handle m = Handle {
 
 attachmentsToQuery :: Maybe [Attachment] -> Maybe Text
 attachmentsToQuery Nothing = Nothing
-attachmentsToQuery (Just a) = if null queryStringApi
+attachmentsToQuery (Just xs) = if null queryStringApi
   then Nothing
   else Just $ T.intercalate "," queryStringApi
-  where queryStringApi = map attachmentToString a
+  where queryStringApi = filter (not . T.null) (map attachmentToString xs)
 
 attachmentToString :: Attachment -> Text
 attachmentToString attach = case attach_type attach of 
@@ -34,13 +34,6 @@ attachmentToString attach = case attach_type attach of
     "audio" -> (attach_type attach) <> (convert (getAudioOwnerId attach)) <> "_" <> (convert (getAudioId attach))
     "doc" -> (attach_type attach) <> (convert (getDocOwnerId attach)) <> "_" <> (convert (getDocId attach))
     _ -> ""
-    --"link" -> []
-    --"market" -> (getMarketId attach, getMarketOwnerId attach, "")
-    --"market_album" -> (getMarketAlbumId attach, getMarketAlbumOwnerId attach, "")
-    --"wall" -> (getWallId attach, getWallOwnerId attach, "")
-    --"wall_reply" -> (getWallReplyId attach, getWallReplyOwnerId attach, "")
-    --"sticker" -> unpack $ attach_type attach <> unpack $ getStickerId attach <> "_" <> convert getStickerOwnerId attach
-    --"gift" -> (getGiftId attach, getGiftOwnerId attach, "")
 
 updateAttachments :: Monad m => Handle m -> Maybe [Attachment] -> m (Maybe [Attachment])
 updateAttachments handle Nothing = do

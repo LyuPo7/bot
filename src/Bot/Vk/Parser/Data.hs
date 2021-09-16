@@ -408,3 +408,19 @@ instance ToJSON Action where
 newtype KeyboardData = KeyboardData {
   keyboard :: Maybe Keyboard -- Keyboard responce.
 } deriving (Show, Read, Eq, Generic, FromJSON, ToJSON)
+
+defaultAttach :: Attachment
+defaultAttach = Attachment {
+  attach_type = "",
+  attach_photo = Nothing,
+  attach_video = Nothing,
+  attach_audio = Nothing,
+  attach_doc = Nothing,
+  attach_link = Nothing,
+  attach_marketItem = Nothing,
+  attach_marketCollection = Nothing,
+  attach_wallPost = Nothing,
+  attach_wallComment = Nothing,
+  attach_sticker = Nothing,
+  attach_gift = Nothing
+}

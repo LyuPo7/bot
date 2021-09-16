@@ -155,16 +155,6 @@ genUploadObjectResponse :: Gen UploadObjectResponse
 genUploadObjectResponse = UploadObjectResponse
   <$> Gen.list (Range.constant 0 10) genUploadObject
 
--- | Config file
-updatesFile, update_objFile :: FilePath
-updatesFile = "src/Bot/files/Test/Vk/Parser/UpdateData.json"
-update_objFile = "src/Bot/files/Test/Vk/Parser/UpdateDataObj.txt"
-
--- | Read the config JSON file.
-readUpdate, readobjFile :: IO B.ByteString
-readUpdate = B.readFile updatesFile
-readobjFile = B.readFile update_objFile
-
 logH :: Logger.Handle Identity
 logH = Logger.Handle {
     Logger.log = \_ _ -> return (),
@@ -175,13 +165,3 @@ parserH :: ParserSpec.Handle Identity
 parserH = ParserSpec.Handle {
     ParserSpec.hLogger = logH
 }
-
-spec_parseUpdateData :: B.ByteString -> B.ByteString -> B.ByteString -> Spec
-spec_parseUpdateData obj bstr bstrFail = describe "Testing update parse for vk bot" $ do
-    it "Should successfully parse UpdateData" $ do
-      let result = Parser.parseUpdateData parserH bstr
-          check = read (B8.toString obj) :: UpdateData
-      result `shouldBe` (Identity check)
-    it "Should fail parse UpdateData" $ do
-      let result = Parser.parseUpdateData parserH bstrFail
-      result `shouldBe` (Identity UpdateData{ts = "0", updates = [])
