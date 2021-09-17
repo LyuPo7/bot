@@ -8,7 +8,8 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Web.FormUrlEncoded as Url
 import qualified Data.Text as T
 import Data.Text (Text)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, fromMaybe)
+import Text.Read (readMaybe)
 
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Logger as Logger
@@ -27,44 +28,67 @@ data Handle m = Handle {
     getUpdate :: Text -> Text -> Integer -> m B.ByteString
 }
 
+-- | Server query
+createServerQuery :: Monad m => Handle m -> m Text
+createServerQuery handle = do
+  let logh = hLogger handle
+      config = configReq handle
+      groupId = fromMaybe 0 $ Settings.botGroupId config
+      token = Settings.botToken config
+      params = getPollServer groupId token Settings.vkVersion
+  Logger.logDebug logh "Server query string was created."
+  return $ T.pack $ L8.unpack $ Url.urlEncodeAsFormStable params
+
 getServer :: Monad m => Handle m -> m B.ByteString
 getServer handle = do
   let logh = hLogger handle
-      config = configReq handle
-      groupId = fromJust $ Settings.botGroupId config
-      token = Settings.botToken config
-      params = getPollServer groupId token Settings.vkVersion
-      queryOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable params
+  queryOptions <- createServerQuery handle
   Logger.logInfo logh "Get server parameters for requests."
   makeRequest handle getLongPollServer queryOptions
 
-sendHelpMessage :: Monad m => Handle m -> UserID -> m ()
-sendHelpMessage handle userId = do
+-- | sendHelpMessage
+createHelpMessage :: Monad m => Handle m -> UserID -> m Text
+createHelpMessage handle userId = do
   let logh = hLogger handle
       config = configReq handle
       description = Settings.botDescription config
       token = Settings.botToken config
       message = (defaultMessage userId token Settings.vkVersion) {sendMessag_message = description}
-      queryOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable message
+  Logger.logDebug logh "Help Message was created."
+  return $ T.pack $ L8.unpack $ Url.urlEncodeAsFormStable message
+
+sendHelpMessage :: Monad m => Handle m -> UserID -> m ()
+sendHelpMessage handle userId = do
+  let logh = hLogger handle
+  queryOptions <- createHelpMessage handle userId
   _ <- makeRequest handle sendMessage queryOptions
   Logger.logInfo logh $ "Help message was sended to chat with id: " <> convert userId
 
-sendEchoMessage :: Monad m => Handle m -> UserID -> Text -> Maybe [Attachment] -> Maybe Geo -> m ()
-sendEchoMessage handle userId text atts geo = do
+-- | send EchoMessage
+geoToLatLong :: Maybe Geo -> [Maybe Double]
+geoToLatLong Nothing = [Nothing, Nothing]
+geoToLatLong (Just geo) = map (\x -> readMaybe  x :: Maybe Double) (words $ T.unpack $ geo_coordinates geo)
+
+createEchoMessage :: Monad m => Handle m -> UserID -> Text -> Maybe [Attachment] -> Maybe Geo -> m Text
+createEchoMessage handle userId text atts geo = do
   let logh = hLogger handle
       config = configReq handle
       token = Settings.botToken config
-      geoCoords = T.unpack <$> fmap geo_coordinates geo
-      lat = fmap (\x -> read x :: Double) (head <$> fmap words geoCoords)
-      long = fmap (\x -> read x :: Double) (last <$> fmap words geoCoords)
+      lat : long : [] = geoToLatLong geo
       message = (defaultMessage userId token Settings.vkVersion) {
         sendMessag_message = text,
         sendMessag_attachment = attachmentsToQuery atts,
         sendMessag_stickerId = returnStickerId atts,
         sendMessag_lat = lat,
         sendMessag_long = long
-        }
-      queryOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable message
+    }
+  Logger.logDebug logh "Echo Message was created."
+  return $ T.pack $ L8.unpack $ Url.urlEncodeAsFormStable message
+
+sendEchoMessage :: Monad m => Handle m -> UserID -> Text -> Maybe [Attachment] -> Maybe Geo -> m ()
+sendEchoMessage handle userId text atts geo = do
+  let logh = hLogger handle
+  queryOptions <- createEchoMessage handle userId text atts geo
   _ <- makeRequest handle sendMessage queryOptions
   Logger.logInfo logh $ "Echo message was sended to chat with id: " <> convert userId
 
@@ -76,17 +100,22 @@ sendNEchoMessage logh userId text atts geo n = do
   sendEchoMessage logh userId text atts geo
   sendNEchoMessage logh userId text atts geo (n-1)
 
-sendRepeatMessage :: Monad m => Handle m -> UserID -> m ()
-sendRepeatMessage handle userId = do
+-- | sendRepeatMessage
+createRepeatMessage :: Monad m => Handle m -> UserID -> m Text
+createRepeatMessage handle userId = do
   let logh = hLogger handle
       config = configReq handle
       token = Settings.botToken config
       question = Settings.botQuestion config
-  --hf <- SIO.openFile "src/Bot/files/repeatButtons.txt" SIO.ReadMode
-  --keyboardF <- SIO.hGetLine hf
   keyboardF <- readFile handle "src/Bot/files/repeatButtons.txt"
   let message = (defaultMessage userId token Settings.vkVersion) {sendMessag_message = question}
-      queryOptions = T.pack $ L8.unpack (Url.urlEncodeAsFormStable message) <> "&keyboard=" <> keyboardF
+  Logger.logDebug logh "Repeat Message was created."
+  return $ T.pack $ L8.unpack (Url.urlEncodeAsFormStable message) <> "&keyboard=" <> keyboardF
+
+sendRepeatMessage :: Monad m => Handle m -> UserID -> m ()
+sendRepeatMessage handle userId = do
+  let logh = hLogger handle
+  queryOptions <- createRepeatMessage handle userId
   _ <- makeRequest handle sendMessage queryOptions
   Logger.logInfo logh $ "Repeat message was sended to chat with id: " <> convert userId
 

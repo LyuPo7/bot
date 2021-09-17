@@ -61,6 +61,11 @@ main = do
                VkReq.spec_returnStickerId,
                VkReq.spec_attachmentToString,
                VkReq.spec_attachmentsToQuery,
+               VkReq.spec_createHelpMessage,
+               VkReq.spec_createEchoMessage,
+               VkReq.spec_createRepeatMessage,
+               VkReq.spec_createServerQuery,
+               VkReq.spec_geoToLatLong,
                VkDoc.spec_updateDoc
              ]
   defaultMain (testGroup "All Tests" [

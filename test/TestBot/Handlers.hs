@@ -44,6 +44,16 @@ runC = Settings.Config {
     Settings.botGroupId = Nothing
 }
 
+runCVk :: Settings.Config
+runCVk = Settings.Config {
+    Settings.botApi = "vk",
+    Settings.botToken = "abcd0dcba",
+    Settings.botInitialReplyNumber = 3,
+    Settings.botQuestion = "How many replies do you prefer to recieve?",
+    Settings.botDescription = "Hi! I'm bot=)",
+    Settings.botGroupId = Just 37891
+}
+
 attachH1 :: AttachSpec.Handle Identity
 attachH1 = AttachSpec.Handle {
     AttachSpec.hLogger = logH,
