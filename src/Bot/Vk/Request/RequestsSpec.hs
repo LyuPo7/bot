@@ -8,7 +8,7 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Web.FormUrlEncoded as Url
 import qualified Data.Text as T
 import Data.Text (Text)
-import Data.Maybe (fromJust, fromMaybe)
+import Data.Maybe (fromMaybe)
 import Text.Read (readMaybe)
 
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
@@ -144,79 +144,58 @@ returnStickerId xsm = do
 
 -- get Attachment's Id
 getPhotoId :: Attachment -> Integer
-getPhotoId = photo_id . fromJust . attach_photo
+getPhotoId attach = case attach_photo attach of
+  Nothing -> 0 
+  Just photo -> photo_id photo
 
 getVideoId :: Attachment -> Integer
-getVideoId = video_id . fromJust . attach_video
+getVideoId attach = case attach_video attach of
+  Nothing -> 0 
+  Just video -> video_id video
 
 getAudioId :: Attachment -> Integer
-getAudioId = audio_id . fromJust . attach_audio
+getAudioId attach = case attach_audio attach of
+  Nothing -> 0 
+  Just audio -> audio_id audio
 
 getDocId :: Attachment -> Integer
-getDocId = document_id . fromJust . attach_doc
+getDocId attach = case attach_doc attach of
+  Nothing -> 0 
+  Just doc -> document_id doc
 
---getLinkId :: Attachment -> Integer
---getLinkId = fromJust . fmap link_id . attach_link
-
-getMarketId :: Attachment -> Integer
-getMarketId = market_id . fromJust . attach_marketItem
-
-getMarketAlbumId :: Attachment -> Integer
-getMarketAlbumId = marketAl_id . fromJust . attach_marketCollection
-
-getWallId :: Attachment -> Integer
-getWallId = wall_id . fromJust . attach_wallPost
-
-getWallReplyId :: Attachment -> Integer
-getWallReplyId = wallRep_id . fromJust . attach_wallComment
-
---getGiftId :: Attachment -> Integer
---getGiftId = fromJust . fmap gift_id . attach_gift
-
-getStickerId :: Attachment -> Integer
-getStickerId = sticker_id . fromJust . attach_sticker
-
--- get Attachment's ownerId
-
+-- | get Attachment's ownerId
 getPhotoOwnerId :: Attachment -> Integer
-getPhotoOwnerId = photo_ownerId . fromJust . attach_photo
+getPhotoOwnerId attach = case attach_photo attach of
+  Nothing -> 0 
+  Just photo -> photo_ownerId photo
 
 getVideoOwnerId :: Attachment -> Integer
-getVideoOwnerId = video_ownerId . fromJust . attach_video
+getVideoOwnerId attach = case attach_video attach of
+  Nothing -> 0 
+  Just video -> video_ownerId video
 
 getAudioOwnerId :: Attachment -> Integer
-getAudioOwnerId = audio_ownerId . fromJust . attach_audio
+getAudioOwnerId attach = case attach_audio attach of
+  Nothing -> 0 
+  Just audio -> audio_ownerId audio
 
 getDocOwnerId :: Attachment -> Integer
-getDocOwnerId = document_ownerId . fromJust . attach_doc
-
---getLinkOwnerId :: Attachment -> Integer
---getLinkOwnerId = fromJust . fmap link_id . attach_link
-
-getMarketOwnerId :: Attachment -> Integer
-getMarketOwnerId = market_ownerId . fromJust . attach_marketItem
-
-getMarketAlbumOwnerId :: Attachment -> Integer
-getMarketAlbumOwnerId = marketAl_ownerId . fromJust . attach_marketCollection
-
-getWallOwnerId :: Attachment -> Integer
-getWallOwnerId = wall_ownerId . fromJust . attach_wallPost
-
-getWallReplyOwnerId :: Attachment -> Integer
-getWallReplyOwnerId = wallRep_ownerId . fromJust . attach_wallComment
-
---getGiftOwnerId :: Attachment -> Integer
---getGiftOwnerId = fromJust . fmap gift_ownerId . attach_gift
-
-getStickerOwnerId :: Attachment -> Integer
-getStickerOwnerId = sticker_id . fromJust . attach_sticker
+getDocOwnerId attach = case attach_doc attach of
+  Nothing -> 0 
+  Just doc -> document_ownerId doc
 
 -- get Attachment's access_key
 getPhotoAccessKey :: Attachment -> Text
-getPhotoAccessKey = photo_accessKey . fromJust . attach_photo
+getPhotoAccessKey attach = case attach_photo attach of
+  Nothing -> ""
+  Just photo -> photo_accessKey photo
 
 getVideoAccessKey :: Attachment -> Text
-getVideoAccessKey = video_accessKey . fromJust . attach_video
+getVideoAccessKey attach = case attach_video attach of
+  Nothing -> ""
+  Just video -> video_accessKey video
 
 getDocAccessKey :: Attachment -> Text
-getDocAccessKey = document_accessKey . fromJust . attach_doc
+getDocAccessKey attach = case attach_doc attach of
+  Nothing -> "" 
+  Just doc -> document_accessKey doc
