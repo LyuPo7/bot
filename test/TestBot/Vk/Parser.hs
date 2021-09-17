@@ -6,24 +6,13 @@ import Control.Monad.Identity
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.UTF8 as B8
 
-import qualified Bot.Logger as Logger
+import TestBot.Handlers
+
 import qualified Bot.Vk.Parser.Parser as Parser
-import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Vk.Parser.Data as DParser
 
 import Test.Tasty.Hspec ()
 import Test.Hspec
-
-logH :: Logger.Handle Identity
-logH = Logger.Handle {
-    Logger.log = \_ _ -> return (),
-    Logger.hconfig = Logger.Config {Logger.cVerbocity = Nothing}
-}
-
-parserH :: ParserSpec.Handle Identity
-parserH = ParserSpec.Handle {
-    ParserSpec.hLogger = logH
-}
 
 spec_parseUpdateData :: B.ByteString -> B.ByteString -> B.ByteString -> Spec
 spec_parseUpdateData obj bstr bstrFail = describe "Testing parseUpdateData for vk bot" $ do

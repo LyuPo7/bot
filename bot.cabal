@@ -50,6 +50,7 @@ library
       Bot.Vk.Request.DocumentImpl
       Bot.Vk.Request.DocumentSpec
       Bot.Vk.Request.Requests
+      Bot.Vk.Request.RequestsImpl
       Bot.Vk.Request.RequestsSpec
       Bot.Vk.Run
       Bot.Vk.RunSpec
@@ -133,6 +134,8 @@ test-suite bot-test
       TestBot.Vk.Attach
       TestBot.Vk.Request
       TestBot.Vk.Document
+      TestBot.GenData
+      TestBot.Handlers
   hs-source-dirs:
       test
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N

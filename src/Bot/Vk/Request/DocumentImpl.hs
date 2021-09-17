@@ -15,16 +15,17 @@ import qualified System.IO as SIO
 import Bot.Vk.Request.RequestsSpec (Handle(..))
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
-import qualified Bot.Vk.Request.Requests as Req
+import qualified Bot.Vk.Request.RequestsImpl as ReqImpl
 import Bot.Vk.Request.Data
 
 getUploadedServer :: Handle IO -> Integer -> Text -> IO B.ByteString
 getUploadedServer handle peerId fileType = do
-  let config = configReq handle
+  let logh = hLogger handle
+      config = configReq handle
       token = Settings.botToken config
       query = getLink peerId fileType Settings.vkVersion token
       queryOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable query
-  Req.makeRequest handle getMessagesUploadServer queryOptions
+  ReqImpl.makeRequest logh getMessagesUploadServer queryOptions
 
 {- | Download a URL.  (Left errorMessage) if an error,
 (Right doc) if success. -}
@@ -55,4 +56,4 @@ saveUploadedDoc handle file = do
       link = saveNewDoc file token Settings.vkVersion
   Logger.logInfo logh "Doc was saved."
   let queryOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable link
-  Req.makeRequest handle saveDoc queryOptions
+  ReqImpl.makeRequest logh saveDoc queryOptions

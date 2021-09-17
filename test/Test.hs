@@ -58,9 +58,9 @@ main = do
                VkParser.spec_parseUploadObject objUpObjVk bstrUpObjVk bstrUpObjFailVk,
                VkAttach.spec_updateAttachment,
                VkAttach.spec_updateAttachments,
-               VkAttach.spec_attachmentToString,
-               VkAttach.spec_attachmentsToQuery,
                VkReq.spec_returnStickerId,
+               VkReq.spec_attachmentToString,
+               VkReq.spec_attachmentsToQuery,
                VkDoc.spec_updateDoc
              ]
   defaultMain (testGroup "All Tests" [

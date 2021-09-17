@@ -80,7 +80,7 @@ tests:
   bot-test:
     main:                Test.hs
     source-dirs:         test
-    other-modules: [TestBot.Tele.Parser, TestBot.Config, TestBot.Tele.Run, TestBot.Vk.Parser, TestBot.Vk.Attach, TestBot.Vk.Request, TestBot.Vk.Document]
+    other-modules: [TestBot.Tele.Parser, TestBot.Config, TestBot.Tele.Run, TestBot.Vk.Parser, TestBot.Vk.Attach, TestBot.Vk.Request, TestBot.Vk.Document, TestBot.GenData, TestBot.Handlers]
     ghc-options:
     - -Wall 
     - -Werror 

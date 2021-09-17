@@ -5,7 +5,6 @@ module Bot.Vk.Run where
 import qualified Bot.Settings as Settings
 import qualified Bot.Logger as Logger
 import qualified Bot.DB.DBQueries as DB
-import qualified Bot.Vk.Request.Requests as Req
 import qualified Bot.Vk.Parser.Parser as Parser
 import qualified Bot.DB.DBSpec as DBSpec
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
@@ -36,11 +35,11 @@ withHandleIO logger config dbh reqh parserh attachh f = do
     getMode = \userId -> DB.getMode dbh userId,
     setMode = \userId mode -> DB.setMode dbh userId mode,
 
-    sendNEchoMessage = \userId text mAtts mGeo repNum -> Req.sendNEchoMessage reqh userId text mAtts mGeo repNum,
-    sendRepeatMessage = \userId -> Req.sendRepeatMessage reqh userId,
-    sendHelpMessage = \userId -> Req.sendHelpMessage reqh userId,
-    getUpdate = \text1 text2 int -> Req.getUpdate reqh text1 text2 int,
-    getServer = Req.getServer reqh,
+    sendNEchoMessage = \userId text mAtts mGeo repNum -> ReqSpec.sendNEchoMessage reqh userId text mAtts mGeo repNum,
+    sendRepeatMessage = \userId -> ReqSpec.sendRepeatMessage reqh userId,
+    sendHelpMessage = \userId -> ReqSpec.sendHelpMessage reqh userId,
+    getUpdate = \text1 text2 int -> ReqSpec.getUpdate reqh text1 text2 int,
+    getServer = ReqSpec.getServer reqh,
 
     updateAttachments = \mAtts -> AttachSpec.updateAttachments attachh mAtts
   }
