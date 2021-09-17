@@ -44,6 +44,7 @@ dependencies:
 - utf8-string
 - hspec
 - exceptions
+- filepath
 
 library:
   source-dirs: src
@@ -79,7 +80,7 @@ tests:
   bot-test:
     main:                Test.hs
     source-dirs:         test
-    other-modules: [TestBot.Tele.Parser, TestBot.Config, TestBot.Tele.Run, TestBot.Vk.Parser, TestBot.Vk.Attach, TestBot.Vk.Request]
+    other-modules: [TestBot.Tele.Parser, TestBot.Config, TestBot.Tele.Run, TestBot.Vk.Parser, TestBot.Vk.Attach, TestBot.Vk.Request, TestBot.Vk.Document]
     ghc-options:
     - -Wall 
     - -Werror 

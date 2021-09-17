@@ -15,6 +15,7 @@ import qualified Bot.Tele.Run as Tele
 import qualified Bot.Tele.RunSpec as STele
 import qualified Bot.Vk.Request.Requests as VReq
 import qualified Bot.Vk.Request.Attach as VAttach
+import qualified Bot.Vk.Request.Document as VDoc
 import qualified Bot.Vk.Parser.Parser as VParser
 import qualified Bot.Vk.Run as Vk
 import qualified Bot.Vk.RunSpec as SVk
@@ -40,7 +41,8 @@ main = Exc.handle errorHandler $ do
         DB.withHandleIO hLogger cSet $ \hDb ->
         VParser.withHandleIO hLogger $ \hParser ->
         VReq.withHandleIO hLogger cSet hParser $ \hReq ->
-        VAttach.withHandleIO hLogger hParser hReq $ \hAttach ->
+        VDoc.withHandleIO hLogger hParser hReq $ \hDoc ->
+        VAttach.withHandleIO hLogger hParser hReq hDoc $ \hAttach ->
         Vk.withHandleIO hLogger cSet hDb hReq hParser hAttach $ \hVk ->
         SVk.run hVk
     _ -> do
