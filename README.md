@@ -28,29 +28,23 @@
         <p><b>git clone https://github.com/LyuPo7/bot</b></p>
  
 <h3>How to use?</h3>
-    <p>Use <b>page-loader</b> command with appropriate keys.</p>
-    <ul>
-        <li> <h4>Usage without keys</h4>
-            <p>Download html page to work directory</p>
-            <a href="https://asciinema.org/a/374204" target="_blank"><img src="https://asciinema.org/a/374204.svg" /></a>
+    <ol>
+        <li> <h4>Setup data/config.json</h4>
+             <ul>
+                 <li><b>"api_settings"</b></li>
+                    <ul>
+                        <li><b>"bot_api":</b> must be one of ["vk", "telegram"];</li>
+                        <li><b>"bot_token":</b> token for vk/telegram bot;</li>
+                        <li><b>"bot_initial_reply_number":</b> will be used as initial reply number for any new chat;</li>
+                        <li><b>"bot_question":</b> quetion in reply to /repeat command;</li>
+                        <li><b>"bot_description":</b> message in reply to /help command;</li> 
+                    </ul>
+             </ul>
+            <ul>
+                 <li><b>"logger_settings"</b></li>
+                    <ul>
+                        <li><b>"verbocity":</b> level of logging - must be one of ["debug", "info", "warning", "error"];</li>
+                    </ul>
+             </ul>
        </li>
-        <li> <h4>Usage with output key</h4>
-            <p>Download html page to directory in <b>output</b> key</p>
-            <a href="https://asciinema.org/a/374207" target="_blank"><img src="https://asciinema.org/a/374207.svg" /></a>
-       </li>
-        <li> <h4>Usage with <b>verbosity</b> key</h4>
-           <ul>
-                <li> <p><b>Verbosity = error/warning</b></p>
-                    <p>Show error/warning messages only if where was problems while downloading page</p>
-                </li>
-                <li> <p><b>Verbosity = info</b></p>
-                    <p>Show info messages for every step of downloading page</p>
-                    <a href="https://asciinema.org/a/374211" target="_blank"><img src="https://asciinema.org/a/374211.svg" /></a>
-                </li>
-                <li> <p><b>Verbosity = debug</b></p>
-                    <p>Show debug messages about every step of downloading page</p>
-                    <a href="https://asciinema.org/a/374212" target="_blank"><img src="https://asciinema.org/a/374212.svg" /></a>
-                </li>
-           </ul>
-       </li>
-    </ul>
+    </ol>
