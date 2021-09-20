@@ -5,7 +5,6 @@ module Bot.Vk.Parser.Parser where
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.Text as T
 import Data.Aeson (eitherDecode)
-import System.IO.Error ()
 
 import Bot.Vk.Parser.ParserSpec (Handle(..))
 import qualified Bot.Logger as Logger

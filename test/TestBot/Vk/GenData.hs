@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TestBot.GenData where
+module TestBot.Vk.GenData where
 
 import Hedgehog (Gen)
 import qualified Hedgehog.Gen as Gen
@@ -141,6 +141,42 @@ genMessage = Message
   <$> Gen.maybe (toInteger <$> genId)
   <*> (toInteger <$> genId)
   <*> Gen.element ["Hi!", "Let's talk!", ""]
+  <*> Gen.maybe genGeo
+  <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
+  <*> Gen.constant Nothing
+
+genNum5Message :: Gen Message
+genNum5Message = Message
+  <$> Gen.maybe (toInteger <$> genId)
+  <*> (toInteger <$> genId)
+  <*> Gen.constant "5"
+  <*> Gen.maybe genGeo
+  <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
+  <*> Gen.constant Nothing
+
+genBotHelpMessage :: Gen Message
+genBotHelpMessage = Message
+  <$> Gen.maybe (toInteger <$> genId)
+  <*> (toInteger <$> genId)
+  <*> Gen.constant "/help"
+  <*> Gen.maybe genGeo
+  <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
+  <*> Gen.constant Nothing
+
+genBotRepeatMessage :: Gen Message
+genBotRepeatMessage = Message
+  <$> Gen.maybe (toInteger <$> genId)
+  <*> (toInteger <$> genId)
+  <*> Gen.constant "/repeat"
+  <*> Gen.maybe genGeo
+  <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
+  <*> Gen.constant Nothing
+
+genMessageWoBotCom :: Gen Message
+genMessageWoBotCom = Message
+  <$> Gen.maybe (toInteger <$> genId)
+  <*> (toInteger <$> genId)
+  <*> Gen.element ["", "Hi!", "Let's talk!"]
   <*> Gen.maybe genGeo
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
   <*> Gen.constant Nothing

@@ -5,7 +5,6 @@ module Bot.Tele.Run where
 import qualified Bot.Settings as Settings
 import qualified Bot.Logger as Logger
 import qualified Bot.DB.DBQueries as DB
-import qualified Bot.Tele.Request.Requests as Req
 import qualified Bot.Tele.Parser.Parser as Parser
 import qualified Bot.DB.DBSpec as DBSpec
 import qualified Bot.Tele.Request.RequestsSpec as ReqSpec
@@ -30,11 +29,11 @@ withHandleIO logger config dbh reqh parserh f = do
     getMode = \chatId -> DB.getMode dbh chatId,
     setMode = \chatId mode -> DB.setMode dbh chatId mode,
 
-    getUpdate = \updateId -> Req.getUpdate reqh updateId,
-    sendTextMessage = \chatId text -> Req.sendTextMessage reqh chatId text,
-    sendEchoMessage = \chatId messageId -> Req.sendEchoMessage reqh chatId messageId,
-    sendNEchoMessage = \chatId messageId repNum -> Req.sendNEchoMessage reqh chatId messageId repNum,
-    sendQueryNumber = \chatId text -> Req.sendQueryNumber reqh chatId text,
-    setCommands = Req.setCommands reqh
+    getUpdate = \updateId -> ReqSpec.getUpdate reqh updateId,
+    sendTextMessage = \chatId text -> ReqSpec.sendTextMessage reqh chatId text,
+    sendEchoMessage = \chatId messageId -> ReqSpec.sendEchoMessage reqh chatId messageId,
+    sendNEchoMessage = \chatId messageId repNum -> ReqSpec.sendNEchoMessage reqh chatId messageId repNum,
+    sendQueryNumber = \chatId text -> ReqSpec.sendQueryNumber reqh chatId text,
+    setCommands = ReqSpec.setCommands reqh
   }
   f handle

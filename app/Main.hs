@@ -32,8 +32,8 @@ main = Exc.handle errorHandler $ do
     "telegram" -> do
       Logger.withHandleIO cLog $ \hLogger ->
         DB.withHandleIO hLogger cSet $ \hDb ->
-        TParser.withHandleIO hLogger $ \hParser ->
-        TReq.withHandleIO hLogger cSet $ \hReq ->
+        TParser.withHandleIO hLogger cSet $ \hParser ->
+        TReq.withHandleIO hLogger hParser cSet $ \hReq ->
         Tele.withHandleIO hLogger cSet hDb hReq hParser $ \hTele ->
         STele.run hTele
     "vk" -> do

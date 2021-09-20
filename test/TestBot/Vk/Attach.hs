@@ -9,8 +9,8 @@ import qualified Hedgehog.Range as Range
 import Test.Tasty.Hspec ()
 import Test.Hspec
 
-import TestBot.GenData as GD
-import TestBot.Handlers as H
+import TestBot.Vk.GenData as GD
+import TestBot.Vk.Handlers as H
 
 import qualified Bot.Vk.Request.AttachSpec as AttachSpec
 import Bot.Vk.Parser.Data

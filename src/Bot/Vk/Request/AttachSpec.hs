@@ -2,8 +2,6 @@
 
 module Bot.Vk.Request.AttachSpec where
 
-import Data.Maybe (fromJust)
-
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
 import qualified Bot.Logger as Logger
@@ -32,6 +30,9 @@ updateAttachment handle attach = do
   let attachType = attach_type attach
   case attachType of
     "doc" -> do
-      docNew <- updateDoc handle $ fromJust $ attach_doc attach
-      return attach { attach_doc = Just docNew }
+      case attach_doc attach of
+        Nothing -> return attach
+        Just doc -> do
+          docNew <- updateDoc handle doc
+          return attach { attach_doc = Just docNew }
     _ -> return attach

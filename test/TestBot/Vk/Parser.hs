@@ -6,7 +6,7 @@ import Control.Monad.Identity
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.UTF8 as B8
 
-import TestBot.Handlers
+import TestBot.Vk.Handlers
 
 import qualified Bot.Vk.Parser.Parser as Parser
 import qualified Bot.Vk.Parser.Data as DParser

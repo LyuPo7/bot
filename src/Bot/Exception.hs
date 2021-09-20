@@ -2,7 +2,6 @@
 
 module Bot.Exception where
 
-import Control.Monad.Except ()
 import Control.Exception (Exception)
 
 data BotError = ParseRequestError String

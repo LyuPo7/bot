@@ -96,9 +96,9 @@ sendNEchoMessage :: Monad m => Handle m -> UserID -> Text -> Maybe [Attachment] 
 sendNEchoMessage handle _ _ _ _ 0 = do
   let logh = hLogger handle
   Logger.logInfo logh "Echo-Messages were sended."
-sendNEchoMessage logh userId text atts geo n = do
-  sendEchoMessage logh userId text atts geo
-  sendNEchoMessage logh userId text atts geo (n-1)
+sendNEchoMessage handle userId text atts geo n = do
+  sendEchoMessage handle userId text atts geo
+  sendNEchoMessage handle userId text atts geo (n-1)
 
 -- | sendRepeatMessage
 createRepeatMessage :: Monad m => Handle m -> UserID -> m Text

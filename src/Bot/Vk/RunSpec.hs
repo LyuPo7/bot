@@ -4,8 +4,8 @@ module Bot.Vk.RunSpec where
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as L8
-import Data.Char (isDigit)
 import Data.Maybe (fromMaybe)
+import Text.Read (readMaybe)
 import Data.Text (Text, unpack, pack)
 import Control.Monad.Catch (MonadThrow, throwM)
 
@@ -17,6 +17,7 @@ import qualified Bot.Vk.Request.RequestsSpec as Req
 import qualified Bot.Vk.Request.AttachSpec as Attach
 import qualified Bot.Vk.Parser.ParserSpec as Parser
 import Bot.Vk.Parser.Data
+import Bot.Util (convert)
 
 data Handle m = Handle {
     hLogger :: Logger.Handle m,
@@ -89,17 +90,17 @@ checkMode handle serverParams = do
           userId = message_userId message
       mode <- getMode handle userId
       let action | mode == Settings.reply && updateType == pack "message_new" = do
+                    _ <- replyMode handle message
                     Logger.logDebug logh "Bot in reply mode."
-                    replyMode handle message
                  | mode == Settings.answer && updateType == pack "message_new" = do
+                    _ <- answerMode handle message
                     Logger.logDebug logh "Bot in answer mode."
-                    answerMode handle message
                  | otherwise = Logger.logError logh "Unsuported type of update."
       action
       putUpdate handle tsDb
       checkMode handle serverParams {server_ts = tsDb + 1}
 
-replyMode :: Monad m => Handle m -> Message -> m ()
+replyMode :: Monad m => Handle m -> Message -> m Mode
 replyMode handle message = do
   let logh = hLogger handle
       userId = message_userId message
@@ -111,28 +112,31 @@ replyMode handle message = do
   let action | Settings.helpMessage == messageText = do 
                 Logger.logInfo logh "User's /help message"
                 sendHelpMessage handle userId
+                return Settings.reply
              | Settings.repeatMessage == messageText = do
                 sendRepeatMessage handle userId
                 Logger.logInfo logh "User's /repeat message"
                 setMode handle userId Settings.answer
+                return Settings.answer
              | otherwise = do
                 Logger.logInfo logh "It's text message from User."
                 repNum <- getRepliesNumber handle userId
                 sendNEchoMessage handle userId messageText attachmentsNew geo repNum
+                return Settings.reply
   action
 
-answerMode :: Monad m => Handle m -> Message -> m ()
+answerMode :: Monad m => Handle m -> Message -> m (Maybe RepNum)
 answerMode handle message = do
   let logh = hLogger handle
       userId = message_userId message
       messageText = unpack $ message_body message
       -- Extract pollData_result (message) from updatesData: if no new messages print Warning
-      action | all isDigit messageText = do 
-                Logger.logInfo logh "Info: Recieved user's answer"
-                setRepliesNumber handle userId (read messageText :: Integer)
-             | otherwise = Logger.logWarning logh "Wrong answer from user"
-  action
   setMode handle userId Settings.reply
-
-convert :: Show a => a -> Text
-convert = pack . show
+  case (readMaybe messageText :: Maybe Integer) of
+    Just repNum -> do
+      Logger.logInfo logh "Info: Recieved user's answer"
+      setRepliesNumber handle userId repNum
+      return $ Just repNum
+    Nothing -> do
+      Logger.logError logh "Couldn't parse User's answer!"
+      return Nothing

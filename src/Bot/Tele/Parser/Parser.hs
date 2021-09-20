@@ -7,12 +7,13 @@ import Data.ByteString.Lazy.Char8 (ByteString)
 import Data.Aeson (eitherDecode)
 
 import Bot.Tele.Parser.ParserSpec (Handle(..))
+import qualified Bot.Settings as Settings
 import qualified Bot.Logger as Logger
 import Bot.Tele.Parser.Data
 
-withHandleIO :: Logger.Handle IO -> (Handle IO -> IO a) -> IO a
-withHandleIO logger f = do
-  let handle = Handle logger
+withHandleIO :: Logger.Handle IO -> Settings.Config -> (Handle IO -> IO a) -> IO a
+withHandleIO logger cParser f = do
+  let handle = Handle logger cParser
   f handle
 
 {-- | UpdateData parser --}

@@ -36,6 +36,7 @@ library
       Bot.Tele.Parser.ParserSpec
       Bot.Tele.Request.Data
       Bot.Tele.Request.Requests
+      Bot.Tele.Request.RequestsImpl
       Bot.Tele.Request.RequestsSpec
       Bot.Tele.Run
       Bot.Tele.RunSpec
@@ -134,8 +135,11 @@ test-suite bot-test
       TestBot.Vk.Attach
       TestBot.Vk.Request
       TestBot.Vk.Document
-      TestBot.GenData
-      TestBot.Handlers
+      TestBot.Vk.Run
+      TestBot.Vk.GenData
+      TestBot.Vk.Handlers
+      TestBot.Tele.GenData
+      TestBot.Tele.Handlers
   hs-source-dirs:
       test
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N

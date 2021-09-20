@@ -1,17 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TestBot.Tele.Run where
+module TestBot.Vk.Run where
 
 import Control.Monad.Identity
 
-import TestBot.Tele.GenData as GD
-import TestBot.Tele.Handlers as H
+import TestBot.Vk.GenData as GD
+import TestBot.Vk.Handlers as H
 
 import qualified Bot.Settings as Settings
-import qualified Bot.Tele.RunSpec as RunSpec
+import qualified Bot.Vk.RunSpec as RunSpec
 
 import Hedgehog (Property, property, (===), forAll)
-import Control.Monad.Identity()
 
 prop_answerModeFail :: Property
 prop_answerModeFail = property $ do

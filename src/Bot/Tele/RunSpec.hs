@@ -10,18 +10,18 @@ import Text.Read (readMaybe)
 
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
-import qualified Bot.DB.DBSpec as DB
-import qualified Bot.Tele.Request.RequestsSpec as Req
-import qualified Bot.Tele.Parser.ParserSpec as Parser
+import qualified Bot.DB.DBSpec as DBSpec
+import qualified Bot.Tele.Request.RequestsSpec as ReqSpec
+import qualified Bot.Tele.Parser.ParserSpec as ParserSpec
 import Bot.Tele.Parser.Data
 import Bot.Util (convert)
 
 data Handle m = Handle {
     hLogger :: Logger.Handle m,
     cRun :: Settings.Config,
-    hDb :: DB.Handle m,
-    hReq :: Req.Handle m,
-    hParser :: Parser.Handle m,
+    hDb :: DBSpec.Handle m,
+    hReq :: ReqSpec.Handle m,
+    hParser :: ParserSpec.Handle m,
     
     parseUpdateData :: L8.ByteString -> m UpdateData,
     

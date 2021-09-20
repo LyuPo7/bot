@@ -7,8 +7,8 @@ import Control.Monad.Identity
 import qualified Bot.Vk.Request.DocumentSpec as DocSpec
 import qualified Bot.Vk.Parser.Data as DParser
 
-import qualified TestBot.GenData as GD
-import qualified TestBot.Handlers as H
+import qualified TestBot.Vk.GenData as GD
+import qualified TestBot.Vk.Handlers as H
 
 import qualified Hedgehog.Gen as Gen
 import Test.Tasty.Hspec ()

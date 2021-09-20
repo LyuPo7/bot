@@ -6,7 +6,6 @@ import Database.HDBC (handleSql, getTables, run, commit, quickQuery', fromSql, t
 import Database.HDBC.Sqlite3 (Connection, connectSqlite3)
 import Control.Monad (when)
 import Data.Text (Text, pack)
-import Control.Monad.Except ()
 import qualified Control.Exception as Exc
 
 import Bot.DB.DBSpec (Handle(..))
