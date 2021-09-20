@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Bot.Vk.Request.Attach where
 
@@ -15,6 +15,6 @@ withHandleIO logger parserh reqh doch f = do
     hReq = reqh,
     hParser = parserh,
 
-    updateDoc = \doc -> DocSpec.updateDoc doch doc
+    updateDoc = DocSpec.updateDoc doch
   }
   f handle

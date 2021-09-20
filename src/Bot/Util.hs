@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Util where
 
 import qualified Data.Text as T

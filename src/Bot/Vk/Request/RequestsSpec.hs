@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Bot.Vk.Request.RequestsSpec where
 
@@ -74,7 +74,7 @@ createEchoMessage handle userId text atts geo = do
   let logh = hLogger handle
       config = configReq handle
       token = Settings.botToken config
-      lat : long : [] = geoToLatLong geo
+      [lat, long] = geoToLatLong geo
       message = (defaultMessage userId token Settings.vkVersion) {
         sendMessag_message = text,
         sendMessag_attachment = attachmentsToQuery atts,
@@ -128,10 +128,10 @@ attachmentsToQuery (Just xs) = if null queryStringApi
 
 attachmentToString :: Attachment -> Text
 attachmentToString attach = case attach_type attach of 
-    "photo" -> (attach_type attach) <> (convert (getPhotoOwnerId attach)) <> "_" <> (convert (getPhotoId attach)) <> "_" <> (getPhotoAccessKey attach)
-    "video" -> (attach_type attach) <> (convert (getVideoOwnerId attach)) <> "_" <> (convert (getVideoId attach)) <> "_" <> (getVideoAccessKey attach)
-    "audio" -> (attach_type attach) <> (convert (getAudioOwnerId attach)) <> "_" <> (convert (getAudioId attach))
-    "doc" -> (attach_type attach) <> (convert (getDocOwnerId attach)) <> "_" <> (convert (getDocId attach))
+    "photo" -> attach_type attach <> convert (getPhotoOwnerId attach) <> "_" <> convert (getPhotoId attach) <> "_" <> getPhotoAccessKey attach
+    "video" -> attach_type attach <> convert (getVideoOwnerId attach) <> "_" <> convert (getVideoId attach) <> "_" <> getVideoAccessKey attach
+    "audio" -> attach_type attach <> convert (getAudioOwnerId attach) <> "_" <> convert (getAudioId attach)
+    "doc" -> attach_type attach <> convert (getDocOwnerId attach) <> "_" <> convert (getDocId attach)
     _ -> ""
 
 returnStickerId :: Maybe [Attachment] -> Maybe Integer
@@ -144,58 +144,36 @@ returnStickerId xsm = do
 
 -- get Attachment's Id
 getPhotoId :: Attachment -> Integer
-getPhotoId attach = case attach_photo attach of
-  Nothing -> 0 
-  Just photo -> photo_id photo
+getPhotoId attach = maybe 0 photo_id (attach_photo attach)
 
 getVideoId :: Attachment -> Integer
-getVideoId attach = case attach_video attach of
-  Nothing -> 0 
-  Just video -> video_id video
+getVideoId attach = maybe 0 video_id (attach_video attach)
 
 getAudioId :: Attachment -> Integer
-getAudioId attach = case attach_audio attach of
-  Nothing -> 0 
-  Just audio -> audio_id audio
+getAudioId attach = maybe 0 audio_id (attach_audio attach)
 
 getDocId :: Attachment -> Integer
-getDocId attach = case attach_doc attach of
-  Nothing -> 0 
-  Just doc -> document_id doc
+getDocId attach = maybe 0 document_id (attach_doc attach)
 
 -- | get Attachment's ownerId
 getPhotoOwnerId :: Attachment -> Integer
-getPhotoOwnerId attach = case attach_photo attach of
-  Nothing -> 0 
-  Just photo -> photo_ownerId photo
+getPhotoOwnerId attach = maybe 0 video_ownerId (attach_video attach)
 
 getVideoOwnerId :: Attachment -> Integer
-getVideoOwnerId attach = case attach_video attach of
-  Nothing -> 0 
-  Just video -> video_ownerId video
+getVideoOwnerId attach = maybe 0 video_ownerId (attach_video attach)
 
 getAudioOwnerId :: Attachment -> Integer
-getAudioOwnerId attach = case attach_audio attach of
-  Nothing -> 0 
-  Just audio -> audio_ownerId audio
+getAudioOwnerId attach = maybe 0 audio_ownerId (attach_audio attach)
 
 getDocOwnerId :: Attachment -> Integer
-getDocOwnerId attach = case attach_doc attach of
-  Nothing -> 0 
-  Just doc -> document_ownerId doc
+getDocOwnerId attach = maybe 0 document_ownerId (attach_doc attach)
 
 -- get Attachment's access_key
 getPhotoAccessKey :: Attachment -> Text
-getPhotoAccessKey attach = case attach_photo attach of
-  Nothing -> ""
-  Just photo -> photo_accessKey photo
+getPhotoAccessKey attach = maybe "" photo_accessKey (attach_photo attach)
 
 getVideoAccessKey :: Attachment -> Text
-getVideoAccessKey attach = case attach_video attach of
-  Nothing -> ""
-  Just video -> video_accessKey video
+getVideoAccessKey attach = maybe "" video_accessKey (attach_video attach)
 
 getDocAccessKey :: Attachment -> Text
-getDocAccessKey attach = case attach_doc attach of
-  Nothing -> "" 
-  Just doc -> document_accessKey doc
+getDocAccessKey attach = maybe "" document_accessKey (attach_doc attach)

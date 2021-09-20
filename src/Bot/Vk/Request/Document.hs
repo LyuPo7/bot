@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Bot.Vk.Request.Document where
 
@@ -18,9 +18,9 @@ withHandleIO logger parserh reqh f = do
     hParser = parserh,
 
     getTemporaryDirectory = Dir.getTemporaryDirectory,
-    saveUploadedDoc = \text -> DocImpl.saveUploadedDoc reqh text,
-    downloadFile = \text fp -> DocImpl.downloadFile text fp,
-    getUploadedServer = \int text -> DocImpl.getUploadedServer reqh int text,
-    uploadFile = \text fp -> DocImpl.uploadFile text fp
+    saveUploadedDoc = DocImpl.saveUploadedDoc reqh,
+    downloadFile = DocImpl.downloadFile,
+    getUploadedServer = DocImpl.getUploadedServer reqh,
+    uploadFile = DocImpl.uploadFile
   }
   f handle

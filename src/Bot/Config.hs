@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
 
 module Bot.Config where
 
@@ -27,17 +27,17 @@ instance A.FromJSON Config where
 getConfig :: IO Config
 getConfig = do
   conf <- readConfig
-  let config = (parseConfig conf) >>= checkConfig
+  let config = parseConfig conf >>= checkConfig
   case config of
     Right cnfg -> return cnfg
     Left err -> Exc.throwIO err
 
 checkConfig :: Config -> Either E.BotError Config
 checkConfig config 
-  | not $ elem (Settings.botApi cSet) ["vk", "telegram"] = Left $ E.ParseConfigError "Incorrect field 'bot_api' in config.json"
+  | Settings.botApi cSet `notElem` ["vk", "telegram"] = Left $ E.ParseConfigError "Incorrect field 'bot_api' in config.json"
   | Settings.botInitialReplyNumber cSet < 0 = Left $ E.ParseConfigError "Incorrect field in config.json: 'bot_initial_reply_number' < 0"
   | Settings.botInitialReplyNumber cSet > 5 = Left $ E.ParseConfigError "Incorrect field in config.json: 'bot_initial_reply_number' > 5"
-  | not $ elem (Logger.cVerbocity cLog) [Just Logger.Debug, Just Logger.Info, Just Logger.Warning, Just Logger.Error, Nothing] = Left $ E.ParseConfigError "Incorrect field 'verbocity' in config.json"
+  | Logger.cVerbocity cLog `notElem` [Just Logger.Debug, Just Logger.Info, Just Logger.Warning, Just Logger.Error, Nothing] = Left $ E.ParseConfigError "Incorrect field 'verbocity' in config.json"
   | otherwise = Right config where
       cLog = cLogger config
       cSet = cSettings config
@@ -51,5 +51,5 @@ parseConfig :: B.ByteString -> Either E.BotError Config
 parseConfig config = do
   let d = A.eitherDecode config :: Either String Config
   case d of
-    Left err -> Left $ E.ParseConfigError $ err
+    Left err -> Left $ E.ParseConfigError err
     Right ps -> Right ps

@@ -42,7 +42,7 @@ instance ToJSON Update where
     fieldLabelModifier = camelTo2 '_' . drop 7 }
 
 -- | Users
-data Users = Users {
+newtype Users = Users {
   user_id :: UserID -- user ID.
   } deriving (Show, Read, Eq,Generic)
 
@@ -73,7 +73,7 @@ instance ToJSON Message where
     fieldLabelModifier = camelTo2 '_' . drop 8 }
 
 -- | Geo
-data Geo = Geo {
+newtype Geo = Geo {
   geo_coordinates :: Text -- location coordinates.
   } deriving (Show, Read, Eq,Generic)
 
@@ -171,7 +171,7 @@ instance ToJSON Document where
     fieldLabelModifier = camelTo2 '_' . drop 9 }
 
 -- | Link
-data Link = Link {
+newtype Link = Link {
   link_url :: Text -- Link URL.
   } deriving (Show, Read, Eq,Generic) 
 

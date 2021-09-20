@@ -21,10 +21,10 @@ parseUpdateData :: Monad m => Handle m -> ByteString -> m UpdateData
 parseUpdateData handle response = do
   let logh = hLogger handle
       -- decode JSON 
-      d = (eitherDecode response) :: (Either String UpdateData)
+      d = eitherDecode response :: (Either String UpdateData)
   case d of
     Left err -> do
-      Logger.logError logh $ ("Couldn't parse UpdateData: " <> (T.pack err))
+      Logger.logError logh ("Couldn't parse UpdateData: " <> T.pack err)
       return UpdateData {ok = True, result = []}
     Right ps -> do
       Logger.logDebug logh "UpdateData was successfully parsed."

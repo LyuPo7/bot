@@ -20,20 +20,20 @@ withHandleIO logger config dbh reqh parserh f = do
     hReq = reqh,
     hParser = parserh,
     
-    parseUpdateData = \bstr -> Parser.parseUpdateData parserh bstr,
+    parseUpdateData = Parser.parseUpdateData parserh,
     
     getLastSucUpdate = DB.getLastSucUpdate dbh,
-    putUpdate = \updateId -> DB.putUpdate dbh updateId,
-    getRepliesNumber = \chatId -> DB.getRepliesNumber dbh chatId,
-    setRepliesNumber = \chatId repNum -> DB.setRepliesNumber dbh chatId repNum,
-    getMode = \chatId -> DB.getMode dbh chatId,
-    setMode = \chatId mode -> DB.setMode dbh chatId mode,
+    putUpdate = DB.putUpdate dbh,
+    getRepliesNumber = DB.getRepliesNumber dbh,
+    setRepliesNumber = DB.setRepliesNumber dbh,
+    getMode = DB.getMode dbh,
+    setMode = DB.setMode dbh,
 
-    getUpdate = \updateId -> ReqSpec.getUpdate reqh updateId,
-    sendTextMessage = \chatId text -> ReqSpec.sendTextMessage reqh chatId text,
-    sendEchoMessage = \chatId messageId -> ReqSpec.sendEchoMessage reqh chatId messageId,
-    sendNEchoMessage = \chatId messageId repNum -> ReqSpec.sendNEchoMessage reqh chatId messageId repNum,
-    sendQueryNumber = \chatId text -> ReqSpec.sendQueryNumber reqh chatId text,
+    getUpdate = ReqSpec.getUpdate reqh,
+    sendTextMessage = ReqSpec.sendTextMessage reqh,
+    sendEchoMessage = ReqSpec.sendEchoMessage reqh,
+    sendNEchoMessage = ReqSpec.sendNEchoMessage reqh,
+    sendQueryNumber = ReqSpec.sendQueryNumber reqh,
     setCommands = ReqSpec.setCommands reqh
   }
   f handle

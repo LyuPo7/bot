@@ -22,25 +22,25 @@ withHandleIO logger config dbh reqh parserh attachh f = do
     hParser = parserh,
     hAttach = attachh,
     
-    parseUpdateData = \bstr -> Parser.parseUpdateData parserh bstr,
-    parsePollResponse = \bstr -> Parser.parsePollResponse parserh bstr,
-    parseUploadUrl = \bstr -> Parser.parseUploadUrl parserh bstr,
-    parseUploadFile = \bstr -> Parser.parseUploadFile parserh bstr,
-    parseUploadObject = \bstr -> Parser.parseUploadObject parserh bstr,
+    parseUpdateData = Parser.parseUpdateData parserh,
+    parsePollResponse = Parser.parsePollResponse parserh,
+    parseUploadUrl = Parser.parseUploadUrl parserh,
+    parseUploadFile = Parser.parseUploadFile parserh,
+    parseUploadObject = Parser.parseUploadObject parserh,
     
     getLastSucUpdate = DB.getLastSucUpdate dbh,
-    putUpdate = \updateId -> DB.putUpdate dbh updateId,
-    getRepliesNumber = \userId -> DB.getRepliesNumber dbh userId,
-    setRepliesNumber = \userId repNum -> DB.setRepliesNumber dbh userId repNum,
-    getMode = \userId -> DB.getMode dbh userId,
-    setMode = \userId mode -> DB.setMode dbh userId mode,
+    putUpdate = DB.putUpdate dbh,
+    getRepliesNumber = DB.getRepliesNumber dbh,
+    setRepliesNumber = DB.setRepliesNumber dbh,
+    getMode = DB.getMode dbh,
+    setMode = DB.setMode dbh,
 
-    sendNEchoMessage = \userId text mAtts mGeo repNum -> ReqSpec.sendNEchoMessage reqh userId text mAtts mGeo repNum,
-    sendRepeatMessage = \userId -> ReqSpec.sendRepeatMessage reqh userId,
-    sendHelpMessage = \userId -> ReqSpec.sendHelpMessage reqh userId,
-    getUpdate = \text1 text2 int -> ReqSpec.getUpdate reqh text1 text2 int,
+    sendNEchoMessage = ReqSpec.sendNEchoMessage reqh,
+    sendRepeatMessage = ReqSpec.sendRepeatMessage reqh,
+    sendHelpMessage =ReqSpec.sendHelpMessage reqh,
+    getUpdate = ReqSpec.getUpdate reqh,
     getServer = ReqSpec.getServer reqh,
 
-    updateAttachments = \mAtts -> AttachSpec.updateAttachments attachh mAtts
+    updateAttachments = AttachSpec.updateAttachments attachh
   }
   f handle

@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Tele.Parser.ParserSpec where
 
 import qualified Bot.Logger as Logger

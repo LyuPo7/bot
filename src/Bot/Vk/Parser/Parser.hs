@@ -20,7 +20,7 @@ parsePollResponse :: Monad m => Handle m -> L8.ByteString -> m (Either String Po
 parsePollResponse handle response = do
   let logh = hLogger handle
       -- decode JSON 
-      d = (eitherDecode response) :: Either String PollResponse
+      d = eitherDecode response :: Either String PollResponse
   case d of
     Left err -> do
       Logger.logError logh $ "Couldn't parse poll response: " <> T.pack err
@@ -34,7 +34,7 @@ parseUpdateData :: Monad m => Handle m -> L8.ByteString -> m UpdateData
 parseUpdateData handle response = do
   let logh = hLogger handle
       -- decode JSON 
-      d = (eitherDecode response) :: Either String UpdateData
+      d = eitherDecode response :: Either String UpdateData
   case d of
     Left err -> do
       Logger.logError logh $ "Couldn't parse UpdateData: " <> T.pack err
@@ -48,7 +48,7 @@ parseUploadUrl :: Monad m => Handle m -> L8.ByteString -> m UploadUrlResponse
 parseUploadUrl handle response = do
   let logh = hLogger handle
       -- decode JSON 
-      d = (eitherDecode response) :: Either String UploadUrlResponse
+      d = eitherDecode response :: Either String UploadUrlResponse
   case d of
     Left err -> do
       Logger.logError logh $ "Couldn't parse UploadUrlResponse: " <> T.pack err
@@ -62,7 +62,7 @@ parseUploadFile :: Monad m => Handle m -> L8.ByteString -> m UploadFileResponse
 parseUploadFile handle response = do
   let logh = hLogger handle
       -- decode JSON 
-      d = (eitherDecode response) :: Either String UploadFileResponse
+      d = eitherDecode response :: Either String UploadFileResponse
   case d of
     Left err -> do
       Logger.logError logh $ "Couldn't parse parseUploadFile: " <> T.pack err
@@ -76,7 +76,7 @@ parseUploadObject :: Monad m => Handle m -> L8.ByteString -> m UploadObjectRespo
 parseUploadObject handle response = do
   let logh = hLogger handle
       -- decode JSON 
-      d = (eitherDecode response) :: Either String UploadObjectResponse
+      d = eitherDecode response :: Either String UploadObjectResponse
   case d of
     Left err -> do
       Logger.logError logh $ "Couldn't parse parseUploadObject: " <> T.pack err

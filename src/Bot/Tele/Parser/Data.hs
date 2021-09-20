@@ -17,7 +17,7 @@ type RepNum = Integer
 type Mode = Text
 
 -- | Chat (only private chats)
-data Chat = Chat {
+newtype Chat = Chat {
   chat_id :: ChatID -- Unique identifier for this chat.
   } deriving (Show, Read, Eq, Generic) 
 
@@ -46,7 +46,7 @@ instance ToJSON Message where
     A.fieldLabelModifier = camelTo2 '_' . drop 8 }
 
 -- | MessageEntity
-data MessageEntity = MessageEntity {
+newtype MessageEntity = MessageEntity {
   messageent_type :: Text -- Type of the entity. Can be “mention” (@username), “hashtag” (#hashtag),...
   } deriving (Show, Read, Eq, Generic)
 

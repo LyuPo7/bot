@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Bot.Vk.Request.DocumentSpec where
 
@@ -37,7 +37,7 @@ updateDoc handle doc = do
       userId = document_ownerId doc
   -- create temp directory
   tempDir <- getTemporaryDirectory handle
-  let fileName = tempDir </> (T.unpack title)
+  let fileName = tempDir </> T.unpack title
   -- download file
   downloadFile handle link fileName
   Logger.logInfo logh "File was downloaded"

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric, OverloadedStrings, LambdaCase #-}
 
 module Bot.Logger where
 
@@ -35,15 +35,15 @@ instance TextShow Level where
   showb Error = "[ERROR]"
 
 instance FromJSON Level where
-  parseJSON = A.withText "Config Logger" $ \val ->
-    case val of
+  parseJSON = A.withText "Config Logger" $ 
+    \case
       "debug" -> pure Debug
       "info" -> pure Info
       "warning" -> pure Warning
       "error" -> pure Error
       _ -> mzero
 
-data Config = Config {
+newtype Config = Config {
   cVerbocity :: Maybe Level
 } deriving (Show, Generic, Eq)
 
@@ -51,7 +51,7 @@ instance A.FromJSON Config where
     parseJSON = A.withObject "General Config" $ \o ->
         Config <$> o A..:? "verbocity"
 
-data LogMessage = LogMessage { 
+newtype LogMessage = LogMessage { 
   level :: Level
 }
 
@@ -84,7 +84,7 @@ logError = (`log` LogMessage {level = Error})
 
 getTime :: IO Text
 getTime = do 
-  T.pack <$> formatTime defaultTimeLocale (T.unpack defaultTimeFormat) <$> getZonedTime
+  T.pack . formatTime defaultTimeLocale (T.unpack defaultTimeFormat) <$> getZonedTime
 
 defaultTimeFormat :: Text
 defaultTimeFormat = "%_Y-%m-%d %T.%3q"
@@ -105,22 +105,3 @@ redCS = "\o33[1;31m"
 purpleCS = "\o33[0;35m"
 blueCS = "\o33[0;34m"
 yellowCS = "\o33[1;33m"
-{- color schemes
-CLR="\[\033[0;0m\]"   # normal color scheme
-BK="\[\O33[0;30m\]"   # black
-BL="\[\033[0;34m\]"   # blue
-GR="\[\033[0;32m\]"   # green
-CY="\[\033[0;36m\]"   # cyan
-RD="\[\033[0;31m\]"   # red
-PL="\[\033[0;35m\]"   # purple
-BR="\[\033[0;33m\]"   # brown
-GY="\[\033[1;30m\]"   # grey
-#eGY="\[\033[0;37m\]"  # light gray
-#eBL="\[\033[1;34m\]"  # light blue
-#eGR="\[\033[1;32m\]"  # light green
-#eCY="\[\033[1;36m\]"  # light cyan
-#eRD="\[\033[1;31m\]"  # light red
-#ePL="\[\033[1;35m\]"  # light purple
-#eYW="\[\033[1;33m\]"  # yellow
-#eWT="\[\033[1;37m\]"  # white
--}

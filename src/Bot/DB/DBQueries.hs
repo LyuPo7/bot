@@ -36,9 +36,7 @@ withHandleIO logger config f = do
 
 -- | Initialize DB and return database Connection
 connect :: FilePath -> IO Connection
-connect dbFile = do 
-    dbHandle <- connectSqlite3 dbFile
-    return dbHandle
+connect dbFile = do connectSqlite3 dbFile
 
 {- | Prepare the database for data.
 Create two tables and ask the database engine to verify some info:
@@ -91,7 +89,7 @@ getLastSucUpdate handle = handleSql errorHandler $ do
             Logger.logWarning logh "There are no processed updates for now"
             return Nothing --return (Right (-1))
     where errorHandler _ = 
-              do Exc.throwIO $ E.DbError $ "Error: Error in getLastSucUpdate!"-- return $ throwError $ DbError $ show err
+              do Exc.throwIO $ E.DbError "Error: Error in getLastSucUpdate!"-- return $ throwError $ DbError $ show err
 
 putUpdate :: Handle IO -> UpdateID -> IO ()
 putUpdate handle updateID = handleSql errorHandler $ do

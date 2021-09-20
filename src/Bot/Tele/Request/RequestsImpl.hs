@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Bot.Tele.Request.RequestsImpl where
 
@@ -39,7 +39,7 @@ makeRequest handle teleRequest options = do
   let codeResp = statusCode $ responseStatus response
   if codeResp == 200
     then do
-      Logger.logDebug logh $ "Successfull request to api."
+      Logger.logDebug logh "Successfull request to api."
       return $ responseBody response
     else do
       Logger.logDebug logh $ "Unsuccessfull request to api with code: " <> convert codeResp

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Bot.Vk.Request.RequestsImpl where
 
@@ -32,7 +32,7 @@ getUpdate handle server key timeStamp = do
   let codeResp = statusCode $ responseStatus response
   if codeResp == 200
     then do
-      Logger.logDebug handle $ "Successfull request to api."
+      Logger.logDebug handle "Successfull request to api."
       return $ responseBody response
     else do
       Logger.logDebug handle $ "Unsuccessfull request to api with code: " <> convert codeResp
@@ -56,7 +56,7 @@ makeRequest handle vkRequest queryOptions = do
   let codeResp = statusCode $ responseStatus response
   if codeResp == 200
     then do
-      Logger.logDebug handle $ "Successfull request to api."
+      Logger.logDebug handle "Successfull request to api."
       return $ responseBody response
     else do
       Logger.logDebug handle $ "Unsuccessfull request to api with code: " <> convert codeResp

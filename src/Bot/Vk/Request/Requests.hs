@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Bot.Vk.Request.Requests where
 
@@ -16,8 +16,8 @@ withHandleIO logger config parserh f = do
     configReq = config,
     hParser = parserh,
     
-    ReqSpec.readFile = \fp -> Prelude.readFile fp,
-    makeRequest = \req text -> ReqImpl.makeRequest logger req text,
-    getUpdate = \t1 t2 int -> ReqImpl.getUpdate logger t1 t2 int
+    ReqSpec.readFile = Prelude.readFile,
+    makeRequest = ReqImpl.makeRequest logger,
+    getUpdate = ReqImpl.getUpdate logger
   }
   f handle

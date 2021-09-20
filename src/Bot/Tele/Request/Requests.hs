@@ -15,6 +15,6 @@ withHandleIO logger parserh config f = do
     hParser = parserh,
     configReq = config,
 
-    makeRequest = \req opts -> ReqImpl.makeRequest parserh req opts
+    makeRequest = ReqImpl.makeRequest parserh
   }
   f handle
