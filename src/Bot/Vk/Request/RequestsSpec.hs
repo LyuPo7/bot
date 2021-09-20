@@ -157,7 +157,7 @@ getDocId attach = maybe 0 document_id (attach_doc attach)
 
 -- | get Attachment's ownerId
 getPhotoOwnerId :: Attachment -> Integer
-getPhotoOwnerId attach = maybe 0 video_ownerId (attach_video attach)
+getPhotoOwnerId attach = maybe 0 photo_ownerId (attach_photo attach)
 
 getVideoOwnerId :: Attachment -> Integer
 getVideoOwnerId attach = maybe 0 video_ownerId (attach_video attach)
