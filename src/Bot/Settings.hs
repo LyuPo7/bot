@@ -54,6 +54,4 @@ vkVersion = "5.81"
 
 -- | Config file
 configFile :: FilePath
---configFile = "src/Bot/files/confighier_tele.json"
-configFile = "src/Bot/files/confighier_vk.json"
--- configFile = "src/Bot/files/confighier_vvk.json"
+configFile = "data/config.json"

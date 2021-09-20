@@ -80,9 +80,9 @@ main = do
 
 -- | Tele UpdateData file
 updatesFileTele, updatesFileFailTele, updateObjFileTele :: FilePath
-updatesFileTele = "src/Bot/files/Test/Request/getUpdates.json"
-updatesFileFailTele = "src/Bot/files/Test/Request/getUpdatesFail.json"
-updateObjFileTele = "src/Bot/files/Test/Request/getUpdatesObj.txt"
+updatesFileTele = "data/Test/Request/getUpdates.json"
+updatesFileFailTele = "data/Test/Request/getUpdatesFail.json"
+updateObjFileTele = "data/Test/Request/getUpdatesObj.txt"
 
 -- | Read Tele UpdateData JSON/txt file.
 readUpdateTele, readobjFileTele, readUpdateFailTele :: IO B.ByteString
@@ -92,9 +92,9 @@ readobjFileTele = B.readFile updateObjFileTele
 
 -- | Vk UpdateData file
 updatesFileVk, updatesFileFailVk, updateObjFileVk :: FilePath
-updatesFileVk = "src/Bot/files/Test/Vk/Parser/UpdateData.json"
-updatesFileFailVk = "src/Bot/files/Test/Vk/Parser/UpdateDataFail.json"
-updateObjFileVk = "src/Bot/files/Test/Vk/Parser/UpdateDataObj.txt"
+updatesFileVk = "data/Test/Vk/Parser/UpdateData.json"
+updatesFileFailVk = "data/Test/Vk/Parser/UpdateDataFail.json"
+updateObjFileVk = "data/Test/Vk/Parser/UpdateDataObj.txt"
 
 -- | Read Vk UpdateData JSON/txt file.
 readUpdateVk, readobjFileVk, readUpdateFailVk :: IO B.ByteString
@@ -104,8 +104,8 @@ readobjFileVk = B.readFile updateObjFileVk
 
 -- | Vk PollServerResponse file
 serverFileVk, serverObjFileVk :: FilePath
-serverFileVk = "src/Bot/files/Test/Vk/Parser/PollResponse.json"
-serverObjFileVk = "src/Bot/files/Test/Vk/Parser/PollResponseObj.txt"
+serverFileVk = "data/Test/Vk/Parser/PollResponse.json"
+serverObjFileVk = "data/Test/Vk/Parser/PollResponseObj.txt"
 
 -- | Read Vk PollServerResponse JSON/txt file.
 readServerVk, readServerObjVk :: IO B.ByteString
@@ -114,9 +114,9 @@ readServerObjVk = B.readFile serverObjFileVk
 
 -- | Vk UploadUrlResponse file
 upUrlFileVk, upUrlFailFileVk, upUrlObjVk :: FilePath
-upUrlFileVk = "src/Bot/files/Test/Vk/Parser/UploadUrlResponse.json"
-upUrlFailFileVk = "src/Bot/files/Test/Vk/Parser/UploadUrlResponseFail.json"
-upUrlObjVk = "src/Bot/files/Test/Vk/Parser/UploadUrlResponseObj.txt"
+upUrlFileVk = "data/Test/Vk/Parser/UploadUrlResponse.json"
+upUrlFailFileVk = "data/Test/Vk/Parser/UploadUrlResponseFail.json"
+upUrlObjVk = "data/Test/Vk/Parser/UploadUrlResponseObj.txt"
 
 -- | Read Vk UploadUrlResponse JSON/txt file.
 readObjUpUrlVk, readUpUrlFailVk, readUpUrlVk :: IO B.ByteString
@@ -126,9 +126,9 @@ readObjUpUrlVk = B.readFile upUrlObjVk
 
 -- | Vk UploadFileResponse file
 upFileFileVk, upFileFailFileVk, upFileObjVk :: FilePath
-upFileFileVk = "src/Bot/files/Test/Vk/Parser/UploadFileResponse.json"
-upFileFailFileVk = "src/Bot/files/Test/Vk/Parser/UploadFileResponseFail.json"
-upFileObjVk = "src/Bot/files/Test/Vk/Parser/UploadFileResponseObj.txt"
+upFileFileVk = "data/Test/Vk/Parser/UploadFileResponse.json"
+upFileFailFileVk = "data/Test/Vk/Parser/UploadFileResponseFail.json"
+upFileObjVk = "data/Test/Vk/Parser/UploadFileResponseObj.txt"
 
 -- | Read Vk UploadFileResponse JSON/txt file.
 readObjUpFileVk, readUpFileFailVk, readUpFileVk :: IO B.ByteString
@@ -138,9 +138,9 @@ readObjUpFileVk = B.readFile upFileObjVk
 
 -- | Vk UploadObjectResponse file
 upObjFileVk, upObjFailFileVk, upObjObjVk :: FilePath
-upObjFileVk = "src/Bot/files/Test/Vk/Parser/UploadObjectResponse.json"
-upObjFailFileVk = "src/Bot/files/Test/Vk/Parser/UploadObjectResponseFail.json"
-upObjObjVk = "src/Bot/files/Test/Vk/Parser/UploadObjectResponseObj.txt"
+upObjFileVk = "data/Test/Vk/Parser/UploadObjectResponse.json"
+upObjFailFileVk = "data/Test/Vk/Parser/UploadObjectResponseFail.json"
+upObjObjVk = "data/Test/Vk/Parser/UploadObjectResponseObj.txt"
 
 -- | Read Vk UploadObjectResponse JSON/txt file.
 readObjUpObjVk, readUpObjFailVk, readUpObjVk :: IO B.ByteString

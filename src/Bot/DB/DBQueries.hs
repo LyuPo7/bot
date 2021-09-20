@@ -13,18 +13,19 @@ import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
 import qualified Bot.Exception as E
 import Bot.Tele.Parser.Data
+import Bot.Util (convert)
 
 withHandleIO :: Logger.Handle IO -> Settings.Config -> (Handle IO -> IO a) -> IO a
 withHandleIO logger config f = do
     case Settings.botApi config of
         "vk" -> do
-            let dbFile = "src/Bot/files/test_vk.db"
+            let dbFile = "data/Vk/test_vk.db"
             dbh <- connect dbFile
             let handle = Handle logger dbh config
             prepDB handle
             f handle
         "telegram" -> do
-            let dbFile = "src/Bot/files/test_tele.db"
+            let dbFile = "data/Tele/test_tele.db"
             dbh <- connect dbFile
             let handle = Handle logger dbh config
             prepDB handle
@@ -199,6 +200,3 @@ setMode handle chatId mode = handleSql errorHandler $ do
     where errorHandler e = 
               do Exc.throwIO $ E.DbError $ "Error in setMode!\n"
                      ++ show e
-
-convert :: Integer -> Text
-convert = pack . show
