@@ -25,9 +25,8 @@
 
 <h3>Installation:</h3>
     <p>You may clone GitHub repository</p>
-        <p><i>git clone https://github.com/LyuPo7/bot</p>
-    <a href="https://asciinema.org/a/374182" target="_blank"><img src="https://asciinema.org/a/374182.svg" /></a>
-
+        <p><b>git clone https://github.com/LyuPo7/bot</b></p>
+ 
 <h3>How to use?</h3>
     <p>Use <b>page-loader</b> command with appropriate keys.</p>
     <ul>
