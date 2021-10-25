@@ -19,13 +19,13 @@ withHandleIO :: Logger.Handle IO -> Settings.Config -> (Handle IO -> IO a) -> IO
 withHandleIO logger config f = do
     case Settings.botApi config of
         "vk" -> do
-            let dbFile = "data/Vk/test_vk.db"
+            let dbFile = "data/vk.db"
             dbh <- connect dbFile
             let handle = Handle logger dbh config
             prepDB handle
             f handle
         "telegram" -> do
-            let dbFile = "data/Tele/test_tele.db"
+            let dbFile = "data/tele.db"
             dbh <- connect dbFile
             let handle = Handle logger dbh config
             prepDB handle
