@@ -55,7 +55,7 @@
            <ul><b>$ stack exec bot-exe</b>
            </ul>
                <p>For more information see asciinema below:
-                  <a href="https://asciinema.org/a/443725" target="_blank"><img src="https://asciinema.org/a/443725.svg" /></a></b>
+                  <a href="https://asciinema.org/a/444443" target="_blank"><img src="https://asciinema.org/a/444443.svg" /></a></b>
                </p>
            </ul>
        </li>
