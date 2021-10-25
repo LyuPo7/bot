@@ -15,9 +15,9 @@
         </li>
         <li>Supports 4 levels of logging:
             <ul>
-                <li><b>error</b>-level (default): show only error messages;</li>
+                <li><b>error</b>-level(default): show only error messages;</li>
                 <li><b>warning</b>-level: show only error and warning messages;</li>
-                <li><b>info</b>-level: show info messages for every step of downloading page including error and warning messages;</li>
+                <li><b>info</b>-level: show info, error and warning messages;</li>
                 <li><b>debug</b>-level: show even more details than info-level;</li>
             </ul>
         </li>
@@ -25,7 +25,7 @@
 
 <h3>Installation:</h3>
     <p>You may clone GitHub repository</p>
-        <p><b>git clone https://github.com/LyuPo7/bot</b></p>
+        <p><b>git clone https://github.com/LyuPo7/bot.git</b></p>
  
 <h3>How to use?</h3>
     <ol>
@@ -47,5 +47,19 @@
                     </ul>
              </ul>
        </li>
+       <li><h4>Build project using <b>stack</b>:</h4>
+           <ul><b>$ stack build</b>
+           </ul>
+       </li>
+       <li><h4>Run project using <b>stack</b>:</h4>
+           <ul><b>$ stack exec post-server-exe</b>
+           </ul>
+               <p>For more information see asciinema below:
+                  <a href="https://asciinema.org/a/443725" target="_blank"><img src="https://asciinema.org/a/443725.svg" /></a></b>
+               </p>
+           </ul>
+       </li>
+    </ol>
+    <p>
     </ol>
 <h3>Project pattern</h3>

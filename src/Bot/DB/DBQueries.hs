@@ -84,12 +84,12 @@ getLastSucUpdate handle = handleSql errorHandler $ do
     case r of
         [[x]] -> do
             Logger.logInfo logh $ "Last processed update with id: " <> convert (fromSql x :: Integer)
-            return (Just $ fromSql x) --return (Right $ fromSql x)
+            return (Just $ fromSql x)
         _ -> do
             Logger.logWarning logh "There are no processed updates for now"
-            return Nothing --return (Right (-1))
+            return Nothing
     where errorHandler _ = 
-              do Exc.throwIO $ E.DbError "Error: Error in getLastSucUpdate!"-- return $ throwError $ DbError $ show err
+              do Exc.throwIO $ E.DbError "Error: Error in getLastSucUpdate!"
 
 putUpdate :: Handle IO -> UpdateID -> IO ()
 putUpdate handle updateID = handleSql errorHandler $ do

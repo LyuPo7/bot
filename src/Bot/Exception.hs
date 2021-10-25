@@ -17,5 +17,3 @@ instance Show BotError where
     show (ConnectionError code) = "Unsuccessfull request to api with code: " ++ show code
     show (Default _) = "Default error"
     show (DbError err) = "Db error: " ++ err
-
-type ThrowsError = Either BotError
