@@ -40,7 +40,8 @@ data Handle m = Handle {
     getMode :: UserID -> m Text,
     setMode :: UserID -> Mode -> m (),
 
-    sendNEchoMessage :: UserID -> Text -> Maybe [Attachment] -> Maybe Geo -> RepNum -> m (),
+    sendNEchoMessage :: UserID -> Text -> Maybe [Attachment] ->
+                        Maybe Geo -> RepNum -> m (),
     sendRepeatMessage :: UserID -> m (),
     sendHelpMessage :: UserID -> m (),
     updateAttachments :: Maybe [Attachment] -> m (Maybe [Attachment]),
@@ -77,7 +78,8 @@ checkMode handle serverParams = do
   Logger.logInfo logh ("Work with update: " <> convert tsDb)
   responseUp <- getUpdate handle server key tsDb
   updateData <- parseUpdateData handle responseUp
-  -- Extract result (updates) from updatesData: if no new messages print Warning
+  -- Extract result (updates) from updatesData:
+  --          if no new messages print Warning
   let update = updates updateData
   case update of
     [] -> do
@@ -107,8 +109,9 @@ replyMode handle message = do
       messageText = message_body message
       attachments = message_attachments message
       geo = message_geo message
-  attachmentsNew <- updateAttachments handle attachments
-  Logger.logInfo logh ("Checking message from user with id: " <> convert userId)
+  attsNew <- updateAttachments handle attachments
+  Logger.logInfo logh $ "Checking message from user with id: " 
+    <> convert userId
   let action | Settings.helpMessage == messageText = do 
                 Logger.logInfo logh "User's /help message"
                 sendHelpMessage handle userId
@@ -121,7 +124,7 @@ replyMode handle message = do
              | otherwise = do
                 Logger.logInfo logh "It's text message from User."
                 repNum <- getRepliesNumber handle userId
-                sendNEchoMessage handle userId messageText attachmentsNew geo repNum
+                sendNEchoMessage handle userId messageText attsNew geo repNum
                 return Settings.reply
   action
 
@@ -130,7 +133,8 @@ answerMode handle message = do
   let logh = hLogger handle
       userId = message_userId message
       messageText = unpack $ message_body message
-      -- Extract pollData_result (message) from updatesData: if no new messages print Warning
+      -- Extract pollData_result (message) from updatesData:
+      --     if no new messages print Warning
   setMode handle userId Settings.reply
   case (readMaybe messageText :: Maybe Integer) of
     Just repNum -> do

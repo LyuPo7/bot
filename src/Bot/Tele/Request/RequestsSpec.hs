@@ -68,7 +68,8 @@ sendQueryNumber handle chatId question = do
       b5 = createButton "5" "Pressed 5"
       markupIn = createKeyboard [[b1, b2, b3, b4, b5]]
       query = createQueryMessage chatId question markupIn
-  Logger.logInfo logh $ "Question was sended to chat with id: " <> convert chatId
+  Logger.logInfo logh $ "Question was sended to chat with id: "
+    <> convert chatId
   makeRequest handle sendMessage query
 
 {-- | St Bot Commands "/help", "/repeat--}

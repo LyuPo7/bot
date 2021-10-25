@@ -11,7 +11,8 @@ import qualified Bot.Settings as Settings
 import qualified Bot.Logger as Logger
 import Bot.Tele.Parser.Data
 
-withHandleIO :: Logger.Handle IO -> Settings.Config -> (Handle IO -> IO a) -> IO a
+withHandleIO :: Logger.Handle IO ->
+                Settings.Config -> (Handle IO -> IO a) -> IO a
 withHandleIO logger cParser f = do
   let handle = Handle logger cParser
   f handle
@@ -24,7 +25,8 @@ parseUpdateData handle response = do
       d = eitherDecode response :: (Either String UpdateData)
   case d of
     Left err -> do
-      Logger.logError logh ("Couldn't parse UpdateData: " <> T.pack err)
+      Logger.logError logh $"Couldn't parse UpdateData: "
+        <> T.pack err
       return UpdateData {ok = True, result = []}
     Right ps -> do
       Logger.logDebug logh "UpdateData was successfully parsed."

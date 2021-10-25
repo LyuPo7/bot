@@ -10,7 +10,8 @@ import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
 import qualified Bot.Vk.Request.DocumentImpl as DocImpl
 
-withHandleIO :: Logger.Handle IO -> ParserSpec.Handle IO -> ReqSpec.Handle IO -> (Handle IO -> IO a) -> IO a
+withHandleIO :: Logger.Handle IO -> ParserSpec.Handle IO ->
+                ReqSpec.Handle IO -> (Handle IO -> IO a) -> IO a
 withHandleIO logger parserh reqh f = do
   let handle = Handle {
     hLogger = logger,

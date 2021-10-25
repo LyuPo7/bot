@@ -53,7 +53,9 @@ createHelpMessage handle userId = do
       config = configReq handle
       description = Settings.botDescription config
       token = Settings.botToken config
-      message = (defaultMessage userId token Settings.vkVersion) {sendMessag_message = description}
+      message = (defaultMessage userId token Settings.vkVersion) {
+        sendMessag_message = description
+      }
   Logger.logDebug logh "Help Message was created."
   return $ T.pack $ L8.unpack $ Url.urlEncodeAsFormStable message
 
@@ -62,14 +64,18 @@ sendHelpMessage handle userId = do
   let logh = hLogger handle
   queryOptions <- createHelpMessage handle userId
   _ <- makeRequest handle sendMessage queryOptions
-  Logger.logInfo logh $ "Help message was sended to chat with id: " <> convert userId
+  Logger.logInfo logh $ "Help message was sended to chat with id: "
+    <> convert userId
 
 -- | send EchoMessage
 geoToLatLong :: Maybe Geo -> [Maybe Double]
 geoToLatLong Nothing = [Nothing, Nothing]
-geoToLatLong (Just geo) = map (\x -> readMaybe  x :: Maybe Double) (words $ T.unpack $ geo_coordinates geo)
+geoToLatLong (Just geo) = map 
+  (\x -> readMaybe  x :: Maybe Double) 
+  (words $ T.unpack $ geo_coordinates geo)
 
-createEchoMessage :: Monad m => Handle m -> UserID -> Text -> Maybe [Attachment] -> Maybe Geo -> m Text
+createEchoMessage :: Monad m => Handle m -> UserID -> Text ->
+                     Maybe [Attachment] -> Maybe Geo -> m Text
 createEchoMessage handle userId text atts geo = do
   let logh = hLogger handle
       config = configReq handle
@@ -85,14 +91,17 @@ createEchoMessage handle userId text atts geo = do
   Logger.logDebug logh "Echo Message was created."
   return $ T.pack $ L8.unpack $ Url.urlEncodeAsFormStable message
 
-sendEchoMessage :: Monad m => Handle m -> UserID -> Text -> Maybe [Attachment] -> Maybe Geo -> m ()
+sendEchoMessage :: Monad m => Handle m -> UserID -> Text ->
+                   Maybe [Attachment] -> Maybe Geo -> m ()
 sendEchoMessage handle userId text atts geo = do
   let logh = hLogger handle
   queryOptions <- createEchoMessage handle userId text atts geo
   _ <- makeRequest handle sendMessage queryOptions
-  Logger.logInfo logh $ "Echo message was sended to chat with id: " <> convert userId
+  Logger.logInfo logh $ "Echo message was sended to chat with id: "
+    <> convert userId
 
-sendNEchoMessage :: Monad m => Handle m -> UserID -> Text -> Maybe [Attachment] -> Maybe Geo -> RepNum -> m ()
+sendNEchoMessage :: Monad m => Handle m -> UserID -> Text ->
+                    Maybe [Attachment] -> Maybe Geo -> RepNum -> m ()
 sendNEchoMessage handle _ _ _ _ 0 = do
   let logh = hLogger handle
   Logger.logInfo logh "Echo-Messages were sended."
@@ -108,16 +117,21 @@ createRepeatMessage handle userId = do
       token = Settings.botToken config
       question = Settings.botQuestion config
   keyboardF <- readFile handle "src/Bot/files/repeatButtons.txt"
-  let message = (defaultMessage userId token Settings.vkVersion) {sendMessag_message = question}
+  let message = (defaultMessage userId token Settings.vkVersion) {
+    sendMessag_message = question
+  }
   Logger.logDebug logh "Repeat Message was created."
-  return $ T.pack $ L8.unpack (Url.urlEncodeAsFormStable message) <> "&keyboard=" <> keyboardF
+  return $ T.pack $ L8.unpack (Url.urlEncodeAsFormStable message)
+    <> "&keyboard="
+    <> keyboardF
 
 sendRepeatMessage :: Monad m => Handle m -> UserID -> m ()
 sendRepeatMessage handle userId = do
   let logh = hLogger handle
   queryOptions <- createRepeatMessage handle userId
   _ <- makeRequest handle sendMessage queryOptions
-  Logger.logInfo logh $ "Repeat message was sended to chat with id: " <> convert userId
+  Logger.logInfo logh $ "Repeat message was sended to chat with id: "
+    <> convert userId
 
 attachmentsToQuery :: Maybe [Attachment] -> Maybe Text
 attachmentsToQuery Nothing = Nothing
@@ -128,10 +142,26 @@ attachmentsToQuery (Just xs) = if null queryStringApi
 
 attachmentToString :: Attachment -> Text
 attachmentToString attach = case attach_type attach of 
-    "photo" -> attach_type attach <> convert (getPhotoOwnerId attach) <> "_" <> convert (getPhotoId attach) <> "_" <> getPhotoAccessKey attach
-    "video" -> attach_type attach <> convert (getVideoOwnerId attach) <> "_" <> convert (getVideoId attach) <> "_" <> getVideoAccessKey attach
-    "audio" -> attach_type attach <> convert (getAudioOwnerId attach) <> "_" <> convert (getAudioId attach)
-    "doc" -> attach_type attach <> convert (getDocOwnerId attach) <> "_" <> convert (getDocId attach)
+    "photo" -> attach_type attach 
+                 <> convert (getPhotoOwnerId attach) 
+                 <> "_"
+                 <> convert (getPhotoId attach) 
+                 <> "_"
+                 <> getPhotoAccessKey attach
+    "video" -> attach_type attach
+                 <> convert (getVideoOwnerId attach)
+                 <> "_"
+                 <> convert (getVideoId attach)
+                 <> "_"
+                 <> getVideoAccessKey attach
+    "audio" -> attach_type attach
+                 <> convert (getAudioOwnerId attach)
+                 <> "_"
+                 <> convert (getAudioId attach)
+    "doc" -> attach_type attach
+               <> convert (getDocOwnerId attach)
+               <> "_"
+               <> convert (getDocId attach)
     _ -> ""
 
 returnStickerId :: Maybe [Attachment] -> Maybe Integer

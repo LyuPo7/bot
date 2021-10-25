@@ -5,10 +5,12 @@ module Bot.Tele.Request.RequestsImpl where
 import qualified Data.ByteString.Lazy as B
 import qualified Control.Exception as Exc
 import qualified Data.Text as T
-import Network.HTTP.Client (newManager, parseRequest, httpLbs, responseStatus, responseBody, Request(..), RequestBody(..))
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types.Status (statusCode, statusCode)
 import Data.Aeson (encode)
+import Network.HTTP.Client (Request(..), RequestBody(..), 
+                            newManager, parseRequest, httpLbs,
+                            responseStatus, responseBody)
 
 import qualified Bot.Exception as E
 import Bot.Tele.Parser.ParserSpec (Handle(..))
@@ -42,5 +44,6 @@ makeRequest handle teleRequest options = do
       Logger.logDebug logh "Successfull request to api."
       return $ responseBody response
     else do
-      Logger.logDebug logh $ "Unsuccessfull request to api with code: " <> convert codeResp
+      Logger.logDebug logh $ "Unsuccessfull request to api with code: "
+        <> convert codeResp
       Exc.throwIO $ E.ConnectionError codeResp

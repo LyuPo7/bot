@@ -5,7 +5,9 @@ module Bot.Tele.Request.Data where
 import Data.Text (Text)
 import GHC.Generics (Generic)
 import Data.Aeson (camelTo2)
-import Data.Aeson.Types (ToJSON(..), FromJSON(..), genericToJSON, defaultOptions, fieldLabelModifier, genericParseJSON)
+import Data.Aeson.Types (ToJSON(..), FromJSON(..),
+                         genericToJSON, defaultOptions,
+                         fieldLabelModifier, genericParseJSON)
 
 -- | Types for RequestOptions requests
 newtype TeleRequest = TeleRequest { getRequest :: Text }

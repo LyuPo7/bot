@@ -6,9 +6,11 @@ import qualified Data.ByteString.Lazy as B
 import qualified Control.Exception as Exc
 import qualified Data.Text as T
 import Data.Text (Text)
-import Network.HTTP.Client (newManager, parseRequest, httpLbs, responseStatus, responseBody, Request(..))
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types.Status (statusCode, statusCode)
+import Network.HTTP.Client (Request(..),
+                            newManager, parseRequest, httpLbs,
+                            responseStatus, responseBody)
 
 import qualified Bot.Exception as E
 import Bot.Logger (Handle(..))
@@ -19,7 +21,11 @@ import Bot.Util (convert)
 
 getUpdate :: Handle IO -> Text -> Text -> Integer -> IO B.ByteString
 getUpdate handle server key timeStamp = do
-  let api = T.unpack server <> "?act=a_check&key=" <> T.unpack key <> "&ts=" <> show timeStamp
+  let api = T.unpack server
+        <> "?act=a_check&key="
+        <> T.unpack key
+        <> "&ts="
+        <> show timeStamp
   manager <- newManager tlsManagerSettings
   initialRequest <- parseRequest api
   let request = initialRequest {
@@ -35,7 +41,8 @@ getUpdate handle server key timeStamp = do
       Logger.logDebug handle "Successfull request to api."
       return $ responseBody response
     else do
-      Logger.logDebug handle $ "Unsuccessfull request to api with code: " <> convert codeResp
+      Logger.logDebug handle $ "Unsuccessfull request to api with code: "
+        <> convert codeResp
       Exc.throwIO $ E.ConnectionError codeResp
 
 makeRequest :: Handle IO -> VkRequest -> Text -> IO B.ByteString
@@ -59,5 +66,6 @@ makeRequest handle vkRequest queryOptions = do
       Logger.logDebug handle "Successfull request to api."
       return $ responseBody response
     else do
-      Logger.logDebug handle $ "Unsuccessfull request to api with code: " <> convert codeResp
+      Logger.logDebug handle $ "Unsuccessfull request to api with code: "
+       <> convert codeResp
       Exc.throwIO $ E.ConnectionError codeResp

@@ -7,12 +7,16 @@ import qualified Web.FormUrlEncoded as Url
 import Data.Text (Text)
 import GHC.Generics (Generic)
 import Data.Aeson (camelTo2)
-import Data.Aeson.Types (ToJSON(..), FromJSON(..), genericToJSON, defaultOptions, fieldLabelModifier, genericParseJSON)
+import Data.Aeson.Types (ToJSON(..), FromJSON(..),
+                         genericToJSON, defaultOptions,
+                         fieldLabelModifier, genericParseJSON)
 
 import Bot.Vk.Parser.Data
 
 -- | type for RequestOptions requests
-newtype VkRequest = VkRequest { getRequest :: Text }
+newtype VkRequest = VkRequest {
+  getRequest :: Text
+}
 
 data GetLongPollServer = GetLongPollServer {
     pollServer_groupId :: Integer, -- Id of bot group.

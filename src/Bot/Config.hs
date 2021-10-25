@@ -34,10 +34,22 @@ getConfig = do
 
 checkConfig :: Config -> Either E.BotError Config
 checkConfig config 
-  | Settings.botApi cSet `notElem` ["vk", "telegram"] = Left $ E.ParseConfigError "Incorrect field 'bot_api' in config.json"
-  | Settings.botInitialReplyNumber cSet < 0 = Left $ E.ParseConfigError "Incorrect field in config.json: 'bot_initial_reply_number' < 0"
-  | Settings.botInitialReplyNumber cSet > 5 = Left $ E.ParseConfigError "Incorrect field in config.json: 'bot_initial_reply_number' > 5"
-  | Logger.cVerbocity cLog `notElem` [Just Logger.Debug, Just Logger.Info, Just Logger.Warning, Just Logger.Error, Nothing] = Left $ E.ParseConfigError "Incorrect field 'verbocity' in config.json"
+  | Settings.botApi cSet `notElem` ["vk", "telegram"] = Left 
+     $ E.ParseConfigError "Incorrect field 'bot_api' in config.json"
+  | Settings.botInitialReplyNumber cSet < 0 = Left
+     $ E.ParseConfigError "Incorrect field in config.json: \
+                          \'bot_initial_reply_number' < 0"
+  | Settings.botInitialReplyNumber cSet > 5 = Left 
+     $ E.ParseConfigError "Incorrect field in config.json: \
+                          \'bot_initial_reply_number' > 5"
+  | Logger.cVerbocity cLog `notElem` [
+      Just Logger.Debug,
+      Just Logger.Info,
+      Just Logger.Warning,
+      Just Logger.Error,
+      Nothing
+    ] = Left $ E.ParseConfigError "Incorrect field \
+                                  \'verbocity' in config.json"
   | otherwise = Right config where
       cLog = cLogger config
       cSet = cSettings config

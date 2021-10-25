@@ -11,7 +11,9 @@ import qualified Bot.Tele.Request.RequestsSpec as ReqSpec
 import qualified Bot.Tele.Parser.ParserSpec as ParserSpec
 import Bot.Tele.RunSpec (Handle(..))
 
-withHandleIO :: Logger.Handle IO -> Settings.Config -> DBSpec.Handle IO -> ReqSpec.Handle IO -> ParserSpec.Handle IO -> (Handle IO -> IO a) -> IO a
+withHandleIO :: Logger.Handle IO -> Settings.Config -> DBSpec.Handle IO ->
+                ReqSpec.Handle IO -> ParserSpec.Handle IO ->
+                (Handle IO -> IO a) -> IO a
 withHandleIO logger config dbh reqh parserh f = do
   let handle = Handle {
     hLogger = logger,

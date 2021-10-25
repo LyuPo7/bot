@@ -64,5 +64,6 @@ updateDoc handle doc = do
         document_url = upObj_url x
       }
     _ -> do
-      Logger.logWarning logh "No uploaded objects" -- Maybe only one uploaded object
+       -- Maybe only one uploaded object
+      Logger.logWarning logh "No uploaded objects"
       return doc

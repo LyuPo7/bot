@@ -15,7 +15,8 @@ data Handle m = Handle {
     updateDoc :: Document -> m Document
 }
 
-updateAttachments :: Monad m => Handle m -> Maybe [Attachment] -> m (Maybe [Attachment])
+updateAttachments :: Monad m => Handle m ->
+                     Maybe [Attachment] -> m (Maybe [Attachment])
 updateAttachments handle Nothing = do
   let logh = hLogger handle
   Logger.logDebug logh "Message hasn't Attachments."

@@ -9,7 +9,8 @@ import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
 
-withHandleIO :: Logger.Handle IO -> Settings.Config -> ParserSpec.Handle IO -> (Handle IO -> IO a) -> IO a
+withHandleIO :: Logger.Handle IO -> Settings.Config ->
+                ParserSpec.Handle IO -> (Handle IO -> IO a) -> IO a
 withHandleIO logger config parserh f = do
   let handle = Handle {
     hLogger = logger,

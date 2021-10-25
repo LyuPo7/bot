@@ -79,8 +79,8 @@ checkMode handle = do
           return $ Just updateId
         Just message -> do
           -- check if in MessageEntities appears "bot_command"
-          let chatId = chat_id $ message_chat message -- Extract chat_id from Message
-          mode <- getMode handle chatId -- Get current work mode for this User
+          let chatId = chat_id $ message_chat message -- Extract chat_id
+          mode <- getMode handle chatId -- Get current work mode User
           let action -- realise depending on mode
                 | mode == Settings.reply = do
                   _ <- replyMode handle message
@@ -103,13 +103,15 @@ replyMode :: Monad m => Handle m -> Message -> m Mode
 replyMode handle message = do
   let logh = hLogger handle
       config = cRun handle
-      messageType = filter ((== "bot_command") . messageent_type) <$> message_entities message
+      messageType = filter 
+        ((== "bot_command") . messageent_type) 
+        <$> message_entities message
       chatId = chat_id $ message_chat message -- Extract chat_id from Message
       messageId = message_messageId message -- Extract message_id from Message
       messageText = message_text message -- Extract text from Message
   case messageType of
     Nothing -> do
-      repNum <- getRepliesNumber handle chatId -- Get current replyNum mode for this Chat
+      repNum <- getRepliesNumber handle chatId -- Get current replyNum mode Chat
       sendNEchoMessage handle chatId messageId repNum
       Logger.logInfo logh "It's ordinary message from User."
       return Settings.reply
@@ -117,21 +119,22 @@ replyMode handle message = do
       let action
             | Just Settings.helpMessage == messageText = do
               Logger.logInfo logh "User's /help message"
-              let description = Settings.botDescription config -- Get bot description from config
+              let description = Settings.botDescription config
               sendTextMessage handle chatId description
               return Settings.reply
             | Just Settings.repeatMessage == messageText = do
-              let quetion = Settings.botQuestion config -- Get bot quetion from config
+              let quetion = Settings.botQuestion config
               _ <- sendQueryNumber handle chatId quetion
               Logger.logInfo logh "Info: User's /repeat message"
               setMode handle chatId Settings.answer
               return Settings.answer
             | Just Settings.startMessage == messageText = do
               Logger.logInfo logh "User's /start message"
-              sendTextMessage handle chatId "You are welcome!" -- Welcome message for User
+              sendTextMessage handle chatId "You are welcome!"
               return Settings.reply
             | otherwise = do
-              Logger.logError logh "Recieved unsupported bot-command!" -- Ignore it
+              -- Ignore it
+              Logger.logError logh "Recieved unsupported bot-command!"
               return Settings.reply
       action
 
@@ -140,12 +143,15 @@ answerMode :: Monad m => Handle m -> Message -> m (Maybe RepNum)
 answerMode handle message = do
   let logh = hLogger handle
       messageId = message_messageId message
-      chatId = chat_id $ message_chat message -- Extract chat_id from Message
-      messageText = T.unpack $ fromMaybe "" $ message_text message -- Extract text from Message
+      -- Extract chat_id from Message
+      chatId = chat_id $ message_chat message
+      -- Extract text from Message
+      messageText = T.unpack $ fromMaybe "" $ message_text message 
   setMode handle chatId Settings.reply
   case (readMaybe messageText :: Maybe Integer) of -- Trying parse answer
     Just repNum -> do
-      Logger.logInfo logh $ "Info: Recieved user's answer: " <> convert messageId
+      Logger.logInfo logh $ "Info: Recieved user's answer: "
+        <> convert messageId
       setRepliesNumber handle chatId repNum -- set new replyNum to db
       return $ Just repNum
     Nothing -> do
