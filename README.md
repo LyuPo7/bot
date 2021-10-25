@@ -29,7 +29,7 @@
  
 <h3>How to use?</h3>
     <ol>
-        <li> <h4>Setup data/config.json</h4>
+        <li> <h4>Setup data/config.json (for example see config-json-file: 'data/config_tele.json' for Telegram and 'data/config_vk.json' for Vk)</h4>
              <ul>
                  <li><b>"api_settings"</b></li>
                     <ul>
@@ -52,7 +52,7 @@
            </ul>
        </li>
        <li><h4>Run project using <b>stack</b>:</h4>
-           <ul><b>$ stack exec post-server-exe</b>
+           <ul><b>$ stack exec bot-exe</b>
            </ul>
                <p>For more information see asciinema below:
                   <a href="https://asciinema.org/a/443725" target="_blank"><img src="https://asciinema.org/a/443725.svg" /></a></b>
