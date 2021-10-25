@@ -7,13 +7,15 @@ import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Web.FormUrlEncoded as Url
 import qualified Data.Text as T
+import qualified Control.Monad.Catch as Exc
 import Data.Text (Text)
-import Data.Maybe (fromMaybe)
 import Text.Read (readMaybe)
+import Control.Monad.Catch (MonadThrow)
 
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
+import qualified Bot.Exception as E
 import Bot.Vk.Parser.Data
 import Bot.Vk.Request.Data
 import Bot.Util (convert)
@@ -29,17 +31,22 @@ data Handle m = Handle {
 }
 
 -- | Server query
-createServerQuery :: Monad m => Handle m -> m Text
+createServerQuery :: (MonadThrow m, Monad m) => Handle m -> m Text
 createServerQuery handle = do
   let logh = hLogger handle
       config = configReq handle
-      groupId = fromMaybe 0 $ Settings.botGroupId config
-      token = Settings.botToken config
-      params = getPollServer groupId token Settings.vkVersion
-  Logger.logDebug logh "Server query string was created."
-  return $ T.pack $ L8.unpack $ Url.urlEncodeAsFormStable params
+  case Settings.botGroupId config of
+    Nothing -> do
+      let msg = "'bot_group_id' is required for Api Vk"
+      Logger.logError logh msg
+      Exc.throwM $ E.ParseConfigError $ T.unpack msg
+    Just groupId -> do
+      let token = Settings.botToken config
+          params = getPollServer groupId token Settings.vkVersion
+      Logger.logDebug logh "Server query string was created."
+      return $ T.pack $ L8.unpack $ Url.urlEncodeAsFormStable params
 
-getServer :: Monad m => Handle m -> m B.ByteString
+getServer :: (MonadThrow m, Monad m) => Handle m -> m B.ByteString
 getServer handle = do
   let logh = hLogger handle
   queryOptions <- createServerQuery handle
@@ -116,7 +123,7 @@ createRepeatMessage handle userId = do
       config = configReq handle
       token = Settings.botToken config
       question = Settings.botQuestion config
-  keyboardF <- readFile handle "src/Bot/files/repeatButtons.txt"
+  keyboardF <- readFile handle "data/Vk/repeatButtons.txt"
   let message = (defaultMessage userId token Settings.vkVersion) {
     sendMessag_message = question
   }
@@ -135,34 +142,51 @@ sendRepeatMessage handle userId = do
 
 attachmentsToQuery :: Maybe [Attachment] -> Maybe Text
 attachmentsToQuery Nothing = Nothing
-attachmentsToQuery (Just xs) = if null queryStringApi
-  then Nothing
-  else Just $ T.intercalate "," queryStringApi
-  where queryStringApi = filter (not . T.null) (map attachmentToString xs)
+attachmentsToQuery (Just xs) = do
+  let attsStrsL = filter (/= Nothing) (map attachmentToString xs)
+  case attsStrsL of
+    [] -> Nothing
+    attsStrsML -> do
+      attsStrs <- sequenceA attsStrsML
+      Just $ T.intercalate "," attsStrs
 
-attachmentToString :: Attachment -> Text
+attachmentToString :: Attachment -> Maybe Text
 attachmentToString attach = case attach_type attach of 
-    "photo" -> attach_type attach 
-                 <> convert (getPhotoOwnerId attach) 
-                 <> "_"
-                 <> convert (getPhotoId attach) 
-                 <> "_"
-                 <> getPhotoAccessKey attach
-    "video" -> attach_type attach
-                 <> convert (getVideoOwnerId attach)
-                 <> "_"
-                 <> convert (getVideoId attach)
-                 <> "_"
-                 <> getVideoAccessKey attach
-    "audio" -> attach_type attach
-                 <> convert (getAudioOwnerId attach)
-                 <> "_"
-                 <> convert (getAudioId attach)
-    "doc" -> attach_type attach
-               <> convert (getDocOwnerId attach)
-               <> "_"
-               <> convert (getDocId attach)
-    _ -> ""
+    "photo" -> do
+      ownerId <- photo_ownerId <$> attach_photo attach
+      photoId <- photo_id <$> attach_photo attach
+      key <- photo_accessKey <$> attach_photo attach
+      return $ attach_type attach 
+        <> convert ownerId 
+        <> "_"
+        <> convert photoId
+        <> "_"
+        <> key
+    "video" -> do
+      ownerId <- video_ownerId <$> attach_video attach
+      videoId <- video_id <$> attach_video attach
+      key <- video_accessKey <$> attach_video attach
+      return $ attach_type attach 
+        <> convert ownerId 
+        <> "_"
+        <> convert videoId
+        <> "_"
+        <> key
+    "audio" -> do
+      ownerId <- audio_ownerId <$> attach_audio attach
+      audioId <- audio_id <$> attach_audio attach
+      return $ attach_type attach 
+        <> convert ownerId 
+        <> "_"
+        <> convert audioId
+    "doc" -> do
+      ownerId <- document_ownerId <$> attach_doc attach
+      docId <- document_id <$> attach_doc attach
+      return $ attach_type attach 
+        <> convert ownerId 
+        <> "_"
+        <> convert docId
+    _ -> Nothing
 
 returnStickerId :: Maybe [Attachment] -> Maybe Integer
 returnStickerId xsm = do
@@ -171,39 +195,3 @@ returnStickerId xsm = do
   case awSticker of
     [x] -> sticker_id <$> attach_sticker x
     _ -> Nothing -- Sticker maybe only one in Message
-
--- get Attachment's Id
-getPhotoId :: Attachment -> Integer
-getPhotoId attach = maybe 0 photo_id (attach_photo attach)
-
-getVideoId :: Attachment -> Integer
-getVideoId attach = maybe 0 video_id (attach_video attach)
-
-getAudioId :: Attachment -> Integer
-getAudioId attach = maybe 0 audio_id (attach_audio attach)
-
-getDocId :: Attachment -> Integer
-getDocId attach = maybe 0 document_id (attach_doc attach)
-
--- | get Attachment's ownerId
-getPhotoOwnerId :: Attachment -> Integer
-getPhotoOwnerId attach = maybe 0 photo_ownerId (attach_photo attach)
-
-getVideoOwnerId :: Attachment -> Integer
-getVideoOwnerId attach = maybe 0 video_ownerId (attach_video attach)
-
-getAudioOwnerId :: Attachment -> Integer
-getAudioOwnerId attach = maybe 0 audio_ownerId (attach_audio attach)
-
-getDocOwnerId :: Attachment -> Integer
-getDocOwnerId attach = maybe 0 document_ownerId (attach_doc attach)
-
--- get Attachment's access_key
-getPhotoAccessKey :: Attachment -> Text
-getPhotoAccessKey attach = maybe "" photo_accessKey (attach_photo attach)
-
-getVideoAccessKey :: Attachment -> Text
-getVideoAccessKey attach = maybe "" video_accessKey (attach_video attach)
-
-getDocAccessKey :: Attachment -> Text
-getDocAccessKey attach = maybe "" document_accessKey (attach_doc attach)

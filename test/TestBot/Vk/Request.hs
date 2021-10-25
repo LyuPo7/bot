@@ -3,6 +3,7 @@
 module TestBot.Vk.Request where
 
 import Control.Monad.Identity
+import Control.Monad.Catch (MonadThrow(..))
 
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
@@ -15,6 +16,9 @@ import qualified TestBot.Vk.Handlers as H
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
 import Bot.Vk.Parser.Data
 
+instance MonadThrow Identity where
+  throwM e = undefined
+
 spec_attachmentToString :: Spec
 spec_attachmentToString = describe "Testing attachmentToString" $ do
     it "Should successfully convert Attachment with Doc to String" $ do
@@ -22,29 +26,29 @@ spec_attachmentToString = describe "Testing attachmentToString" $ do
           docAttach = defaultAttach {attach_type = "doc", attach_doc = Just doc}
           result = ReqSpec.attachmentToString docAttach
           check = "doc129_781"
-      result `shouldBe` check
+      result `shouldBe` (Just check)
     it "Should successfully convert Attachment with Photo to String" $ do
       let photo = Photo {photo_id = 810, photo_ownerId = 589, photo_accessKey = "<97z\vYG\v$L"}
           photoAttach = defaultAttach {attach_type = "photo", attach_photo = Just photo}
           result = ReqSpec.attachmentToString photoAttach
           check = "photo589_810_<97z\vYG\v$L"
-      result `shouldBe` check
+      result `shouldBe` (Just check)
     it "Should successfully convert Attachment with Video to String" $ do
       let video = Video {video_id = 567, video_ownerId = 387, video_accessKey = "\DC47H)S:~:*3"}
           videoAttach = defaultAttach {attach_type = "video", attach_video = Just video}
           result = ReqSpec.attachmentToString videoAttach
           check = "video387_567_\DC47H)S:~:*3"
-      result `shouldBe` check
+      result `shouldBe` (Just check)
     it "Should successfully convert Attachment with Audio to String" $ do
       let audio = Audio {audio_id = 787, audio_ownerId = 861}
           audioAttach = defaultAttach {attach_type = "audio", attach_audio = Just audio}
           result = ReqSpec.attachmentToString audioAttach
           check = "audio861_787"
-      result `shouldBe` check
+      result `shouldBe` (Just check)
     it "Should successfully return '' for accidental Attachment if its type is not in ['doc','photo','video','audio']" $ do
       attach <- Gen.sample GD.genCompAttach
       let result = ReqSpec.attachmentToString attach
-      result `shouldBe` ""
+      result `shouldBe` Nothing
 
 spec_attachmentsToQuery :: Spec
 spec_attachmentsToQuery = describe "Testing attachmentsToQuery" $ do
@@ -98,9 +102,6 @@ spec_returnStickerId = describe "Testing returnStickerId" $ do
   
 spec_createServerQuery :: Spec
 spec_createServerQuery = describe "Testing createServerQuery" $ do
-    it "Should successfully Server query string using 0 if group_id==Nothing" $ do
-      let result = ReqSpec.createServerQuery H.reqH
-      result `shouldBe` (Identity "access_token=abcd0dcba&group_id=0&v=5.81")
     it "Should successfully Server query string with group_id==Just a" $ do
       let reqH2 = H.reqH {ReqSpec.configReq = H.runCVk}
           result = ReqSpec.createServerQuery reqH2

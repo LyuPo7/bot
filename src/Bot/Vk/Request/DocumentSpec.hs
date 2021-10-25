@@ -5,7 +5,6 @@ module Bot.Vk.Request.DocumentSpec where
 import qualified Data.ByteString.Lazy as B
 import qualified Data.Text as T
 import Data.Text (Text)
-import Data.Maybe (fromMaybe)
 import System.FilePath.Posix ((</>))
 
 import qualified Bot.Vk.Parser.Parser as Parser
@@ -48,22 +47,26 @@ updateDoc handle doc = do
   -- upload file
   fileUp <- uploadFile handle url fileName
   fileResp <- Parser.parseUploadFile parseh fileUp
-  let file = fromMaybe (T.pack "") $ upFileResponse_file fileResp
-  Logger.logInfo logh "File was uploaded"
-  -- save file
-  objUp <- saveUploadedDoc handle file
-  obj <- Parser.parseUploadObject parseh objUp
-  -- remove tempFile
-  --removeDirectoryRecursive tempDir
-  case upObjResponse_response obj of
-    [x] -> do
-      Logger.logInfo logh "Doc changed"
-      return doc {
-        document_id = upObj_id x,
-        document_ownerId = upObj_ownerId x,
-        document_url = upObj_url x
-      }
-    _ -> do
-       -- Maybe only one uploaded object
-      Logger.logWarning logh "No uploaded objects"
+  case upFileResponse_file fileResp of
+    Nothing -> do
+      Logger.logError logh "File wasn't uploaded"
       return doc
+    Just file -> do
+      Logger.logInfo logh "File was uploaded"
+      -- save file
+      objUp <- saveUploadedDoc handle file
+      obj <- Parser.parseUploadObject parseh objUp
+      -- remove tempFile
+      --removeDirectoryRecursive tempDir
+      case upObjResponse_response obj of
+        [x] -> do
+          Logger.logInfo logh "Doc changed"
+          return doc {
+            document_id = upObj_id x,
+            document_ownerId = upObj_ownerId x,
+            document_url = upObj_url x
+          }
+        _ -> do
+          -- Maybe only one uploaded object
+          Logger.logWarning logh "No uploaded objects"
+          return doc

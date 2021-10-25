@@ -69,8 +69,8 @@ data SendMessage = SendMessage {
     sendMessag_v :: Text, -- Api version.
     sendMessag_attachment :: Maybe Text, -- Attachments.
     sendMessag_stickerId :: Maybe Integer, -- Sticker id.
-    sendMessag_lat :: Maybe Double, -- Geographical latitude of a check-in, in degrees (from -90 to 90).
-    sendMessag_long :: Maybe Double -- 	Geographical longitude of a check-in, in degrees (from -180 to 180).
+    sendMessag_lat :: Maybe Double, -- Geographical latitude.
+    sendMessag_long :: Maybe Double -- 	Geographical longitude.
 } deriving (Generic)
 
 instance FromJSON SendMessage where
@@ -91,7 +91,7 @@ instance Url.ToForm SendMessage where
 
 data GetUploadLink = GetUploadLink {
     getUplLink_type :: Text, -- Type of document: "doc", ... .
-    getUplLink_peerId :: Integer, -- Community ID (if the document will be uploaded to the community).
+    getUplLink_peerId :: Integer, -- Community ID..
     getUplLink_accessToken :: Text, -- Token
     getUplLink_v :: Text -- Api version
 } deriving (Generic)
@@ -113,7 +113,7 @@ instance Url.ToForm GetUploadLink where
     Url.fieldLabelModifier = camelTo2 '_' . drop 11 }
 
 data SaveDoc = SaveDoc {
-    saveDocSer_file :: Text, -- This parameter is returned when the file is uploaded to the server.
+    saveDocSer_file :: Text, -- Returned file is uploaded to the server.
     saveDocSer_accessToken :: Text, -- Token.
     saveDocSer_v :: Text -- Api version.
 } deriving (Generic)

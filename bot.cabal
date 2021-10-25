@@ -85,6 +85,7 @@ library
     , text-show
     , time
     , transformers
+    , transformers-either
     , utf8-string
   default-language: Haskell2010
 
@@ -121,6 +122,7 @@ executable bot-exe
     , text-show
     , time
     , transformers
+    , transformers-either
     , utf8-string
   default-language: Haskell2010
 
@@ -142,7 +144,7 @@ test-suite bot-test
       TestBot.Tele.Handlers
   hs-source-dirs:
       test
-  ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HDBC >=2.4
     , HDBC-sqlite3 >=2.3.3.0
@@ -174,5 +176,6 @@ test-suite bot-test
     , text-show
     , time
     , transformers
+    , transformers-either
     , utf8-string
   default-language: Haskell2010

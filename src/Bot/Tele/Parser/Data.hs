@@ -31,10 +31,10 @@ instance ToJSON Chat where
 
 -- | Message
 data Message = Message {
-  message_messageId :: MessageID, -- Unique message identifier inside this chat.
+  message_messageId :: MessageID, -- Unique message identifier..
   message_chat :: Chat, -- Conversation the message belongs to.
-  message_text :: Maybe Text, -- For text messages, the actual UTF-8 text of the message, 0-4096 characters.
-  message_entities :: Maybe [MessageEntity] --  For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text.
+  message_text :: Maybe Text, -- Text of message.
+  message_entities :: Maybe [MessageEntity] -- Entities of message.
   } deriving (Show, Read, Eq, Generic)
 
 instance FromJSON Message where
@@ -47,7 +47,7 @@ instance ToJSON Message where
 
 -- | MessageEntity
 newtype MessageEntity = MessageEntity {
-  messageent_type :: Text -- Type of the entity. Can be “mention” (@username), “hashtag” (#hashtag),...
+  messageent_type :: Text -- Type of the entity.
   } deriving (Show, Read, Eq, Generic)
 
 instance FromJSON MessageEntity where
@@ -61,7 +61,7 @@ instance ToJSON MessageEntity where
 -- | Update
 data Update = Update {
   update_updateId :: UpdateID, -- The update's unique identifier.
-  update_message :: Maybe Message -- New incoming message of any kind — text, photo, sticker, etc.
+  update_message :: Maybe Message -- New incoming message of any kind.
 } deriving (Show, Read, Eq, Generic)
 
 instance FromJSON Update where

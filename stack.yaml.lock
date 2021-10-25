@@ -53,6 +53,13 @@ packages:
       sha256: b19e23dc469491661e9d1a40a9ba65ce745d4fd0143d4f9f7be824c8a5e2cee8
   original:
     hackage: http-client-tls-0.3.5.3
+- completed:
+    hackage: transformers-either-0.1.2@sha256:e2ba24af49df7fa09794dcff6cb203d086d5c18e35b3cf10a8ecf7eb465fdedf,1677
+    pantry-tree:
+      size: 270
+      sha256: 9c3388ec26e91b6f5115ddeafee991a3589b76b67ea15e333af5946706be374c
+  original:
+    hackage: transformers-either-0.1.2
 snapshots:
 - completed:
     size: 585393

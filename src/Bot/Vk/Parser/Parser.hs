@@ -5,11 +5,11 @@ module Bot.Vk.Parser.Parser where
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.Text as T
 import Data.Aeson (eitherDecode)
+import Data.Text (Text)
 
 import Bot.Vk.Parser.ParserSpec (Handle(..))
 import qualified Bot.Logger as Logger
-import Bot.Vk.Parser.Data (PollResponse(..), UpdateData(..), UploadUrlResponse(..),
-                           UploadFileResponse(..), UploadObjectResponse(..))
+import Bot.Vk.Parser.Data
 
 withHandleIO :: Logger.Handle IO -> (Handle IO -> IO a) -> IO a
 withHandleIO logger f = do
@@ -31,6 +31,21 @@ parsePollResponse handle response = do
     Right _ -> do
       Logger.logDebug logh "Poll response was successfully parsed."
       return d
+
+{-- | PollResponse parser --}
+parsePollResponseText :: Monad m => Handle m -> L8.ByteString ->
+                         m (Either Text PollResponseText)
+parsePollResponseText handle response = do
+  let logh = hLogger handle
+      d = eitherDecode response :: Either String PollResponseText
+  case d of
+    Left err -> do
+      Logger.logError logh $ "Couldn't parse poll-text response: "
+        <> T.pack err
+      return $ Left $ T.pack err
+    Right pollResponse -> do
+      Logger.logDebug logh "Poll-text response was successfully parsed."
+      return $ Right pollResponse
 
 {-- | UpdateData parser --}
 parseUpdateData :: Monad m => Handle m -> L8.ByteString -> m UpdateData

@@ -4,10 +4,12 @@ module Bot.Vk.RunSpec where
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as L8
+import qualified Data.Text as T
 import Data.Maybe (fromMaybe)
 import Text.Read (readMaybe)
-import Data.Text (Text, unpack, pack)
+import Data.Text (Text)
 import Control.Monad.Catch (MonadThrow, throwM)
+import Control.Monad.Trans.Either
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger as Logger
@@ -17,7 +19,7 @@ import qualified Bot.Vk.Request.RequestsSpec as Req
 import qualified Bot.Vk.Request.AttachSpec as Attach
 import qualified Bot.Vk.Parser.ParserSpec as Parser
 import Bot.Vk.Parser.Data
-import Bot.Util (convert)
+import Bot.Util (convert, readEitherMa)
 
 data Handle m = Handle {
     hLogger :: Logger.Handle m,
@@ -28,6 +30,7 @@ data Handle m = Handle {
     hAttach :: Attach.Handle m,
     
     parsePollResponse :: L8.ByteString -> m (Either String PollResponse),
+    parsePollResponseText :: L8.ByteString -> m (Either Text PollResponseText),
     parseUpdateData :: L8.ByteString -> m UpdateData,
     parseUploadUrl :: L8.ByteString -> m UploadUrlResponse,
     parseUploadFile :: L8.ByteString -> m UploadFileResponse,
@@ -58,10 +61,23 @@ run handle = do
   serverUp <- getServer handle
   serverE <- parsePollResponse handle serverUp
   case serverE of
-    Left msg -> throwM $ E.ParseRequestError msg
     Right params -> do
       let serverParams = pollResponse_response params
       checkMode handle serverParams
+    Left msg -> do
+      Logger.logWarning logh $ T.pack msg
+      serverParamsE <- runEitherT $ do
+        params <- EitherT $ parsePollResponseText handle serverUp
+        let tsText = serverText_ts $ pollResponseText_response params
+        tsInt <- EitherT $ readEitherMa tsText
+        return Server {
+          server_key = serverText_key $ pollResponseText_response params,
+          server_server = serverText_server $ pollResponseText_response params,
+          server_ts = tsInt
+        }
+      case serverParamsE of
+        Left msg2 -> throwM $ E.ParseRequestError $ T.unpack msg2
+        Right serverParams -> checkMode handle serverParams
 
 checkMode :: Monad m => Handle m -> Server -> m ()
 checkMode handle serverParams = do
@@ -91,10 +107,10 @@ checkMode handle serverParams = do
           message = update_object x -- Extract Message from Update
           userId = message_userId message
       mode <- getMode handle userId
-      let action | mode == Settings.reply && updateType == pack "message_new" = do
+      let action | mode == Settings.reply && updateType == T.pack "message_new" = do
                     _ <- replyMode handle message
                     Logger.logDebug logh "Bot in reply mode."
-                 | mode == Settings.answer && updateType == pack "message_new" = do
+                 | mode == Settings.answer && updateType == T.pack "message_new" = do
                     _ <- answerMode handle message
                     Logger.logDebug logh "Bot in answer mode."
                  | otherwise = Logger.logError logh "Unsuported type of update."
@@ -132,7 +148,7 @@ answerMode :: Monad m => Handle m -> Message -> m (Maybe RepNum)
 answerMode handle message = do
   let logh = hLogger handle
       userId = message_userId message
-      messageText = unpack $ message_body message
+      messageText = T.unpack $ message_body message
       -- Extract pollData_result (message) from updatesData:
       --     if no new messages print Warning
   setMode handle userId Settings.reply

@@ -5,7 +5,9 @@ module Bot.Vk.Parser.Data where
 import Data.Text (Text)
 import GHC.Generics (Generic)
 import Data.Aeson (camelTo2)
-import Data.Aeson.Types (ToJSON(..), FromJSON(..), genericToJSON, defaultOptions, fieldLabelModifier, genericParseJSON)
+import Data.Aeson.Types (ToJSON(..), FromJSON(..),
+                         genericToJSON, defaultOptions,
+                         fieldLabelModifier, genericParseJSON)
 
 -- Synonims
 type UserID = Integer
@@ -56,7 +58,7 @@ instance ToJSON Users where
 
 -- | Message
 data Message = Message {
-  message_messageId :: Maybe MessageID, -- Message ID. (Not returned for forwarded messages).
+  message_messageId :: Maybe MessageID, -- Message ID.
   message_userId :: UserID, -- Message author ID.
   message_body :: Text, -- message text.
   message_geo :: Maybe Geo, -- Information about location.  
@@ -113,7 +115,7 @@ instance ToJSON Attachment where
 data Photo = Photo {
   photo_id :: Integer, -- Photo ID.
   photo_ownerId :: Integer, -- Photo owner ID.
-  photo_accessKey :: Text -- Field is returned with objects which could have specific privacy settings. 
+  photo_accessKey :: Text -- For privacy settings. 
   } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Photo where
@@ -128,7 +130,7 @@ instance ToJSON Photo where
 data Video = Video {
   video_id :: Integer, -- Video ID.
   video_ownerId :: Integer, -- ID of the user or community that owns the video.
-  video_accessKey :: Text -- Field is returned with objects which could have specific privacy settings. 
+  video_accessKey :: Text -- For specific privacy settings. 
   } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Video where
@@ -158,8 +160,8 @@ data Document = Document {
   document_id :: Integer, -- Document ID.
   document_ownerId :: Integer, -- Document owner ID.
   document_title :: Text, -- Document title.
-  document_url :: Text, -- Link to file. Note that links are bound to an IP address.
-  document_accessKey :: Text -- Field is returned with objects which could have specific privacy settings. 
+  document_url :: Text, -- Link to file.
+  document_accessKey :: Text -- For privacy settings. 
   } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON Document where
@@ -280,6 +282,21 @@ instance ToJSON Server where
   toJSON = genericToJSON defaultOptions {
     fieldLabelModifier = drop 7 }
 
+-- | ServerText with ts String
+data ServerText = ServerText {
+  serverText_key :: Text, -- Key for requests.
+  serverText_server :: Text, -- Requests server.
+  serverText_ts :: Text  -- Server time stamp.
+  } deriving (Show, Read, Eq,Generic) 
+
+instance FromJSON ServerText where
+  parseJSON = genericParseJSON defaultOptions {
+    fieldLabelModifier = drop 11 }
+
+instance ToJSON ServerText where
+  toJSON = genericToJSON defaultOptions {
+    fieldLabelModifier = drop 11 }
+
 -- | PollResponse
 newtype PollResponse = PollResponse {
   pollResponse_response :: Server -- Server.
@@ -292,6 +309,19 @@ instance FromJSON PollResponse where
 instance ToJSON PollResponse where
   toJSON = genericToJSON defaultOptions {
     fieldLabelModifier = drop 13 }
+
+-- | PollResponseText with ts String in Server
+newtype PollResponseText = PollResponseText {
+  pollResponseText_response :: ServerText -- Server.
+  } deriving (Show, Read, Eq,Generic) 
+
+instance FromJSON PollResponseText where
+  parseJSON = genericParseJSON defaultOptions {
+    fieldLabelModifier = drop 17 }
+
+instance ToJSON PollResponseText where
+  toJSON = genericToJSON defaultOptions {
+    fieldLabelModifier = drop 17 }
 
 -- | UploadUrlResponse
 newtype UploadUrlResponse = UploadUrlResponse {
@@ -349,7 +379,7 @@ instance ToJSON UploadObjectResponse where
 data UploadObject = UploadObject {
   upObj_id :: Integer, -- Object ID.
   upObj_ownerId :: Integer, -- Object owner ID.
-  upObj_url :: Text -- Link to Object. Note that links are bound to an IP address.
+  upObj_url :: Text -- Link to Object.
   } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON UploadObject where
@@ -364,7 +394,7 @@ instance ToJSON UploadObject where
 data Keyboard = Keyboard {
   keyboard_oneTime :: Maybe Bool, -- Hides the keyboard after the initial use.
   keyboard_buttons :: [[Button]], -- An array of button arrays.
-  keyboard_inline :: Maybe Bool -- Shows the keyboard inside the message.(In this case, one_time parameter is not supported)
+  keyboard_inline :: Maybe Bool -- Shows the keyboard inside the message.
 } deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Keyboard where
@@ -377,8 +407,8 @@ instance ToJSON Keyboard where
 
 -- | Button
 data Button = Button {
-  button_action :: Action, -- An object that describes the type of action and its parameters.
-  button_color :: Maybe Text -- Button color. This parameter is used only for buttons with the text type <- [primary,secondary,negative,positive]
+  button_action :: Action, -- An object that describes the type of action.
+  button_color :: Maybe Text -- Button color.
 } deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Button where
@@ -392,8 +422,8 @@ instance ToJSON Button where
 -- | Action
 data Action = Action {
   action_type :: Text, -- "callback", "text", ... .
-  action_label :: Text, -- Button text. It is sent by the user to the chat after pressing
-  action_payload :: Text -- Additional information. It is returned in the messages_new event inside the payload property.
+  action_label :: Text, -- Button text.
+  action_payload :: Text -- Additional information.
 } deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Action where

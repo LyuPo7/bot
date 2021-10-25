@@ -41,7 +41,7 @@ repeatMessage = "/repeat" -- request for change reply number;
 -- | Bot modes
 reply, answer :: Text
 reply = "reply" -- in this mode: Bot replies for every User's message;
-answer = "answer" -- in this mode: Bot tries to recieve new reply number from User;
+answer = "answer" -- in this mode: Bot tries to recieve new reply number;
 
 -- | Api host
 apiTele, apiVk :: Host

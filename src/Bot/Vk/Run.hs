@@ -12,7 +12,9 @@ import qualified Bot.Vk.Request.AttachSpec as AttachSpec
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import Bot.Vk.RunSpec (Handle(..))
 
-withHandleIO :: Logger.Handle IO -> Settings.Config -> DBSpec.Handle IO -> ReqSpec.Handle IO -> ParserSpec.Handle IO -> AttachSpec.Handle IO -> (Handle IO -> IO a) -> IO a
+withHandleIO :: Logger.Handle IO -> Settings.Config -> DBSpec.Handle IO ->
+                ReqSpec.Handle IO -> ParserSpec.Handle IO ->
+                AttachSpec.Handle IO -> (Handle IO -> IO a) -> IO a
 withHandleIO logger config dbh reqh parserh attachh f = do
   let handle = Handle {
     hLogger = logger,
@@ -24,6 +26,7 @@ withHandleIO logger config dbh reqh parserh attachh f = do
     
     parseUpdateData = Parser.parseUpdateData parserh,
     parsePollResponse = Parser.parsePollResponse parserh,
+    parsePollResponseText = Parser.parsePollResponseText parserh,
     parseUploadUrl = Parser.parseUploadUrl parserh,
     parseUploadFile = Parser.parseUploadFile parserh,
     parseUploadObject = Parser.parseUploadObject parserh,
