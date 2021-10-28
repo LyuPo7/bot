@@ -7,7 +7,7 @@
     <ul>
         <li><b>Resends user's message to user;</b></li>
         <li><b>Allows the user to choose number of bot replies;</b></li>
-        <li><b>Using <b>Sqlite3</b> as DB for store user settings;
+        <li>Using <b>Sqlite3</b> as DB for store user settings;
         <li>Supports 2 api:
           <ul>
              <li><b>telegram;</b></li>
