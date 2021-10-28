@@ -7,6 +7,7 @@
     <ul>
         <li><b>Resends user's message to user;</b></li>
         <li><b>Allows the user to choose number of bot replies;</b></li>
+        <li><b>Using <b>Sqlite3</b> as DB for store user settings;
         <li>Supports 2 api:
           <ul>
              <li><b>telegram;</b></li>
@@ -46,6 +47,10 @@
                         <li><b>"verbocity":</b> level of logging - must be one of ["debug", "info", "warning", "error"];</li>
                     </ul>
              </ul>
+       </li>
+       <li><h4>Since bot use Sqlite3 You'll need check if you have installed Sqlite3 in your system (if not use):</h4>
+           <ul><b>$ sudo apt-get update -y && sudo apt-get install sqlite3 libsqlite3-dev -y</b>
+           </ul>
        </li>
        <li><h4>Build project using <b>stack</b>:</h4>
            <ul><b>$ stack build</b>
