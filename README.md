@@ -48,7 +48,7 @@
                     </ul>
              </ul>
        </li>
-       <li><h4>Since bot use Sqlite3 You'll need check if you have installed Sqlite3 in your system (if not use):</h4>
+       <li><h4>Since bot use Sqlite3 You'll need check if you have installed Sqlite3 in your system (if not - use):</h4>
            <ul><b>$ sudo apt-get update -y && sudo apt-get install sqlite3 libsqlite3-dev -y</b>
            </ul>
        </li>
