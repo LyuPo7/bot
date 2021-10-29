@@ -20,16 +20,21 @@ genId = Gen.int (Range.constant 0 1000)
 
 genValidLogConfig :: Gen Logger.Config
 genValidLogConfig = Logger.Config
-  <$> Gen.element [Just Logger.Debug, Just Logger.Info, Just Logger.Warning, Just Logger.Error, Nothing]
+  <$> Gen.element [
+        Just Logger.Debug,
+        Just Logger.Info,
+        Just Logger.Warning,
+        Just Logger.Error,
+        Nothing]
 
 genValidSetConfig :: Gen Settings.Config
 genValidSetConfig = Settings.Config
   <$> Gen.element ["vk", "telegram"]
   <*> Gen.text (Range.constant 10 15) Gen.ascii
-  <*> (toInteger <$> (Gen.int (Range.constant 1 5)))
+  <*> (toInteger <$> Gen.int (Range.constant 1 5))
   <*> Gen.element ["Reps?"]
   <*> Gen.element ["Bot!"]
-  <*> (Gen.maybe (toInteger <$> (Gen.int (Range.constant 0 1000))))
+  <*> Gen.maybe (toInteger <$> Gen.int (Range.constant 0 1000))
 
 genValidConfig :: Gen Config
 genValidConfig = Config

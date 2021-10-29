@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings, RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
@@ -50,4 +50,4 @@ main = Exc.handle errorHandler $ do
       Exc.throwIO $ E.ParseConfigError "Incorrect field 'bot_api' in config.json" 
     where
       errorHandler :: E.BotError -> IO ()
-      errorHandler e = putStrLn $ show e
+      errorHandler e = print e

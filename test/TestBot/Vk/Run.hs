@@ -20,19 +20,19 @@ prop_answerModeFail = property $ do
 prop_answerModeSuc :: Property
 prop_answerModeSuc = property $ do
   message <- forAll GD.genNum5Message
-  RunSpec.answerMode H.runH message === (Identity $ Just 5)
+  RunSpec.answerMode H.runH message === Identity (Just 5)
 
 prop_replyModeReplySuc :: Property
 prop_replyModeReplySuc = property $ do
   message <- forAll GD.genBotHelpMessage
-  RunSpec.replyMode H.runH message === (Identity Settings.reply)
+  RunSpec.replyMode H.runH message === Identity Settings.reply
 
 prop_replyModeAnswerSuc :: Property
 prop_replyModeAnswerSuc = property $ do
   message <- forAll GD.genBotRepeatMessage
-  RunSpec.replyMode H.runH message === (Identity Settings.answer)
+  RunSpec.replyMode H.runH message === Identity Settings.answer
 
 prop_replyModeOrdinarySuc :: Property
 prop_replyModeOrdinarySuc = property $ do
   message <- forAll GD.genMessageWoBotCom
-  RunSpec.replyMode H.runH message === (Identity Settings.reply)
+  RunSpec.replyMode H.runH message === Identity Settings.reply

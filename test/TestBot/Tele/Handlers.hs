@@ -72,13 +72,17 @@ runH = RunSpec.Handle {
     RunSpec.hReq = reqH,
     RunSpec.hParser = parserH,
     
-    RunSpec.parseUpdateData = \_ -> return $ DParser.UpdateData {DParser.ok = True, DParser.result = []},
+    RunSpec.parseUpdateData = \_ -> return 
+      $ DParser.UpdateData {
+          DParser.ok = True,
+          DParser.result = []
+        },
     
     RunSpec.getLastSucUpdate = return (Just 100),
     RunSpec.putUpdate = \_ -> return (),
     RunSpec.getRepliesNumber = return 5,
     RunSpec.setRepliesNumber = \_ _ -> return (),
-    RunSpec.getMode = \_ -> return (Settings.reply),
+    RunSpec.getMode = \_ -> return Settings.reply,
     RunSpec.setMode = \_ _ -> return (),
 
     RunSpec.getUpdate = \_ -> return "{\"ok\":true,\"result\":[]}",

@@ -73,7 +73,7 @@ attachH1 = AttachSpec.Handle {
     AttachSpec.hReq = reqH,
     AttachSpec.hParser = parserH,
 
-    AttachSpec.updateDoc = \doc -> Identity doc
+    AttachSpec.updateDoc = Identity
 }
 
 attachH2 :: AttachSpec.Handle Identity
@@ -111,23 +111,44 @@ runH = RunSpec.Handle {
     RunSpec.hParser = parserH,
     RunSpec.hAttach = attachH1,
     
-    RunSpec.parsePollResponse = \_ -> return $ Right $ DParser.PollResponse {DParser.pollResponse_response = DParser.ServerText {DParser.serverText_key = "347e47284fc18830341f78af8a14b434b0cf359e", DParser.serverText_server = "https://lp.vk.com/wh205828081", DParser.serverText_ts = "543"}},
-    RunSpec.parseUpdateData = \_ -> return $ DParser.UpdateData {DParser.ts = "10", DParser.updates = []},
-    RunSpec.parseUploadUrl = \_ -> return $ DParser.UploadUrlResponse {DParser.upUrlResponse_response = Nothing},
-    RunSpec.parseUploadFile = \_ -> return $ DParser.UploadFileResponse {DParser.upFileResponse_file = Nothing},
-    RunSpec.parseUploadObject = \_ -> return $ DParser.UploadObjectResponse {DParser.upObjResponse_response = []},
+    RunSpec.parsePollResponse = \_ -> return $ Right 
+      $ DParser.PollResponse {
+          DParser.pollResponse_response = DParser.ServerText {
+              DParser.serverText_key = "347e47284fc18830341f78af8a14b434b0cf359e",
+              DParser.serverText_server = "https://lp.vk.com/wh205828081",
+              DParser.serverText_ts = "543"
+          }
+        },
+    RunSpec.parseUpdateData = \_ -> return 
+      $ DParser.UpdateData {
+          DParser.ts = "10",
+          DParser.updates = []
+        },
+    RunSpec.parseUploadUrl = \_ -> return 
+      $ DParser.UploadUrlResponse {
+          DParser.upUrlResponse_response = Nothing
+        },
+    RunSpec.parseUploadFile = \_ -> return 
+      $ DParser.UploadFileResponse {
+          DParser.upFileResponse_file = Nothing
+        },
+    RunSpec.parseUploadObject = \_ -> return 
+      $ DParser.UploadObjectResponse {
+          DParser.upObjResponse_response = []
+        },
     
     RunSpec.getLastSucUpdate = return (Just 100),
     RunSpec.putUpdate = \_ -> return (),
     RunSpec.getRepliesNumber = return 5,
     RunSpec.setRepliesNumber = \_ _ -> return (),
-    RunSpec.getMode = \_ -> return (Settings.reply),
+    RunSpec.getMode = \_ -> return Settings.reply,
     RunSpec.setMode = \_ _ -> return (),
 
     RunSpec.getUpdate = \_ _ _ -> return "{\"ts\":\"0\",\"updates\":[]}",
-    RunSpec.getServer = return "{\"response\":{\"key\":\"347e47284fc18830341f78af8a14b434b0cf359e\",\"server\":\"https://lp.vk.com/wh205828081\",\"ts\":543}}",
+    RunSpec.getServer = return "{\"response\":{\"key\":\"347e47284fc18830341f78af8a14b434b0cf359e\",\
+                               \\"server\":\"https://lp.vk.com/wh205828081\",\"ts\":543}}",
     RunSpec.sendHelpMessage = \_ -> return (),
     RunSpec.sendRepeatMessage = \_ -> return (),
     RunSpec.sendNEchoMessage = \_ _ _ _ _ -> return (),
-    RunSpec.updateAttachments = \mAtts -> AttachSpec.updateAttachments attachH1 mAtts
+    RunSpec.updateAttachments = AttachSpec.updateAttachments attachH1
 }
