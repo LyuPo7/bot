@@ -8,8 +8,6 @@ import GHC.Generics (Generic)
 import Data.Aeson.Types (ToJSON, FromJSON)
 import Data.Aeson (camelTo2, parseJSON, toJSON)
 
-import Bot.Tele.Request.Data()
-
 -- | Bot Config Settings
 data Config = Config {
     botApi :: Text,
@@ -55,3 +53,7 @@ vkVersion = "5.81"
 -- | Config file
 configFile :: FilePath
 configFile = "data/config.json"
+
+-- | Timeout
+timeout :: Integer
+timeout = 30

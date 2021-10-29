@@ -9,6 +9,8 @@ import Data.Aeson.Types (ToJSON(..), FromJSON(..),
                          genericToJSON, defaultOptions,
                          fieldLabelModifier, genericParseJSON)
 
+import qualified Bot.Settings as Settings
+
 -- | Types for RequestOptions requests
 newtype TeleRequest = TeleRequest { getRequest :: Text }
 
@@ -132,7 +134,7 @@ createGetUpdates :: Maybe Integer -> RequestOptions
 createGetUpdates updateId = GetUpdates {
   updates_offset = updateId,
   updates_limit = Nothing,
-  updates_timeout = Nothing,
+  updates_timeout = Just Settings.timeout,
   updates_allowedUpdates = Just ["message"]
 }
 

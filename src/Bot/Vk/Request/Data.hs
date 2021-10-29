@@ -43,7 +43,8 @@ instance Url.ToForm GetLongPollServer where
 data LongPollServer = LongPollServer {
     longServer_key :: Text, -- Key for requests.
     longServer_ts :: Integer, -- Server time stamp.
-    longServer_act :: Text -- Action.
+    longServer_act :: Text, -- Action.
+    longServer_wait :: Integer
 } deriving (Generic)
 
 instance FromJSON LongPollServer where

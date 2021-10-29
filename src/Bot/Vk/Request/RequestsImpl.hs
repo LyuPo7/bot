@@ -26,6 +26,8 @@ getUpdate handle server key timeStamp = do
         <> T.unpack key
         <> "&ts="
         <> show timeStamp
+        <> "&wait="
+        <> show Settings.timeout
   manager <- newManager tlsManagerSettings
   initialRequest <- parseRequest api
   let request = initialRequest {
