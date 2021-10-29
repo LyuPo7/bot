@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Tele.Request.Requests where
 
 import qualified Bot.Logger as Logger

@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Tele.RunSpec where
 
 import qualified Data.ByteString.Lazy.Char8 as L8

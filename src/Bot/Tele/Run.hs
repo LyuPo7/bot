@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Tele.Run where
 
 import qualified Bot.Settings as Settings

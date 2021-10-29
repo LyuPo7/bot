@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module TestBot.Vk.Document where
 
 import Control.Monad.Identity

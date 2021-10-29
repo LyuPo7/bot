@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Vk.Request.Attach where
 
 import Bot.Vk.Request.AttachSpec (Handle(..))

@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module TestBot.Vk.GenData where
 
 import Hedgehog (Gen)

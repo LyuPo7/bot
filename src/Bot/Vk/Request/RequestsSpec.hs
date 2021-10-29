@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Vk.Request.RequestsSpec where
 
 import Prelude hiding (readFile)

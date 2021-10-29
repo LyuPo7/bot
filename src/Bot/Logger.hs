@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings, LambdaCase #-}
+{-# LANGUAGE DeriveGeneric, LambdaCase #-}
 
 module Bot.Logger where
 

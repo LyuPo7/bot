@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Tele.Request.RequestsSpec where
 
 import qualified Data.ByteString.Lazy as B

@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module TestBot.Tele.Parser where
 
 import Control.Monad.Identity

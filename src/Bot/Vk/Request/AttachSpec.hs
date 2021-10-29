@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Vk.Request.AttachSpec where
 
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec

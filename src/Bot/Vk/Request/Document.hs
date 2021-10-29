@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Vk.Request.Document where
 
 import qualified System.Directory as Dir

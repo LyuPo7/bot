@@ -59,6 +59,8 @@ library
       Paths_bot
   hs-source-dirs:
       src
+  default-extensions:
+      OverloadedStrings
   ghc-options: -Wall -Werror
   build-depends:
       HDBC >=2.4
@@ -95,6 +97,8 @@ executable bot-exe
       Paths_bot
   hs-source-dirs:
       app
+  default-extensions:
+      OverloadedStrings
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HDBC >=2.4
@@ -144,6 +148,8 @@ test-suite bot-test
       TestBot.Tele.Handlers
   hs-source-dirs:
       test
+  default-extensions:
+      OverloadedStrings
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HDBC >=2.4

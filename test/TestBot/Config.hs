@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module TestBot.Config where
 
 import Hedgehog (Gen, Property, property, (===), forAll)

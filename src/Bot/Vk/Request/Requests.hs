@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Vk.Request.Requests where
 
 import Bot.Vk.Request.RequestsSpec (Handle(..))

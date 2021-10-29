@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Tele.Parser.Parser where
 
 import qualified Data.Text as T

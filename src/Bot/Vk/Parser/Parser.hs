@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Vk.Parser.Parser where
 
 import qualified Data.ByteString.Lazy.Char8 as L8

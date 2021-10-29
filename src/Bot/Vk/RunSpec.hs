@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Bot.Vk.RunSpec where
 
 import qualified Data.ByteString.Lazy as B

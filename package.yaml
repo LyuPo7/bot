@@ -47,11 +47,13 @@ dependencies:
 - filepath
 - transformers-either
 
+default-extensions: OverloadedStrings
+
 library:
   source-dirs: src
   ghc-options: 
     - -Wall 
-    - -Werror 
+    - -Werror
 
 executables:
   bot-exe:
