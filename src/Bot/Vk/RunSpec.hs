@@ -29,8 +29,7 @@ data Handle m = Handle {
     hParser :: Parser.Handle m,
     hAttach :: Attach.Handle m,
     
-    parsePollResponse :: L8.ByteString -> m (Either String PollResponse),
-    parsePollResponseText :: L8.ByteString -> m (Either Text PollResponseText),
+    parsePollResponse :: L8.ByteString -> m (Either Text PollResponse),
     parseUpdateData :: L8.ByteString -> m UpdateData,
     parseUploadUrl :: L8.ByteString -> m UploadUrlResponse,
     parseUploadFile :: L8.ByteString -> m UploadFileResponse,
@@ -59,25 +58,18 @@ run handle = do
   Logger.logInfo logh "Bot api: vk"
   -- Connect to DB
   serverUp <- getServer handle
-  serverE <- parsePollResponse handle serverUp
-  case serverE of
-    Right params -> do
-      let serverParams = pollResponse_response params
-      checkMode handle serverParams
-    Left msg -> do
-      Logger.logWarning logh $ T.pack msg
-      serverParamsE <- runEitherT $ do
-        params <- EitherT $ parsePollResponseText handle serverUp
-        let tsText = serverText_ts $ pollResponseText_response params
-        tsInt <- EitherT $ readEitherMa tsText
-        return Server {
-          server_key = serverText_key $ pollResponseText_response params,
-          server_server = serverText_server $ pollResponseText_response params,
-          server_ts = tsInt
-        }
-      case serverParamsE of
-        Left msg2 -> throwM $ E.ParseRequestError $ T.unpack msg2
-        Right serverParams -> checkMode handle serverParams
+  serverParamsE <- runEitherT $ do
+    params <- EitherT $ parsePollResponse handle serverUp
+    let tsText = serverText_ts $ pollResponse_response params
+    tsInt <- EitherT $ readEitherMa tsText
+    return Server {
+      server_key = serverText_key $ pollResponse_response params,
+      server_server = serverText_server $ pollResponse_response params,
+      server_ts = tsInt
+    }
+  case serverParamsE of
+    Left msg2 -> throwM $ E.ParseRequestError $ T.unpack msg2
+    Right serverParams -> checkMode handle serverParams
 
 checkMode :: Monad m => Handle m -> Server -> m ()
 checkMode handle serverParams = do

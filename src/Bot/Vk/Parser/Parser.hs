@@ -18,26 +18,10 @@ withHandleIO logger f = do
 
 {-- | PollResponse parser --}
 parsePollResponse :: Monad m => Handle m -> L8.ByteString ->
-                     m (Either String PollResponse)
+                         m (Either Text PollResponse)
 parsePollResponse handle response = do
   let logh = hLogger handle
-      -- decode JSON 
       d = eitherDecode response :: Either String PollResponse
-  case d of
-    Left err -> do
-      Logger.logError logh $ "Couldn't parse poll response: "
-        <> T.pack err
-      return d
-    Right _ -> do
-      Logger.logDebug logh "Poll response was successfully parsed."
-      return d
-
-{-- | PollResponse parser --}
-parsePollResponseText :: Monad m => Handle m -> L8.ByteString ->
-                         m (Either Text PollResponseText)
-parsePollResponseText handle response = do
-  let logh = hLogger handle
-      d = eitherDecode response :: Either String PollResponseText
   case d of
     Left err -> do
       Logger.logError logh $ "Couldn't parse poll-text response: "

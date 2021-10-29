@@ -297,9 +297,9 @@ instance ToJSON ServerText where
   toJSON = genericToJSON defaultOptions {
     fieldLabelModifier = drop 11 }
 
--- | PollResponse
+-- | PollResponse with ts String in Server
 newtype PollResponse = PollResponse {
-  pollResponse_response :: Server -- Server.
+  pollResponse_response :: ServerText -- Server.
   } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON PollResponse where
@@ -309,19 +309,6 @@ instance FromJSON PollResponse where
 instance ToJSON PollResponse where
   toJSON = genericToJSON defaultOptions {
     fieldLabelModifier = drop 13 }
-
--- | PollResponseText with ts String in Server
-newtype PollResponseText = PollResponseText {
-  pollResponseText_response :: ServerText -- Server.
-  } deriving (Show, Read, Eq,Generic) 
-
-instance FromJSON PollResponseText where
-  parseJSON = genericParseJSON defaultOptions {
-    fieldLabelModifier = drop 17 }
-
-instance ToJSON PollResponseText where
-  toJSON = genericToJSON defaultOptions {
-    fieldLabelModifier = drop 17 }
 
 -- | UploadUrlResponse
 newtype UploadUrlResponse = UploadUrlResponse {

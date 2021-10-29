@@ -26,7 +26,6 @@ withHandleIO logger config dbh reqh parserh attachh f = do
     
     parseUpdateData = Parser.parseUpdateData parserh,
     parsePollResponse = Parser.parsePollResponse parserh,
-    parsePollResponseText = Parser.parsePollResponseText parserh,
     parseUploadUrl = Parser.parseUploadUrl parserh,
     parseUploadFile = Parser.parseUploadFile parserh,
     parseUploadObject = Parser.parseUploadObject parserh,
