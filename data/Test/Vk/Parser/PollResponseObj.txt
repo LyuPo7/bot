@@ -1,1 +1,1 @@
-PollResponse {pollResponse_response = Server {server_key = "347e47284fc18830341f78af8a14b434b0cf359e", server_server = "https://lp.vk.com/wh205828081", server_ts = 543}}
+PollResponse {pollResponse_response = ServerText {serverText_key = "347e47284fc18830341f78af8a14b434b0cf359e", serverText_server = "https://lp.vk.com/wh205828081", serverText_ts = "543"}}

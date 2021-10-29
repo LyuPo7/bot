@@ -191,11 +191,11 @@ genUpdateData = UpdateData
   <$> Gen.text (Range.constant 10 15) Gen.digit
   <*> Gen.list (Range.constant 0 10) genUpdate
 
-genServer :: Gen Server
-genServer = Server
+genServer :: Gen ServerText
+genServer = ServerText
   <$> Gen.text (Range.constant 10 15) Gen.ascii
   <*> Gen.element ["https://server/server1", "https://server/server2"]
-  <*> (toInteger <$> genId)
+  <*> Gen.text (Range.constant 10 15) Gen.digit
 
 genPollResponse :: Gen PollResponse
 genPollResponse = PollResponse

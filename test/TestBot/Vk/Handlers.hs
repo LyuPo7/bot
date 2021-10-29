@@ -111,8 +111,7 @@ runH = RunSpec.Handle {
     RunSpec.hParser = parserH,
     RunSpec.hAttach = attachH1,
     
-    RunSpec.parsePollResponse = \_ -> return $ Right $ DParser.PollResponse {DParser.pollResponse_response = DParser.Server {DParser.server_key = "347e47284fc18830341f78af8a14b434b0cf359e", DParser.server_server = "https://lp.vk.com/wh205828081", DParser.server_ts = 543}},
-    RunSpec.parsePollResponseText = \_ -> return $ Right $ DParser.PollResponseText {DParser.pollResponseText_response = DParser.ServerText {DParser.serverText_key = "347e47284fc18830341f78af8a14b434b0cf359e", DParser.serverText_server = "https://lp.vk.com/wh205828081", DParser.serverText_ts = "543"}},
+    RunSpec.parsePollResponse = \_ -> return $ Right $ DParser.PollResponse {DParser.pollResponse_response = DParser.ServerText {DParser.serverText_key = "347e47284fc18830341f78af8a14b434b0cf359e", DParser.serverText_server = "https://lp.vk.com/wh205828081", DParser.serverText_ts = "543"}},
     RunSpec.parseUpdateData = \_ -> return $ DParser.UpdateData {DParser.ts = "10", DParser.updates = []},
     RunSpec.parseUploadUrl = \_ -> return $ DParser.UploadUrlResponse {DParser.upUrlResponse_response = Nothing},
     RunSpec.parseUploadFile = \_ -> return $ DParser.UploadFileResponse {DParser.upFileResponse_file = Nothing},
