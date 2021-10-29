@@ -1,4 +1,7 @@
 .stack-work/
 .vscode
 .history
+data/vk.db
+data/tele.db
+data/config.json
 *~
