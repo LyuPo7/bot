@@ -3,11 +3,11 @@ module Bot.Vk.RunSpec where
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.Text as T
+import qualified Control.Monad.Trans.Either as EiT
 import Data.Maybe (fromMaybe)
 import Text.Read (readMaybe)
 import Data.Text (Text)
 import Control.Monad.Catch (MonadThrow, throwM)
-import Control.Monad.Trans.Either
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger as Logger
@@ -16,7 +16,10 @@ import qualified Bot.DB.DBSpec as DB
 import qualified Bot.Vk.Request.RequestsSpec as Req
 import qualified Bot.Vk.Request.AttachSpec as Attach
 import qualified Bot.Vk.Parser.ParserSpec as Parser
-import Bot.Vk.Parser.Data
+import Bot.Vk.Parser.Data (Message(..), Server(..), ServerText(..), Update(..),
+                           UpdateData(..), Attachment, RepNum, Mode, UserID,
+                           UpdateID, Geo, UploadObjectResponse, UploadFileResponse,
+                           UploadUrlResponse, PollResponse(..))
 import Bot.Util (convert, readEitherMa)
 
 data Handle m = Handle {
@@ -56,10 +59,10 @@ run handle = do
   Logger.logInfo logh "Bot api: vk"
   -- Connect to DB
   serverUp <- getServer handle
-  serverParamsE <- runEitherT $ do
-    params <- EitherT $ parsePollResponse handle serverUp
+  serverParamsE <- EiT.runEitherT $ do
+    params <- EiT.EitherT $ parsePollResponse handle serverUp
     let tsText = serverText_ts $ pollResponse_response params
-    tsInt <- EitherT $ readEitherMa tsText
+    tsInt <- EiT.EitherT $ readEitherMa tsText
     return Server {
       server_key = serverText_key $ pollResponse_response params,
       server_server = serverText_server $ pollResponse_response params,

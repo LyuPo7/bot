@@ -7,8 +7,9 @@ import Data.Text (Text)
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
 import qualified Bot.Tele.Parser.ParserSpec as ParserSpec
-import Bot.Tele.Request.Data
-import Bot.Tele.Parser.Data
+import qualified Bot.Tele.Request.Data as RD
+import Bot.Tele.Request.Data (TeleRequest, RequestOptions)
+import Bot.Tele.Parser.Data (ChatID, RepNum, MessageID, UpdateID)
 import Bot.Util (convert)
 
 data Handle m = Handle {
@@ -23,15 +24,15 @@ data Handle m = Handle {
 getUpdate :: Monad m => Handle m -> Maybe UpdateID -> m L8.ByteString
 getUpdate handle updateId  = do
   -- Get JSON data
-  let updateOptions = createGetUpdates updateId
-  makeRequest handle getUpdates updateOptions
+  let updateOptions = RD.createGetUpdates updateId
+  makeRequest handle RD.getUpdates updateOptions
 
 {-- | Send text Message request --}
 sendTextMessage :: Monad m => Handle m -> ChatID -> Text -> m ()
 sendTextMessage handle chatId text = do
   let logh = hLogger handle
-      message = createSendMessage chatId text
-  _ <- makeRequest handle sendMessage message
+      message = RD.createSendMessage chatId text
+  _ <- makeRequest handle RD.sendMessage message
   Logger.logInfo logh $ "Message with text: " <> 
       text <> " was sended to chat with id: " <> 
       convert chatId
@@ -40,8 +41,8 @@ sendTextMessage handle chatId text = do
 sendEchoMessage :: Monad m => Handle m -> ChatID -> MessageID -> m ()
 sendEchoMessage handle chatId messageId = do
   let logh = hLogger handle
-      message = createCopyMessage chatId messageId
-  _ <- makeRequest handle copyMessage message
+      message = RD.createCopyMessage chatId messageId
+  _ <- makeRequest handle RD.copyMessage message
   Logger.logInfo logh $ "Echo-Message with id: " <>
       convert messageId <>
       " was forwarded to chat with id: " <> convert chatId
@@ -59,21 +60,21 @@ sendNEchoMessage handle chatId messageId n = do
 sendQueryNumber :: Monad m => Handle m -> ChatID -> Text -> m L8.ByteString
 sendQueryNumber handle chatId question = do
   let logh = hLogger handle
-      b1 = createButton "1" "Pressed 1"
-      b2 = createButton "2" "Pressed 2"
-      b3 = createButton "3" "Pressed 3"
-      b4 = createButton "4" "Pressed 4"
-      b5 = createButton "5" "Pressed 5"
-      markupIn = createKeyboard [[b1, b2, b3, b4, b5]]
-      query = createQueryMessage chatId question markupIn
+      b1 = RD.createButton "1" "Pressed 1"
+      b2 = RD.createButton "2" "Pressed 2"
+      b3 = RD.createButton "3" "Pressed 3"
+      b4 = RD.createButton "4" "Pressed 4"
+      b5 = RD.createButton "5" "Pressed 5"
+      markupIn = RD.createKeyboard [[b1, b2, b3, b4, b5]]
+      query = RD.createQueryMessage chatId question markupIn
   Logger.logInfo logh $ "Question was sended to chat with id: "
     <> convert chatId
-  makeRequest handle sendMessage query
+  makeRequest handle RD.sendMessage query
 
 {-- | St Bot Commands "/help", "/repeat--}
 setCommands :: Monad m => Handle m -> m ()
 setCommands handle = do
   let logh = hLogger handle
-      commands = createBotCommands
-  _ <- makeRequest handle setBotCommands commands
+      commands = RD.createBotCommands
+  _ <- makeRequest handle RD.setBotCommands commands
   Logger.logInfo logh "Bot commands: '/help', '/repeat' were created."

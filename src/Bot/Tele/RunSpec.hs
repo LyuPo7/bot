@@ -11,7 +11,9 @@ import qualified Bot.Settings as Settings
 import qualified Bot.DB.DBSpec as DBSpec
 import qualified Bot.Tele.Request.RequestsSpec as ReqSpec
 import qualified Bot.Tele.Parser.ParserSpec as ParserSpec
-import Bot.Tele.Parser.Data
+import Bot.Tele.Parser.Data (Message(..), Chat(..), Update(..), 
+                             UpdateData(..), MessageEntity(..),
+                             RepNum, UpdateID, Mode, ChatID, MessageID)
 import Bot.Util (convert)
 
 data Handle m = Handle {

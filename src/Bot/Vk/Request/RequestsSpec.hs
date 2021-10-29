@@ -14,8 +14,11 @@ import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
 import qualified Bot.Exception as E
-import Bot.Vk.Parser.Data
-import Bot.Vk.Request.Data
+import qualified Bot.Vk.Request.Data as RD
+import Bot.Vk.Parser.Data (Attachment(..), Geo(..), Document(..),
+                           Sticker(..), Audio(..), Video(..),
+                           Photo(..), UserID, RepNum)
+import Bot.Vk.Request.Data (SendMessage(..), VkRequest)
 import Bot.Util (convert)
 
 data Handle m = Handle {
@@ -40,7 +43,7 @@ createServerQuery handle = do
       Exc.throwM $ E.ParseConfigError $ T.unpack msg
     Just groupId -> do
       let token = Settings.botToken config
-          params = getPollServer groupId token Settings.vkVersion
+          params = RD.getPollServer groupId token Settings.vkVersion
       Logger.logDebug logh "Server query string was created."
       return $ T.pack $ L8.unpack $ Url.urlEncodeAsFormStable params
 
@@ -49,7 +52,7 @@ getServer handle = do
   let logh = hLogger handle
   queryOptions <- createServerQuery handle
   Logger.logInfo logh "Get server parameters for requests."
-  makeRequest handle getLongPollServer queryOptions
+  makeRequest handle RD.getLongPollServer queryOptions
 
 -- | sendHelpMessage
 createHelpMessage :: Monad m => Handle m -> UserID -> m Text
@@ -58,7 +61,7 @@ createHelpMessage handle userId = do
       config = configReq handle
       description = Settings.botDescription config
       token = Settings.botToken config
-      message = (defaultMessage userId token Settings.vkVersion) {
+      message = (RD.defaultMessage userId token Settings.vkVersion) {
         sendMessag_message = description
       }
   Logger.logDebug logh "Help Message was created."
@@ -68,7 +71,7 @@ sendHelpMessage :: Monad m => Handle m -> UserID -> m ()
 sendHelpMessage handle userId = do
   let logh = hLogger handle
   queryOptions <- createHelpMessage handle userId
-  _ <- makeRequest handle sendMessage queryOptions
+  _ <- makeRequest handle RD.sendMessage queryOptions
   Logger.logInfo logh $ "Help message was sended to chat with id: "
     <> convert userId
 
@@ -86,7 +89,7 @@ createEchoMessage handle userId text atts geo = do
       config = configReq handle
       token = Settings.botToken config
       [lat, long] = geoToLatLong geo
-      message = (defaultMessage userId token Settings.vkVersion) {
+      message = (RD.defaultMessage userId token Settings.vkVersion) {
         sendMessag_message = text,
         sendMessag_attachment = attachmentsToQuery atts,
         sendMessag_stickerId = returnStickerId atts,
@@ -101,7 +104,7 @@ sendEchoMessage :: Monad m => Handle m -> UserID -> Text ->
 sendEchoMessage handle userId text atts geo = do
   let logh = hLogger handle
   queryOptions <- createEchoMessage handle userId text atts geo
-  _ <- makeRequest handle sendMessage queryOptions
+  _ <- makeRequest handle RD.sendMessage queryOptions
   Logger.logInfo logh $ "Echo message was sended to chat with id: "
     <> convert userId
 
@@ -122,7 +125,7 @@ createRepeatMessage handle userId = do
       token = Settings.botToken config
       question = Settings.botQuestion config
   keyboardF <- readFile handle "data/Vk/repeatButtons.txt"
-  let message = (defaultMessage userId token Settings.vkVersion) {
+  let message = (RD.defaultMessage userId token Settings.vkVersion) {
     sendMessag_message = question
   }
   Logger.logDebug logh "Repeat Message was created."
@@ -134,7 +137,7 @@ sendRepeatMessage :: Monad m => Handle m -> UserID -> m ()
 sendRepeatMessage handle userId = do
   let logh = hLogger handle
   queryOptions <- createRepeatMessage handle userId
-  _ <- makeRequest handle sendMessage queryOptions
+  _ <- makeRequest handle RD.sendMessage queryOptions
   Logger.logInfo logh $ "Repeat message was sended to chat with id: "
     <> convert userId
 

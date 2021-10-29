@@ -3,7 +3,7 @@ module Bot.Vk.Request.AttachSpec where
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
 import qualified Bot.Logger as Logger
-import Bot.Vk.Parser.Data
+import Bot.Vk.Parser.Data (Attachment(..), Document)
 
 data Handle m = Handle {
     hLogger :: Logger.Handle m,

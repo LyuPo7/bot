@@ -9,7 +9,10 @@ import qualified Bot.Vk.Parser.Parser as Parser
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
 import qualified Bot.Logger as Logger
-import Bot.Vk.Parser.Data
+import Bot.Vk.Parser.Data (Document(..), UploadObject(..), 
+                           UploadObjectResponse(..), 
+                           UploadFileResponse(..), 
+                           UploadUrlResponse(..), UploadUrl(..))
 
 data Handle m = Handle {
     hLogger :: Logger.Handle m,

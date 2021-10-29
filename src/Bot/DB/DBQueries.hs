@@ -12,7 +12,7 @@ import Bot.DB.DBSpec (Handle(..))
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
 import qualified Bot.Exception as E
-import Bot.Tele.Parser.Data
+import Bot.Tele.Parser.Data (UpdateID, ChatID, Mode, RepNum)
 import Bot.Util (convert)
 
 withHandleIO :: Logger.Handle IO ->

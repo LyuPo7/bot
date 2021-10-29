@@ -7,7 +7,9 @@ import Data.Text (Text)
 
 import Bot.Vk.Parser.ParserSpec (Handle(..))
 import qualified Bot.Logger as Logger
-import Bot.Vk.Parser.Data
+import Bot.Vk.Parser.Data (UpdateData(..), UploadObjectResponse(..), 
+                           UploadFileResponse(..), UploadUrlResponse(..),
+                           PollResponse(..))
 
 withHandleIO :: Logger.Handle IO -> (Handle IO -> IO a) -> IO a
 withHandleIO logger f = do

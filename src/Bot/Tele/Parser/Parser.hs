@@ -7,7 +7,7 @@ import Data.Aeson (eitherDecode)
 import Bot.Tele.Parser.ParserSpec (Handle(..))
 import qualified Bot.Settings as Settings
 import qualified Bot.Logger as Logger
-import Bot.Tele.Parser.Data
+import Bot.Tele.Parser.Data (UpdateData(..))
 
 withHandleIO :: Logger.Handle IO ->
                 Settings.Config -> (Handle IO -> IO a) -> IO a

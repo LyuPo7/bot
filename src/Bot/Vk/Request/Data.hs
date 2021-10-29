@@ -11,7 +11,8 @@ import Data.Aeson.Types (ToJSON(..), FromJSON(..),
                          genericToJSON, defaultOptions,
                          fieldLabelModifier, genericParseJSON)
 
-import Bot.Vk.Parser.Data
+import Bot.Vk.Parser.Data (Token, Version, FileType, FilePathT,
+                           UserID, PeerId, GroupID)
 
 -- | type for RequestOptions requests
 newtype VkRequest = VkRequest {

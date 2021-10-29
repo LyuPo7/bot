@@ -14,7 +14,7 @@ import qualified Bot.Exception as E
 import Bot.Tele.Parser.ParserSpec (Handle(..))
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
-import Bot.Tele.Request.Data
+import Bot.Tele.Request.Data (TeleRequest, RequestOptions, getRequest)
 import Bot.Util (convert)
 
 {-- | Request to api --}
