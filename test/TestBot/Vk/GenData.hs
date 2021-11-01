@@ -4,79 +4,87 @@ import Hedgehog (Gen)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
-import Bot.Vk.Parser.Data
+import qualified Bot.Vk.Parser.Data as PD
 
 genId :: Gen Int
 genId = Gen.int (Range.constant 0 1000)
 
-genUser :: Gen Users
-genUser = Users
+genUser :: Gen PD.Users
+genUser = PD.Users
   <$> (toInteger <$> genId)
 
-genGeo :: Gen Geo
-genGeo = Geo
-  <$> Gen.element ["111.345 56.789", "99.999 109.107"]
+genGeo :: Gen PD.Geo
+genGeo = PD.Geo
+  <$> Gen.element ["111.345 56.789",
+                   "99.999 109.107"]
 
-genPhoto :: Gen Photo
-genPhoto = Photo
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
-  <*> Gen.text (Range.constant 10 15) Gen.ascii
-
-genVideo :: Gen Video
-genVideo = Video
+genPhoto :: Gen PD.Photo
+genPhoto = PD.Photo
   <$> (toInteger <$> genId)
   <*> (toInteger <$> genId)
   <*> Gen.text (Range.constant 10 15) Gen.ascii
 
-genAudio :: Gen Audio
-genAudio = Audio
+genVideo :: Gen PD.Video
+genVideo = PD.Video
   <$> (toInteger <$> genId)
   <*> (toInteger <$> genId)
-
-genDoc :: Gen Document
-genDoc = Document
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
-  <*> Gen.element ["book.pdf", "log.txt", "prog.py"]
-  <*> Gen.element ["https://server/link/123", "https://server/link/222"]
   <*> Gen.text (Range.constant 10 15) Gen.ascii
 
-genLink :: Gen Link
-genLink = Link
-  <$> Gen.element ["https://server/link/123", "https://server/link/222"]
-
-genMarket :: Gen Market
-genMarket = Market
+genAudio :: Gen PD.Audio
+genAudio = PD.Audio
   <$> (toInteger <$> genId)
   <*> (toInteger <$> genId)
 
-genMarketAlbum :: Gen MarketAlbum
-genMarketAlbum = MarketAlbum
+genDoc :: Gen PD.Document
+genDoc = PD.Document
+  <$> (toInteger <$> genId)
+  <*> (toInteger <$> genId)
+  <*> Gen.element ["book.pdf",
+                   "log.txt",
+                   "prog.py"]
+  <*> Gen.element ["https://server/link/123",
+                   "https://server/link/222"]
+  <*> Gen.text (Range.constant 10 15) Gen.ascii
+
+genLink :: Gen PD.Link
+genLink = PD.Link
+  <$> Gen.element ["https://server/link/123",
+                   "https://server/link/222"]
+
+genMarket :: Gen PD.Market
+genMarket = PD.Market
   <$> (toInteger <$> genId)
   <*> (toInteger <$> genId)
 
-genWall :: Gen Wall
-genWall = Wall
+genMarketAlbum :: Gen PD.MarketAlbum
+genMarketAlbum = PD.MarketAlbum
   <$> (toInteger <$> genId)
   <*> (toInteger <$> genId)
 
-genWallReply :: Gen WallReply
-genWallReply = WallReply
+genWall :: Gen PD.Wall
+genWall = PD.Wall
   <$> (toInteger <$> genId)
   <*> (toInteger <$> genId)
 
-genSticker :: Gen Sticker
-genSticker = Sticker
+genWallReply :: Gen PD.WallReply
+genWallReply = PD.WallReply
+  <$> (toInteger <$> genId)
+  <*> (toInteger <$> genId)
+
+genSticker :: Gen PD.Sticker
+genSticker = PD.Sticker
   <$> (toInteger <$> genId)
 
-genGift :: Gen Gift
-genGift = Gift
+genGift :: Gen PD.Gift
+genGift = PD.Gift
   <$> (toInteger <$> genId)
 
-genAttach :: Gen Attachment
-genAttach = Attachment
-  <$> Gen.element ["doc", "audio", "video", "photo"]
+genAttach :: Gen PD.Attachment
+genAttach = PD.Attachment
+  <$> Gen.element ["doc",
+                   "audio",
+                   "video",
+                   "photo"]
   <*> Gen.maybe genPhoto
   <*> Gen.maybe genVideo
   <*> Gen.maybe genAudio
@@ -89,9 +97,15 @@ genAttach = Attachment
   <*> Gen.maybe genSticker
   <*> Gen.maybe genGift
 
-genCompAttach :: Gen Attachment
-genCompAttach = Attachment
-  <$> Gen.element ["link", "market", "market_album", "wall", "wall_reply", "sticker", "gift"]
+genCompAttach :: Gen PD.Attachment
+genCompAttach = PD.Attachment
+  <$> Gen.element ["link",
+                   "market",
+                   "market_album",
+                   "wall",
+                   "wall_reply",
+                   "sticker",
+                   "gift"]
   <*> Gen.maybe genPhoto
   <*> Gen.maybe genVideo
   <*> Gen.maybe genAudio
@@ -104,9 +118,18 @@ genCompAttach = Attachment
   <*> Gen.maybe genSticker
   <*> Gen.maybe genGift
 
-genNotDocAttach :: Gen Attachment
-genNotDocAttach = Attachment
-  <$> Gen.element ["photo", "audio", "video", "link", "market", "market_album", "wall", "wall_reply", "sticker", "gift"]
+genNotDocAttach :: Gen PD.Attachment
+genNotDocAttach = PD.Attachment
+  <$> Gen.element ["photo",
+                   "audio",
+                   "video",
+                   "link",
+                   "market",
+                   "market_album",
+                   "wall",
+                   "wall_reply",
+                   "sticker",
+                   "gift"]
   <*> Gen.maybe genPhoto
   <*> Gen.maybe genVideo
   <*> Gen.maybe genAudio
@@ -119,9 +142,18 @@ genNotDocAttach = Attachment
   <*> Gen.maybe genSticker
   <*> Gen.maybe genGift
 
-genNotStickerAttach :: Gen Attachment
-genNotStickerAttach = Attachment
-  <$> Gen.element ["photo", "audio", "video", "link", "market", "market_album", "wall", "wall_reply", "doc", "gift"]
+genNotStickerAttach :: Gen PD.Attachment
+genNotStickerAttach = PD.Attachment
+  <$> Gen.element ["photo",
+                   "audio",
+                   "video",
+                   "link",
+                   "market",
+                   "market_album",
+                   "wall",
+                   "wall_reply",
+                   "doc",
+                   "gift"]
   <*> Gen.maybe genPhoto
   <*> Gen.maybe genVideo
   <*> Gen.maybe genAudio
@@ -134,8 +166,8 @@ genNotStickerAttach = Attachment
   <*> Gen.maybe genSticker
   <*> Gen.maybe genGift
 
-genMessage :: Gen Message
-genMessage = Message
+genMessage :: Gen PD.Message
+genMessage = PD.Message
   <$> Gen.maybe (toInteger <$> genId)
   <*> (toInteger <$> genId)
   <*> Gen.element ["Hi!", "Let's talk!", ""]
@@ -143,8 +175,8 @@ genMessage = Message
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
   <*> Gen.constant Nothing
 
-genNum5Message :: Gen Message
-genNum5Message = Message
+genNum5Message :: Gen PD.Message
+genNum5Message = PD.Message
   <$> Gen.maybe (toInteger <$> genId)
   <*> (toInteger <$> genId)
   <*> Gen.constant "5"
@@ -152,8 +184,8 @@ genNum5Message = Message
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
   <*> Gen.constant Nothing
 
-genBotHelpMessage :: Gen Message
-genBotHelpMessage = Message
+genBotHelpMessage :: Gen PD.Message
+genBotHelpMessage = PD.Message
   <$> Gen.maybe (toInteger <$> genId)
   <*> (toInteger <$> genId)
   <*> Gen.constant "/help"
@@ -161,8 +193,8 @@ genBotHelpMessage = Message
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
   <*> Gen.constant Nothing
 
-genBotRepeatMessage :: Gen Message
-genBotRepeatMessage = Message
+genBotRepeatMessage :: Gen PD.Message
+genBotRepeatMessage = PD.Message
   <$> Gen.maybe (toInteger <$> genId)
   <*> (toInteger <$> genId)
   <*> Gen.constant "/repeat"
@@ -170,8 +202,8 @@ genBotRepeatMessage = Message
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
   <*> Gen.constant Nothing
 
-genMessageWoBotCom :: Gen Message
-genMessageWoBotCom = Message
+genMessageWoBotCom :: Gen PD.Message
+genMessageWoBotCom = PD.Message
   <$> Gen.maybe (toInteger <$> genId)
   <*> (toInteger <$> genId)
   <*> Gen.element ["", "Hi!", "Let's talk!"]
@@ -179,44 +211,47 @@ genMessageWoBotCom = Message
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
   <*> Gen.constant Nothing
 
-genUpdate :: Gen Update
-genUpdate = Update
+genUpdate :: Gen PD.Update
+genUpdate = PD.Update
   <$> Gen.element ["new_message", "reply_message"]
   <*> genMessage
 
-genUpdateData :: Gen UpdateData
-genUpdateData = UpdateData
+genUpdateData :: Gen PD.UpdateData
+genUpdateData = PD.UpdateData
   <$> Gen.text (Range.constant 10 15) Gen.digit
   <*> Gen.list (Range.constant 0 10) genUpdate
 
-genServer :: Gen ServerText
-genServer = ServerText
+genServer :: Gen PD.ServerText
+genServer = PD.ServerText
   <$> Gen.text (Range.constant 10 15) Gen.ascii
-  <*> Gen.element ["https://server/server1", "https://server/server2"]
+  <*> Gen.element ["https://server/server1",
+                   "https://server/server2"]
   <*> Gen.text (Range.constant 10 15) Gen.digit
 
-genPollResponse :: Gen PollResponse
-genPollResponse = PollResponse
+genPollResponse :: Gen PD.PollResponse
+genPollResponse = PD.PollResponse
   <$> genServer
 
-genUploadUrl :: Gen UploadUrl
-genUploadUrl = UploadUrl
-  <$> Gen.element ["https://server/link/123", "https://server/link/222"]
+genUploadUrl :: Gen PD.UploadUrl
+genUploadUrl = PD.UploadUrl
+  <$> Gen.element ["https://server/link/123",
+                   "https://server/link/222"]
 
-genUploadUrlResponse :: Gen UploadUrlResponse
-genUploadUrlResponse = UploadUrlResponse
+genUploadUrlResponse :: Gen PD.UploadUrlResponse
+genUploadUrlResponse = PD.UploadUrlResponse
   <$> Gen.maybe genUploadUrl
 
-genUploadFileResponse :: Gen UploadFileResponse
-genUploadFileResponse = UploadFileResponse
+genUploadFileResponse :: Gen PD.UploadFileResponse
+genUploadFileResponse = PD.UploadFileResponse
   <$> Gen.maybe (Gen.text (Range.constant 10 15) Gen.ascii)
 
-genUploadObject :: Gen UploadObject
-genUploadObject = UploadObject
+genUploadObject :: Gen PD.UploadObject
+genUploadObject = PD.UploadObject
   <$> (toInteger <$> genId)
   <*> (toInteger <$> genId)
-  <*> Gen.element ["https://server/obj/23", "https://server/obj/77"]
+  <*> Gen.element ["https://server/obj/23",
+                   "https://server/obj/77"]
 
-genUploadObjectResponse :: Gen UploadObjectResponse
-genUploadObjectResponse = UploadObjectResponse
+genUploadObjectResponse :: Gen PD.UploadObjectResponse
+genUploadObjectResponse = PD.UploadObjectResponse
   <$> Gen.list (Range.constant 0 10) genUploadObject

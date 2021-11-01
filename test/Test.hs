@@ -1,6 +1,6 @@
-import Test.Tasty
-import Test.Tasty.Hspec
-import Test.Tasty.Hedgehog
+import Test.Tasty (TestTree, testGroup, defaultMain)
+import Test.Tasty.Hspec (testSpecs)
+import Test.Tasty.Hedgehog (testProperty)
 import qualified Data.ByteString.Lazy as B
 
 import qualified TestBot.Config as Cnfg
@@ -14,17 +14,32 @@ import qualified TestBot.Vk.Run as VkRun
 
 props :: [TestTree]
 props = [
-  testProperty "Tele: Successfull checkConfig for each valid Config" Cnfg.prop_checkConfig,
-  testProperty "Tele: Unsuccessfull answerMode parse for each text Message while waiting answer number" TeleRun.prop_answerModeFail,
-  testProperty "Tele: Successfull answerMode parse for each Message with number 5 in body while waiting answer number" TeleRun.prop_answerModeSuc,
-  testProperty "Tele: Successfull replyMode for /help, /start bot command" TeleRun.prop_replyModeReplySuc,
-  testProperty "Tele: Successfull replyMode for /reply bot command" TeleRun.prop_replyModeAnswerSuc,
-  testProperty "Tele: Successfull replyMode for message without bot command" TeleRun.prop_replyModeOrdinarySuc,
-  testProperty "Vk: Unsuccessfull answerMode parse for each text Message while waiting answer number" VkRun.prop_answerModeFail,
-  testProperty "Vk: Successfull answerMode parse for each Message with number 5 in body while waiting answer number" VkRun.prop_answerModeSuc,
-  testProperty "Vk: Successfull replyMode for /help bot command" VkRun.prop_replyModeReplySuc,
-  testProperty "Vk: Successfull replyMode for /reply bot command" VkRun.prop_replyModeAnswerSuc,
-  testProperty "Vk: Successfull replyMode for message without bot command" VkRun.prop_replyModeOrdinarySuc
+  testProperty "Tele: Successfull checkConfig for each valid Config"
+    Cnfg.prop_checkConfig,
+  testProperty "Tele: Unsuccessfull answerMode parse for each text Message \
+               \while waiting answer number"
+               TeleRun.prop_answerModeFail,
+  testProperty "Tele: Successfull answerMode parse for each Message \
+               \with number 5 in body while waiting answer number" 
+               TeleRun.prop_answerModeSuc,
+  testProperty "Tele: Successfull replyMode for /help, /start bot command"
+    TeleRun.prop_replyModeReplySuc,
+  testProperty "Tele: Successfull replyMode for /reply bot command"
+    TeleRun.prop_replyModeAnswerSuc,
+  testProperty "Tele: Successfull replyMode for message without bot command"
+    TeleRun.prop_replyModeOrdinarySuc,
+  testProperty "Vk: Unsuccessfull answerMode parse for each text Message \
+               \while waiting answer number"
+               VkRun.prop_answerModeFail,
+  testProperty "Vk: Successfull answerMode parse for each Message \
+               \with number 5 in body while waiting answer number"
+               VkRun.prop_answerModeSuc,
+  testProperty "Vk: Successfull replyMode for /help bot command"
+    VkRun.prop_replyModeReplySuc,
+  testProperty "Vk: Successfull replyMode for /reply bot command"
+    VkRun.prop_replyModeAnswerSuc,
+  testProperty "Vk: Successfull replyMode for message without bot command"
+    VkRun.prop_replyModeOrdinarySuc
   ]
 
 main :: IO ()

@@ -1,14 +1,14 @@
 module TestBot.Tele.Run where
 
-import Control.Monad.Identity
+import Control.Monad.Identity (Identity(..))
+
+import Hedgehog (Property, property, (===), forAll)
 
 import TestBot.Tele.GenData as GD
 import TestBot.Tele.Handlers as H
 
 import qualified Bot.Settings as Settings
 import qualified Bot.Tele.RunSpec as RunSpec
-
-import Hedgehog (Property, property, (===), forAll)
 
 prop_answerModeFail :: Property
 prop_answerModeFail = property $ do

@@ -9,10 +9,11 @@ import TestBot.Tele.Handlers as H
 import qualified Bot.Tele.Parser.Parser as Parser
 import qualified Bot.Tele.Parser.Data as DParser
 
-import Test.Hspec
+import Test.Hspec (Spec, shouldBe, it, describe)
 
 spec_parseUpdateData :: B.ByteString -> B.ByteString -> B.ByteString -> Spec
-spec_parseUpdateData obj bstr bstrFail = describe "Testing update parse for telegram bot" $ do
+spec_parseUpdateData obj bstr bstrFail = 
+  describe "Testing update parse for telegram bot" $ do
     it "Should successfully parse updates" $ do
       let result = Parser.parseUpdateData H.parserH bstr
           check = read (B8.toString obj) :: DParser.UpdateData

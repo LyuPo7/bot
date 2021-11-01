@@ -1,6 +1,6 @@
 module TestBot.Vk.Handlers where
 
-import Control.Monad.Identity
+import Control.Monad.Identity (Identity(..))
 import Database.HDBC.Sqlite3 (Connection)
 
 import qualified Bot.Logger as Logger
@@ -11,7 +11,7 @@ import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
 import qualified Bot.Vk.Request.DocumentSpec as DocSpec
 import qualified Bot.Vk.RunSpec as RunSpec
-import qualified Bot.Vk.Parser.Data as DParser
+import qualified Bot.Vk.Parser.Data as PD
 
 conn :: Connection
 conn = undefined
@@ -26,7 +26,9 @@ dbH = DBSpec.Handle {
 logH :: Logger.Handle Identity
 logH = Logger.Handle {
     Logger.log = \_ _ -> return (),
-    Logger.hconfig = Logger.Config {Logger.cVerbocity = Nothing}
+    Logger.hconfig = Logger.Config {
+      Logger.cVerbocity = Nothing
+    }
 }
 
 parserH :: ParserSpec.Handle Identity
@@ -81,9 +83,9 @@ attachH2 = AttachSpec.Handle {
     AttachSpec.hParser = parserH,
 
     AttachSpec.updateDoc = \doc -> Identity doc {
-        DParser.document_id = 123,
-        DParser.document_ownerId = 555,
-        DParser.document_url = "https://server/link/222"
+        PD.document_id = 123,
+        PD.document_ownerId = 555,
+        PD.document_url = "https://server/link/222"
       }
 }
 
@@ -94,9 +96,14 @@ docH1 = DocSpec.Handle {
     DocSpec.hParser = parserH,
 
     DocSpec.getTemporaryDirectory = Identity "/temp/dir35/",
-    DocSpec.saveUploadedDoc = \_ -> Identity "{\"response\":[{\"id\":123,\"owner_id\":12321,\n \"url\":\"https:\\/\\/lp.vk.com\\/link\\/12gh56\"\n}]}",
+    DocSpec.saveUploadedDoc = \_ ->
+      Identity "{\"response\":[{\"id\":123,\
+               \\"owner_id\":12321,\
+               \\n \"url\":\"https:\\/\\/lp.vk.com\\/link\\/12gh56\"\n}]}",
     DocSpec.downloadFile = \_ _ -> Identity (),
-    DocSpec.getUploadedServer = \_ _ -> Identity "{\"response\": {\"upload_url\" : \"https:\\/\\/lp.vk.com\\/link\\/12gh56\"}}",
+    DocSpec.getUploadedServer = \_ _ ->
+      Identity "{\"response\": \
+        \{\"upload_url\" : \"https:\\/\\/lp.vk.com\\/link\\/12gh56\"}}",
     DocSpec.uploadFile = \_ _ -> Identity "{\"file\" : \"testFile\"}"
   }
 
@@ -110,29 +117,29 @@ runH = RunSpec.Handle {
     RunSpec.hAttach = attachH1,
     
     RunSpec.parsePollResponse = \_ -> return $ Right 
-      $ DParser.PollResponse {
-          DParser.pollResponse_response = DParser.ServerText {
-              DParser.serverText_key = "347e47284fc18830341f78af8a14b434b0cf359e",
-              DParser.serverText_server = "https://lp.vk.com/wh205828081",
-              DParser.serverText_ts = "543"
+      $ PD.PollResponse {
+          PD.pollResponse_response = PD.ServerText {
+              PD.serverText_key = "347e47284fc18830341f78af8a14b434b0cf359e",
+              PD.serverText_server = "https://lp.vk.com/wh205828081",
+              PD.serverText_ts = "543"
           }
         },
     RunSpec.parseUpdateData = \_ -> return 
-      $ DParser.UpdateData {
-          DParser.ts = "10",
-          DParser.updates = []
+      $ PD.UpdateData {
+          PD.ts = "10",
+          PD.updates = []
         },
     RunSpec.parseUploadUrl = \_ -> return 
-      $ DParser.UploadUrlResponse {
-          DParser.upUrlResponse_response = Nothing
+      $ PD.UploadUrlResponse {
+          PD.upUrlResponse_response = Nothing
         },
     RunSpec.parseUploadFile = \_ -> return 
-      $ DParser.UploadFileResponse {
-          DParser.upFileResponse_file = Nothing
+      $ PD.UploadFileResponse {
+          PD.upFileResponse_file = Nothing
         },
     RunSpec.parseUploadObject = \_ -> return 
-      $ DParser.UploadObjectResponse {
-          DParser.upObjResponse_response = []
+      $ PD.UploadObjectResponse {
+          PD.upObjResponse_response = []
         },
     
     RunSpec.getLastSucUpdate = return (Just 100),
@@ -143,8 +150,10 @@ runH = RunSpec.Handle {
     RunSpec.setMode = \_ _ -> return (),
 
     RunSpec.getUpdate = \_ _ _ -> return "{\"ts\":\"0\",\"updates\":[]}",
-    RunSpec.getServer = return "{\"response\":{\"key\":\"347e47284fc18830341f78af8a14b434b0cf359e\",\
-                               \\"server\":\"https://lp.vk.com/wh205828081\",\"ts\":543}}",
+    RunSpec.getServer =
+      return "{\"response\":\
+             \{\"key\":\"347e47284fc18830341f78af8a14b434b0cf359e\",\
+             \\"server\":\"https://lp.vk.com/wh205828081\",\"ts\":543}}",
     RunSpec.sendHelpMessage = \_ -> return (),
     RunSpec.sendRepeatMessage = \_ -> return (),
     RunSpec.sendNEchoMessage = \_ _ _ _ _ -> return (),

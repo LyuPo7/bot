@@ -1,6 +1,6 @@
 module TestBot.Tele.Handlers where
 
-import Control.Monad.Identity
+import Control.Monad.Identity (Identity(..))
 import Database.HDBC.Sqlite3 (Connection)
 
 import qualified Bot.Logger as Logger
