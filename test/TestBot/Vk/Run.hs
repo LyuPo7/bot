@@ -4,8 +4,8 @@ import Control.Monad.Identity (Identity(..))
 
 import Hedgehog (Property, property, (===), forAll)
 
-import TestBot.Vk.GenData as GD
-import TestBot.Vk.Handlers as H
+import qualified TestBot.Vk.GenData as GD
+import qualified TestBot.Vk.Handlers as H
 
 import qualified Bot.Settings as Settings
 import qualified Bot.Vk.RunSpec as RunSpec

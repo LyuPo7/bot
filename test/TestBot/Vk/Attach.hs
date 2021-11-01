@@ -6,8 +6,8 @@ import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 import Test.Hspec (Spec, shouldBe, it, describe)
 
-import TestBot.Vk.GenData as GD
-import TestBot.Vk.Handlers as H
+import qualified TestBot.Vk.GenData as GD
+import qualified TestBot.Vk.Handlers as H
 
 import qualified Bot.Vk.Request.AttachSpec as AttachSpec
 import qualified Bot.Vk.Parser.Data as PD

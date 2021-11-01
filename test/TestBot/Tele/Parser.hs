@@ -4,7 +4,7 @@ import Control.Monad.Identity
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.UTF8 as B8
 
-import TestBot.Tele.Handlers as H
+import qualified TestBot.Tele.Handlers as H
 
 import qualified Bot.Tele.Parser.Parser as Parser
 import qualified Bot.Tele.Parser.Data as DParser
