@@ -74,7 +74,7 @@ prepDB handle = do
             _ <- run dbh "CREATE TABLE updates (\
                        \update_ID INTEGER NOT NULL PRIMARY KEY UNIQUE,\
                        \processed BOOLEAN)" []
-            Logger.logInfo logh "Info: Table 'updates' was successfully created!"
+            Logger.logInfo logh "Table 'updates' was successfully created!"
             return ()
     commit dbh
 
@@ -136,7 +136,7 @@ getRepliesNumber handle chatId = handleSql errorHandler $ do
               [toSql chatId]
     case r of
         [[x]] -> do
-            Logger.logInfo logh $ "Info: Will use: " 
+            Logger.logInfo logh $ "Will use: " 
               <> convert (fromSql x :: RepNum)
               <> " replies for Chat with id: " 
               <> convert chatId

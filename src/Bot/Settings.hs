@@ -56,4 +56,4 @@ configFile = "data/config.json"
 
 -- | Timeout
 timeout :: Integer
-timeout = 30
+timeout = 25
