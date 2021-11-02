@@ -13,11 +13,11 @@ import Bot.Tele.Parser.Data (ChatID, RepNum, MessageID, UpdateID)
 import Bot.Util (convert)
 
 data Handle m = Handle {
-    hLogger :: Logger.Handle m,
-    configReq :: Settings.Config,
-    hParser :: ParserSpec.Handle m,
+  hLogger :: Logger.Handle m,
+  configReq :: Settings.Config,
+  hParser :: ParserSpec.Handle m,
 
-    makeRequest :: TeleRequest -> RequestOptions -> m B.ByteString
+  makeRequest :: TeleRequest -> RequestOptions -> m B.ByteString
 }
 
 {-- | Get update request --}

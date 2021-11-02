@@ -10,12 +10,12 @@ import Data.Aeson (camelTo2, parseJSON, toJSON)
 
 -- | Bot Config Settings
 data Config = Config {
-    botApi :: Text,
-    botToken :: Text,
-    botInitialReplyNumber :: Integer,
-    botQuestion :: Text,
-    botDescription :: Text,
-    botGroupId :: Maybe Integer
+  botApi :: Text,
+  botToken :: Text,
+  botInitialReplyNumber :: Integer,
+  botQuestion :: Text,
+  botDescription :: Text,
+  botGroupId :: Maybe Integer
 } deriving (Show, Generic, Eq)
 
 instance FromJSON Config where

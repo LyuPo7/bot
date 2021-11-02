@@ -6,11 +6,11 @@ import qualified Bot.Logger as Logger
 import Bot.Vk.Parser.Data (Attachment(..), Document)
 
 data Handle m = Handle {
-    hLogger :: Logger.Handle m,
-    hReq :: ReqSpec.Handle m,
-    hParser :: ParserSpec.Handle m,
+  hLogger :: Logger.Handle m,
+  hReq :: ReqSpec.Handle m,
+  hParser :: ParserSpec.Handle m,
 
-    updateDoc :: Document -> m Document
+  updateDoc :: Document -> m Document
 }
 
 updateAttachments :: Monad m => Handle m ->

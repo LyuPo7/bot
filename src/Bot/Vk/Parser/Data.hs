@@ -89,18 +89,18 @@ instance ToJSON Geo where
 
 -- | Attachment
 data Attachment = Attachment {
-    attach_type :: Text, -- type of attachment.
-    attach_photo :: Maybe Photo, -- Attached Photo.
-    attach_video :: Maybe Video, -- attached Video.
-    attach_audio :: Maybe Audio, -- Attached Audio.
-    attach_doc :: Maybe Document, -- Attached Document.
-    attach_link :: Maybe Link, -- Attached Link.
-    attach_marketItem :: Maybe Market,  -- Attached Market.
-    attach_marketCollection :: Maybe MarketAlbum, -- Attached MarketAlbum.
-    attach_wallPost :: Maybe Wall, -- Attached Wall post.
-    attach_wallComment :: Maybe WallReply, -- Attached Wall comment.
-    attach_sticker :: Maybe Sticker, -- Attached Sticker.
-    attach_gift :: Maybe Gift -- Attached Gift.
+  attach_type :: Text, -- type of attachment.
+  attach_photo :: Maybe Photo, -- Attached Photo.
+  attach_video :: Maybe Video, -- attached Video.
+  attach_audio :: Maybe Audio, -- Attached Audio.
+  attach_doc :: Maybe Document, -- Attached Document.
+  attach_link :: Maybe Link, -- Attached Link.
+  attach_marketItem :: Maybe Market,  -- Attached Market.
+  attach_marketCollection :: Maybe MarketAlbum, -- Attached MarketAlbum.
+  attach_wallPost :: Maybe Wall, -- Attached Wall post.
+  attach_wallComment :: Maybe WallReply, -- Attached Wall comment.
+  attach_sticker :: Maybe Sticker, -- Attached Sticker.
+  attach_gift :: Maybe Gift -- Attached Gift.
 } deriving (Show, Read, Eq,Generic)
 
 instance FromJSON Attachment where

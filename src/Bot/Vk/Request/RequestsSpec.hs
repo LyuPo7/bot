@@ -22,13 +22,13 @@ import Bot.Vk.Request.Data (SendMessage(..), VkRequest)
 import Bot.Util (convert)
 
 data Handle m = Handle {
-    hLogger :: Logger.Handle m,
-    configReq :: Settings.Config,
-    hParser :: ParserSpec.Handle m,
+  hLogger :: Logger.Handle m,
+  configReq :: Settings.Config,
+  hParser :: ParserSpec.Handle m,
     
-    readFile :: FilePath -> m String,
-    makeRequest :: VkRequest -> Text -> m B.ByteString,
-    getUpdate :: Text -> Text -> Integer -> m B.ByteString
+  readFile :: FilePath -> m String,
+  makeRequest :: VkRequest -> Text -> m B.ByteString,
+  getUpdate :: Text -> Text -> Integer -> m B.ByteString
 }
 
 -- | Server query

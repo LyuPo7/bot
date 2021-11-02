@@ -15,15 +15,15 @@ import Bot.Vk.Parser.Data (Document(..), UploadObject(..),
                            UploadUrlResponse(..), UploadUrl(..))
 
 data Handle m = Handle {
-    hLogger :: Logger.Handle m,
-    hReq :: ReqSpec.Handle m,
-    hParser :: ParserSpec.Handle m,
+  hLogger :: Logger.Handle m,
+  hReq :: ReqSpec.Handle m,
+  hParser :: ParserSpec.Handle m,
 
-    getTemporaryDirectory :: m FilePath,
-    saveUploadedDoc :: Text -> m B.ByteString,
-    downloadFile :: Text -> FilePath -> m (),
-    getUploadedServer :: Integer -> Text -> m B.ByteString,
-    uploadFile :: Text -> FilePath -> m B.ByteString
+  getTemporaryDirectory :: m FilePath,
+  saveUploadedDoc :: Text -> m B.ByteString,
+  downloadFile :: Text -> FilePath -> m (),
+  getUploadedServer :: Integer -> Text -> m B.ByteString,
+  uploadFile :: Text -> FilePath -> m B.ByteString
 }
 
 -- work with Doc Attachment

@@ -17,27 +17,27 @@ import Bot.Tele.Parser.Data (Message(..), Chat(..), Update(..),
 import Bot.Util (convert)
 
 data Handle m = Handle {
-    hLogger :: Logger.Handle m,
-    cRun :: Settings.Config,
-    hDb :: DBSpec.Handle m,
-    hReq :: ReqSpec.Handle m,
-    hParser :: ParserSpec.Handle m,
-    
-    parseUpdateData :: L8.ByteString -> m UpdateData,
-    
-    getLastSucUpdate :: m (Maybe UpdateID),
-    putUpdate :: UpdateID -> m (),
-    getRepliesNumber :: ChatID -> m RepNum,
-    setRepliesNumber :: ChatID -> RepNum -> m (),
-    getMode :: ChatID -> m Text,
-    setMode :: ChatID -> Mode -> m (),
+  hLogger :: Logger.Handle m,
+  cRun :: Settings.Config,
+  hDb :: DBSpec.Handle m,
+  hReq :: ReqSpec.Handle m,
+  hParser :: ParserSpec.Handle m,
+  
+  parseUpdateData :: L8.ByteString -> m UpdateData,
+  
+  getLastSucUpdate :: m (Maybe UpdateID),
+  putUpdate :: UpdateID -> m (),
+  getRepliesNumber :: ChatID -> m RepNum,
+  setRepliesNumber :: ChatID -> RepNum -> m (),
+  getMode :: ChatID -> m Text,
+  setMode :: ChatID -> Mode -> m (),
 
-    getUpdate :: Maybe UpdateID -> m L8.ByteString,
-    sendTextMessage :: ChatID -> Text -> m (),
-    sendEchoMessage :: ChatID -> MessageID -> m (),
-    sendNEchoMessage :: ChatID -> MessageID -> RepNum -> m (),
-    sendQueryNumber :: ChatID -> Text -> m L8.ByteString,
-    setCommands :: m ()
+  getUpdate :: Maybe UpdateID -> m L8.ByteString,
+  sendTextMessage :: ChatID -> Text -> m (),
+  sendEchoMessage :: ChatID -> MessageID -> m (),
+  sendNEchoMessage :: ChatID -> MessageID -> RepNum -> m (),
+  sendQueryNumber :: ChatID -> Text -> m L8.ByteString,
+  setCommands :: m ()
 }
 
 {-- | run Tele bot --}

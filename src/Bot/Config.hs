@@ -18,10 +18,10 @@ data Config = Config {
 } deriving (Show, Generic, Eq)
 
 instance A.FromJSON Config where
-    parseJSON = A.withObject "General Config" $ \o ->
-        Config
-            <$> o A..: "api_settings"
-            <*> o A..: "logger_settings"
+  parseJSON = A.withObject "General Config" $ \o ->
+    Config
+      <$> o A..: "api_settings"
+      <*> o A..: "logger_settings"
 
 -- | Get settings from config
 getConfig :: IO Config

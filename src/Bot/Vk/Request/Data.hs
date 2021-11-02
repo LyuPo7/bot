@@ -20,9 +20,9 @@ newtype VkRequest = VkRequest {
 }
 
 data GetLongPollServer = GetLongPollServer {
-    pollServer_groupId :: Integer, -- Id of bot group.
-    pollServer_accessToken :: Text, -- Token.
-    pollServer_v :: Text -- Version of api.
+  pollServer_groupId :: Integer, -- Id of bot group.
+  pollServer_accessToken :: Text, -- Token.
+  pollServer_v :: Text -- Version of api.
 } deriving (Generic)
 
 instance FromJSON GetLongPollServer where
@@ -42,10 +42,10 @@ instance Url.ToForm GetLongPollServer where
     Url.fieldLabelModifier = camelTo2 '_' . drop 11 }
 
 data LongPollServer = LongPollServer {
-    longServer_key :: Text, -- Key for requests.
-    longServer_ts :: Integer, -- Server time stamp.
-    longServer_act :: Text, -- Action.
-    longServer_wait :: Integer
+  longServer_key :: Text, -- Key for requests.
+  longServer_ts :: Integer, -- Server time stamp.
+  longServer_act :: Text, -- Action.
+  longServer_wait :: Integer
 } deriving (Generic)
 
 instance FromJSON LongPollServer where
@@ -65,14 +65,14 @@ instance Url.ToForm LongPollServer where
     Url.fieldLabelModifier = camelTo2 '_' . drop 11 }
 
 data SendMessage = SendMessage {
-    sendMessag_accessToken :: Text, -- 
-    sendMessag_userId :: Integer, -- Message reciever ID.
-    sendMessag_message :: Text, -- Message text.
-    sendMessag_v :: Text, -- Api version.
-    sendMessag_attachment :: Maybe Text, -- Attachments.
-    sendMessag_stickerId :: Maybe Integer, -- Sticker id.
-    sendMessag_lat :: Maybe Double, -- Geographical latitude.
-    sendMessag_long :: Maybe Double -- 	Geographical longitude.
+  sendMessag_accessToken :: Text, -- 
+  sendMessag_userId :: Integer, -- Message reciever ID.
+  sendMessag_message :: Text, -- Message text.
+  sendMessag_v :: Text, -- Api version.
+  sendMessag_attachment :: Maybe Text, -- Attachments.
+  sendMessag_stickerId :: Maybe Integer, -- Sticker id.
+  sendMessag_lat :: Maybe Double, -- Geographical latitude.
+  sendMessag_long :: Maybe Double -- 	Geographical longitude.
 } deriving (Generic)
 
 instance FromJSON SendMessage where
@@ -92,10 +92,10 @@ instance Url.ToForm SendMessage where
     Url.fieldLabelModifier = camelTo2 '_' . drop 11 }
 
 data GetUploadLink = GetUploadLink {
-    getUplLink_type :: Text, -- Type of document: "doc", ... .
-    getUplLink_peerId :: Integer, -- Community ID..
-    getUplLink_accessToken :: Text, -- Token
-    getUplLink_v :: Text -- Api version
+  getUplLink_type :: Text, -- Type of document: "doc", ... .
+  getUplLink_peerId :: Integer, -- Community ID..
+  getUplLink_accessToken :: Text, -- Token
+  getUplLink_v :: Text -- Api version
 } deriving (Generic)
 
 instance FromJSON GetUploadLink where
@@ -115,9 +115,9 @@ instance Url.ToForm GetUploadLink where
     Url.fieldLabelModifier = camelTo2 '_' . drop 11 }
 
 data SaveDoc = SaveDoc {
-    saveDocSer_file :: Text, -- Returned file is uploaded to the server.
-    saveDocSer_accessToken :: Text, -- Token.
-    saveDocSer_v :: Text -- Api version.
+  saveDocSer_file :: Text, -- Returned file is uploaded to the server.
+  saveDocSer_accessToken :: Text, -- Token.
+  saveDocSer_v :: Text -- Api version.
 } deriving (Generic)
 
 instance FromJSON SaveDoc where
