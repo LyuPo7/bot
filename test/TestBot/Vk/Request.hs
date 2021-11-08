@@ -290,7 +290,7 @@ spec_createRepeatMessage =
       let result = ReqSpec.createRepeatMessage H.reqH 12345
       result `shouldBe` Identity "access_token=abcd0dcba&\
                                  \message=How%20many%20replies%20\
-                                 \do%20you%20prefer%20to%20recieve%3F&\
+                                 \do%20you%20prefer%20to%20receive%3F&\
                                  \user_id=12345&\
                                  \v=5.81&\
                                  \keyboard="

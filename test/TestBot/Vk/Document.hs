@@ -38,7 +38,7 @@ spec_updateDoc=
           result = DocSpec.updateDoc docH2 doc
       result `shouldBe` Identity doc
     it "Should successfully return Document without changes \
-       \if saveUploadedDoc return uncorrect Object" $ do
+       \if saveUploadedDoc return incorrect Object" $ do
       doc <- Gen.sample GD.genDoc
       let docH3 = H.docH1 {
             DocSpec.saveUploadedDoc = \_ -> Identity "{\"response\" : []}"

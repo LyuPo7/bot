@@ -14,31 +14,31 @@ import qualified TestBot.Vk.Run as VkRun
 
 props :: [TestTree]
 props = [
-  testProperty "Tele: Successfull checkConfig for each valid Config"
+  testProperty "Tele: Successful checkConfig for each valid Config"
     Cnfg.prop_checkConfig,
-  testProperty "Tele: Unsuccessfull answerMode parse for each text Message \
+  testProperty "Tele: Unsuccessful answerMode parse for each text Message \
                \while waiting answer number"
                TeleRun.prop_answerModeFail,
-  testProperty "Tele: Successfull answerMode parse for each Message \
+  testProperty "Tele: Successful answerMode parse for each Message \
                \with number 5 in body while waiting answer number" 
                TeleRun.prop_answerModeSuc,
-  testProperty "Tele: Successfull replyMode for /help, /start bot command"
+  testProperty "Tele: Successful replyMode for /help, /start bot command"
     TeleRun.prop_replyModeReplySuc,
-  testProperty "Tele: Successfull replyMode for /reply bot command"
+  testProperty "Tele: Successful replyMode for /reply bot command"
     TeleRun.prop_replyModeAnswerSuc,
-  testProperty "Tele: Successfull replyMode for message without bot command"
+  testProperty "Tele: Successful replyMode for message without bot command"
     TeleRun.prop_replyModeOrdinarySuc,
-  testProperty "Vk: Unsuccessfull answerMode parse for each text Message \
+  testProperty "Vk: Unsuccessful answerMode parse for each text Message \
                \while waiting answer number"
                VkRun.prop_answerModeFail,
-  testProperty "Vk: Successfull answerMode parse for each Message \
+  testProperty "Vk: Successful answerMode parse for each Message \
                \with number 5 in body while waiting answer number"
                VkRun.prop_answerModeSuc,
-  testProperty "Vk: Successfull replyMode for /help bot command"
+  testProperty "Vk: Successful replyMode for /help bot command"
     VkRun.prop_replyModeReplySuc,
-  testProperty "Vk: Successfull replyMode for /reply bot command"
+  testProperty "Vk: Successful replyMode for /reply bot command"
     VkRun.prop_replyModeAnswerSuc,
-  testProperty "Vk: Successfull replyMode for message without bot command"
+  testProperty "Vk: Successful replyMode for message without bot command"
     VkRun.prop_replyModeOrdinarySuc
   ]
 
@@ -100,10 +100,10 @@ updatesFileFailTele = "data/Test/Request/getUpdatesFail.json"
 updateObjFileTele = "data/Test/Request/getUpdatesObj.txt"
 
 -- | Read Tele UpdateData JSON/txt file.
-readUpdateTele, readobjFileTele, readUpdateFailTele :: IO B.ByteString
+readUpdateTele, readObjFileTele, readUpdateFailTele :: IO B.ByteString
 readUpdateTele = B.readFile updatesFileTele
 readUpdateFailTele = B.readFile updatesFileFailTele
-readobjFileTele = B.readFile updateObjFileTele
+readObjFileTele = B.readFile updateObjFileTele
 
 -- | Vk UpdateData file
 updatesFileVk, updatesFileFailVk, updateObjFileVk :: FilePath
@@ -112,10 +112,10 @@ updatesFileFailVk = "data/Test/Vk/Parser/UpdateDataFail.json"
 updateObjFileVk = "data/Test/Vk/Parser/UpdateDataObj.txt"
 
 -- | Read Vk UpdateData JSON/txt file.
-readUpdateVk, readobjFileVk, readUpdateFailVk :: IO B.ByteString
+readUpdateVk, readObjFileVk, readUpdateFailVk :: IO B.ByteString
 readUpdateVk = B.readFile updatesFileVk
 readUpdateFailVk = B.readFile updatesFileFailVk
-readobjFileVk = B.readFile updateObjFileVk
+readObjFileVk = B.readFile updateObjFileVk
 
 -- | Vk PollServerResponse file
 serverFileVk, serverObjFileVk :: FilePath

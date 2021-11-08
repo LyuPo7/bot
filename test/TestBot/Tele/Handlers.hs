@@ -14,7 +14,7 @@ import qualified Bot.Tele.Parser.Data as DParser
 logH :: Logger.Handle Identity
 logH = Logger.Handle {
     Logger.log = \_ _ -> return (),
-    Logger.hconfig = Logger.Config {Logger.cVerbocity = Nothing}
+    Logger.hConfig = Logger.Config {Logger.cVerbosity = Nothing}
 }
 
 parserH :: ParserSpec.Handle Identity
@@ -28,7 +28,7 @@ runC = Settings.Config {
     Settings.botApi = "telegram",
     Settings.botToken = "abcd0dcba",
     Settings.botInitialReplyNumber = 3,
-    Settings.botQuestion = "How many replies do you prefer to recieve?",
+    Settings.botQuestion = "How many replies do you prefer to receive?",
     Settings.botDescription = "Hi! I'm bot=)",
     Settings.botGroupId = Nothing
 }
@@ -38,7 +38,7 @@ runCVk = Settings.Config {
     Settings.botApi = "vk",
     Settings.botToken = "abcd0dcba",
     Settings.botInitialReplyNumber = 3,
-    Settings.botQuestion = "How many replies do you prefer to recieve?",
+    Settings.botQuestion = "How many replies do you prefer to receive?",
     Settings.botDescription = "Hi! I'm bot=)",
     Settings.botGroupId = Just 37891
 }

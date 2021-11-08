@@ -10,6 +10,6 @@
         },
     "logger_settings" :
         {
-            "verbocity": "debug"
+            "verbosity": "debug"
         }
 }
