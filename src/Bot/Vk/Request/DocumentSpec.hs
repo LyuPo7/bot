@@ -29,8 +29,8 @@ data Handle m = Handle {
 -- work with Doc Attachment
 updateDoc :: Monad m => Handle m -> Document -> m Document
 updateDoc handle doc = do
-  let logh = hLogger handle
-      parseh = hParser handle
+  let logH = hLogger handle
+      parseH = hParser handle
       -- extract url from file
       link = document_url doc
       title = document_title doc
@@ -40,28 +40,28 @@ updateDoc handle doc = do
   let fileName = tempDir </> T.unpack title
   -- download file
   downloadFile handle link fileName
-  Logger.logInfo logh "File was downloaded"
+  Logger.logInfo logH "File was downloaded"
   -- get server for upload file
   serverUp <- getUploadedServer handle userId (T.pack "doc")
-  urlResp <- Parser.parseUploadUrl parseh serverUp
+  urlResp <- Parser.parseUploadUrl parseH serverUp
   let url = maybe (T.pack "") upUrl_uploadUrl (upUrlResponse_response urlResp)
   -- upload file
   fileUp <- uploadFile handle url fileName
-  fileResp <- Parser.parseUploadFile parseh fileUp
+  fileResp <- Parser.parseUploadFile parseH fileUp
   case upFileResponse_file fileResp of
     Nothing -> do
-      Logger.logError logh "File wasn't uploaded"
+      Logger.logError logH "File wasn't uploaded"
       return doc
     Just file -> do
-      Logger.logInfo logh "File was uploaded"
+      Logger.logInfo logH "File was uploaded"
       -- save file
       objUp <- saveUploadedDoc handle file
-      obj <- Parser.parseUploadObject parseh objUp
+      obj <- Parser.parseUploadObject parseH objUp
       -- remove tempFile
       --removeDirectoryRecursive tempDir
       case upObjResponse_response obj of
         [x] -> do
-          Logger.logInfo logh "Doc changed"
+          Logger.logInfo logH "Doc changed"
           return doc {
             document_id = upObj_id x,
             document_ownerId = upObj_ownerId x,
@@ -69,5 +69,5 @@ updateDoc handle doc = do
           }
         _ -> do
           -- Maybe only one uploaded object
-          Logger.logWarning logh "No uploaded objects"
+          Logger.logWarning logH "No uploaded objects"
           return doc

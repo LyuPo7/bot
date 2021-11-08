@@ -66,7 +66,7 @@ instance Url.ToForm LongPollServer where
 
 data SendMessage = SendMessage {
   sendMessag_accessToken :: Text, -- 
-  sendMessag_userId :: Integer, -- Message reciever ID.
+  sendMessag_userId :: Integer, -- Message receiver ID.
   sendMessag_message :: Text, -- Message text.
   sendMessag_v :: Text, -- Api version.
   sendMessag_attachment :: Maybe Text, -- Attachments.

@@ -8,8 +8,8 @@ import Data.Aeson (camelTo2)
 import Data.Text (Text)
 import GHC.Generics (Generic)
 
--- Synonims
-type Status = Bool -- Responce status.
+-- Synonyms
+type Status = Bool -- Response status.
 type ChatID = Integer
 type UpdateID = Integer
 type MessageID = Integer
@@ -74,6 +74,6 @@ instance ToJSON Update where
 
 -- | UpdateData
 data UpdateData = UpdateData {
-  ok :: Status, -- Responce status.
+  ok :: Status, -- Response status.
   result :: [Update] -- Update's array.
 } deriving (Show, Read, Eq, Generic, FromJSON, ToJSON)

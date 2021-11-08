@@ -43,9 +43,9 @@ data Handle m = Handle {
 {-- | run Tele bot --}
 run :: Monad m => Handle m -> m ()
 run handle = do
-  let logh = hLogger handle
-  Logger.logInfo logh "Bot api: telegram"
-  -- Set ommands for bot
+  let logH = hLogger handle
+  Logger.logInfo logH "Bot api: telegram"
+  -- Set commands for bot
   setCommands handle
   -- Getting updates
   _ <- checkMode handle
@@ -54,7 +54,7 @@ run handle = do
 {-- | Check update mode --}
 checkMode :: Monad m => Handle m -> m (Maybe UpdateID)
 checkMode handle = do
-  let logh = hLogger handle
+  let logH = hLogger handle
   -- Get last successfully processed update from DB
   processedUpdId <- getLastSucUpdate handle
   let newUpdId = fmap (+ 1) processedUpdId -- set next update to check
@@ -65,17 +65,17 @@ checkMode handle = do
   let update = result updateData
   case update of
     [] -> do
-      Logger.logWarning logh "Where are no more updates for now!"
-      Logger.logInfo logh "Waiting updates!"
+      Logger.logWarning logH "Where are no more updates for now!"
+      Logger.logInfo logH "Waiting updates!"
       _ <- checkMode handle
       return Nothing
     [x] -> do
       let updateId = update_updateId x -- Extract update_id from Update
           checkMessage = update_message x -- Extract message from Update
-      Logger.logInfo logh $ "Checking update with id: " <> convert updateId
+      Logger.logInfo logH $ "Checking update with id: " <> convert updateId
       case checkMessage of
         Nothing -> do 
-          Logger.logWarning logh "Where are no new messages!"
+          Logger.logWarning logH "Where are no new messages!"
           return $ Just updateId
         Just message -> do
           -- check if in MessageEntities appears "bot_command"
@@ -84,24 +84,24 @@ checkMode handle = do
           let action -- realise depending on mode
                 | mode == Settings.reply = do
                   _ <- replyMode handle message
-                  Logger.logDebug logh "Bot in reply mode."
+                  Logger.logDebug logH "Bot in reply mode."
                 | mode == Settings.answer = do
                   _ <- answerMode handle message
-                  Logger.logDebug logh "Bot in answer mode."
-                | otherwise = Logger.logError logh "Unknown Bot mode."
+                  Logger.logDebug logH "Bot in answer mode."
+                | otherwise = Logger.logError logH "Unknown Bot mode."
           action
           putUpdate handle updateId -- put update_id in db
           _ <- checkMode handle
           return $ Just updateId
     _ -> do
-      Logger.logError logh "Expected one update, but have many."
+      Logger.logError logH "Expected one update, but have many."
       _ <- checkMode handle
       return Nothing
 
 {-- | Reply mode --}
 replyMode :: Monad m => Handle m -> Message -> m Mode
 replyMode handle message = do
-  let logh = hLogger handle
+  let logH = hLogger handle
       config = cRun handle
       messageType = filter 
         ((== "bot_command") . messageent_type) 
@@ -113,35 +113,35 @@ replyMode handle message = do
     Nothing -> do
       repNum <- getRepliesNumber handle chatId -- Get current replyNum mode Chat
       sendNEchoMessage handle chatId messageId repNum
-      Logger.logInfo logh "It's ordinary message from User."
+      Logger.logInfo logH "It's ordinary message from User."
       return Settings.reply
     Just _ -> do
       let action
             | Just Settings.helpMessage == messageText = do
-              Logger.logInfo logh "User's /help message"
+              Logger.logInfo logH "User's /help message"
               let description = Settings.botDescription config
               sendTextMessage handle chatId description
               return Settings.reply
             | Just Settings.repeatMessage == messageText = do
-              let quetion = Settings.botQuestion config
-              _ <- sendQueryNumber handle chatId quetion
-              Logger.logInfo logh "Info: User's /repeat message"
+              let question = Settings.botQuestion config
+              _ <- sendQueryNumber handle chatId question
+              Logger.logInfo logH "Info: User's /repeat message"
               setMode handle chatId Settings.answer
               return Settings.answer
             | Just Settings.startMessage == messageText = do
-              Logger.logInfo logh "User's /start message"
+              Logger.logInfo logH "User's /start message"
               sendTextMessage handle chatId "You are welcome!"
               return Settings.reply
             | otherwise = do
               -- Ignore it
-              Logger.logError logh "Recieved unsupported bot-command!"
+              Logger.logError logH "Received unsupported bot-command!"
               return Settings.reply
       action
 
 {-- | Waiting answer mode --}
 answerMode :: Monad m => Handle m -> Message -> m (Maybe RepNum)
 answerMode handle message = do
-  let logh = hLogger handle
+  let logH = hLogger handle
       messageId = message_messageId message
       -- Extract chat_id from Message
       chatId = chat_id $ message_chat message
@@ -150,10 +150,10 @@ answerMode handle message = do
   setMode handle chatId Settings.reply
   case (readMaybe messageText :: Maybe Integer) of -- Trying parse answer
     Just repNum -> do
-      Logger.logInfo logh $ "Info: Recieved user's answer: "
+      Logger.logInfo logH $ "Info: Received user's answer: "
         <> convert messageId
       setRepliesNumber handle chatId repNum -- set new replyNum to db
       return $ Just repNum
     Nothing -> do
-      Logger.logError logh "Couldn't parse User's answer!"
+      Logger.logError logH "Couldn't parse User's answer!"
       return Nothing

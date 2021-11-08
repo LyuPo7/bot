@@ -20,7 +20,7 @@ import Bot.Util (convert)
 {-- | Request to api --}
 makeRequest :: Handle IO -> TeleRequest -> RequestOptions -> IO B.ByteString
 makeRequest handle teleRequest options = do
-  let logh = hLogger handle
+  let logH = hLogger handle
       config = cPar handle
       token = Settings.botToken config
       hostApi = Settings.getHost Settings.apiTele
@@ -39,9 +39,9 @@ makeRequest handle teleRequest options = do
   let codeResp = statusCode $ responseStatus response
   if codeResp == 200
     then do
-      Logger.logDebug logh "Successfull request to api."
+      Logger.logDebug logH "Successful request to api."
       return $ responseBody response
     else do
-      Logger.logDebug logh $ "Unsuccessfull request to api with code: "
+      Logger.logDebug logH $ "Unsuccessful request to api with code: "
         <> convert codeResp
       Exc.throwIO $ E.ConnectionError codeResp

@@ -38,10 +38,10 @@ getUpdate handle server key timeStamp = do
   let codeResp = statusCode $ responseStatus response
   if codeResp == 200
     then do
-      Logger.logDebug handle "Successfull request to api."
+      Logger.logDebug handle "Successful request to api."
       return $ responseBody response
     else do
-      Logger.logDebug handle $ "Unsuccessfull request to api with code: "
+      Logger.logDebug handle $ "Unsuccessful request to api with code: "
         <> convert codeResp
       Exc.throwIO $ E.ConnectionError codeResp
 
@@ -63,9 +63,9 @@ makeRequest handle vkRequest queryOptions = do
   let codeResp = statusCode $ responseStatus response
   if codeResp == 200
     then do
-      Logger.logDebug handle "Successfull request to api."
+      Logger.logDebug handle "Successful request to api."
       return $ responseBody response
     else do
-      Logger.logDebug handle $ "Unsuccessfull request to api with code: "
+      Logger.logDebug handle $ "Unsuccessful request to api with code: "
        <> convert codeResp
       Exc.throwIO $ E.ConnectionError codeResp

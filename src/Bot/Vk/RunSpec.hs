@@ -55,8 +55,8 @@ data Handle m = Handle {
 {-- | run Vk bot --}
 run :: (MonadThrow m, Monad m) => Handle m -> m ()
 run handle = do
-  let logh = hLogger handle
-  Logger.logInfo logh "Bot api: vk"
+  let logH = hLogger handle
+  Logger.logInfo logH "Bot api: vk"
   -- Connect to DB
   serverUp <- getServer handle
   serverParamsE <- EiT.runEitherT $ do
@@ -74,7 +74,7 @@ run handle = do
 
 checkMode :: Monad m => Handle m -> Server -> m ()
 checkMode handle serverParams = do
-  let logh = hLogger handle
+  let logH = hLogger handle
       -- Extract server 
       server = server_server serverParams
       key = server_key serverParams
@@ -84,7 +84,7 @@ checkMode handle serverParams = do
   -- Get updates from bot
   let newUpdId = fmap (+1) processedUpdId
       tsDb = fromMaybe tsCurrent newUpdId
-  Logger.logInfo logh ("Work with update: " <> convert tsDb)
+  Logger.logInfo logH ("Work with update: " <> convert tsDb)
   responseUp <- getUpdate handle server key tsDb
   updateData <- parseUpdateData handle responseUp
   -- Extract result (updates) from updatesData:
@@ -92,8 +92,8 @@ checkMode handle serverParams = do
   let update = updates updateData
   case update of
     [] -> do
-      Logger.logWarning logh "Where are no more updates for now!"
-      Logger.logInfo logh "Waiting updates!"
+      Logger.logWarning logH "Where are no more updates for now!"
+      Logger.logInfo logH "Waiting updates!"
       checkMode handle serverParams {server_ts = tsDb - 1}
     (x:_) -> do
       let updateType = update_type x -- Extract update_type from Update
@@ -102,36 +102,36 @@ checkMode handle serverParams = do
       mode <- getMode handle userId
       let action | mode == Settings.reply && updateType == T.pack "message_new" = do
                     _ <- replyMode handle message
-                    Logger.logDebug logh "Bot in reply mode."
+                    Logger.logDebug logH "Bot in reply mode."
                  | mode == Settings.answer && updateType == T.pack "message_new" = do
                     _ <- answerMode handle message
-                    Logger.logDebug logh "Bot in answer mode."
-                 | otherwise = Logger.logError logh "Unsuported type of update."
+                    Logger.logDebug logH "Bot in answer mode."
+                 | otherwise = Logger.logError logH "Unsupported type of update."
       action
       putUpdate handle tsDb
       checkMode handle serverParams {server_ts = tsDb + 1}
 
 replyMode :: Monad m => Handle m -> Message -> m Mode
 replyMode handle message = do
-  let logh = hLogger handle
+  let logH = hLogger handle
       userId = message_userId message
       messageText = message_body message
       attachments = message_attachments message
       geo = message_geo message
   attsNew <- updateAttachments handle attachments
-  Logger.logInfo logh $ "Checking message from user with id: " 
+  Logger.logInfo logH $ "Checking message from user with id: " 
     <> convert userId
   let action | Settings.helpMessage == messageText = do 
-                Logger.logInfo logh "User's /help message"
+                Logger.logInfo logH "User's /help message"
                 sendHelpMessage handle userId
                 return Settings.reply
              | Settings.repeatMessage == messageText = do
                 sendRepeatMessage handle userId
-                Logger.logInfo logh "User's /repeat message"
+                Logger.logInfo logH "User's /repeat message"
                 setMode handle userId Settings.answer
                 return Settings.answer
              | otherwise = do
-                Logger.logInfo logh "It's text message from User."
+                Logger.logInfo logH "It's text message from User."
                 repNum <- getRepliesNumber handle userId
                 sendNEchoMessage handle userId messageText attsNew geo repNum
                 return Settings.reply
@@ -139,7 +139,7 @@ replyMode handle message = do
 
 answerMode :: Monad m => Handle m -> Message -> m (Maybe RepNum)
 answerMode handle message = do
-  let logh = hLogger handle
+  let logH = hLogger handle
       userId = message_userId message
       messageText = T.unpack $ message_body message
       -- Extract pollData_result (message) from updatesData:
@@ -147,9 +147,9 @@ answerMode handle message = do
   setMode handle userId Settings.reply
   case (readMaybe messageText :: Maybe Integer) of
     Just repNum -> do
-      Logger.logInfo logh "Info: Recieved user's answer"
+      Logger.logInfo logH "Info: Received user's answer"
       setRepliesNumber handle userId repNum
       return $ Just repNum
     Nothing -> do
-      Logger.logError logh "Couldn't parse User's answer!"
+      Logger.logError logH "Couldn't parse User's answer!"
       return Nothing

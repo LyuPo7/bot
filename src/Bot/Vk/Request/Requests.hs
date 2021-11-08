@@ -9,11 +9,11 @@ import qualified Bot.Settings as Settings
 
 withHandleIO :: Logger.Handle IO -> Settings.Config ->
                 ParserSpec.Handle IO -> (Handle IO -> IO a) -> IO a
-withHandleIO logger config parserh f = do
+withHandleIO logger config parserH f = do
   let handle = Handle {
     hLogger = logger,
     configReq = config,
-    hParser = parserh,
+    hParser = parserH,
     
     ReqSpec.readFile = Prelude.readFile,
     makeRequest = ReqImpl.makeRequest logger,

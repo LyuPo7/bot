@@ -9,7 +9,7 @@ import Data.Aeson.Types (ToJSON(..), FromJSON(..),
                          genericToJSON, defaultOptions,
                          fieldLabelModifier, genericParseJSON)
 
--- Synonims
+-- Synonyms
 type UserID = Integer
 type GroupID = Integer
 type UpdateID = Integer
@@ -338,7 +338,7 @@ instance ToJSON UploadUrl where
   
 -- | UploadFileResponse
 newtype UploadFileResponse = UploadFileResponse {
-  upFileResponse_file :: Maybe Text -- Uploade file response
+  upFileResponse_file :: Maybe Text -- Upload file response
   } deriving (Show, Read, Eq,Generic) 
 
 instance FromJSON UploadFileResponse where
@@ -423,7 +423,7 @@ instance ToJSON Action where
 
 -- | KeyboardData
 newtype KeyboardData = KeyboardData {
-  keyboard :: Maybe Keyboard -- Keyboard responce.
+  keyboard :: Maybe Keyboard -- Keyboard response.
 } deriving (Show, Read, Eq, Generic, FromJSON, ToJSON)
 
 defaultAttach :: Attachment

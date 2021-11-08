@@ -8,12 +8,12 @@ import qualified Bot.Tele.Request.RequestsImpl as ReqImpl
 
 withHandleIO :: Logger.Handle IO -> ParserSpec.Handle IO ->
                 Settings.Config -> (Handle IO -> IO a) -> IO a
-withHandleIO logger parserh config f = do
+withHandleIO logger parserH config f = do
   let handle = Handle {
     hLogger = logger,
-    hParser = parserh,
+    hParser = parserH,
     configReq = config,
 
-    makeRequest = ReqImpl.makeRequest parserh
+    makeRequest = ReqImpl.makeRequest parserH
   }
   f handle

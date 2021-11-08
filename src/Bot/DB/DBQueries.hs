@@ -21,14 +21,14 @@ withHandleIO logger config f = do
   case Settings.botApi config of
     "vk" -> do
       let dbFile = "data/vk.db"
-      dbh <- connect dbFile
-      let handle = Handle logger dbh config
+      dbH <- connect dbFile
+      let handle = Handle logger dbH config
       prepDB handle
       f handle
     "telegram" -> do
       let dbFile = "data/tele.db"
-      dbh <- connect dbFile
-      let handle = Handle logger dbh config
+      dbH <- connect dbFile
+      let handle = Handle logger dbH config
       prepDB handle
       f handle
     _ -> do
@@ -45,74 +45,74 @@ connect dbFile = do connectSqlite3 dbFile
 Create two tables and ask the database engine to verify some info:
 ** Table: rep_numbers (table contains info about reply_number for every Chat):
     - chat_id - unique identifier for this message;
-    - reply_number - number of replies for responce;
+    - reply_number - number of replies for response;
 ** Table: modes (table contains mode in which bot work for every Chat):
     - chat_id - unique identifier for this message;
     - mode - work mode;
 ** Table: updates (table contains info about update's status):
     - update_id - unique identifier for this update;
-    - processed - status the responce;
+    - processed - status the response;
 -}
 prepDB :: Handle IO -> IO ()
 prepDB handle = do
-  let dbh = hDb handle
-      logh = hLogger handle
-  tables <- getTables dbh
+  let dbH = hDb handle
+      logH = hLogger handle
+  tables <- getTables dbH
   when ("rep_numbers" `notElem` tables) $ do
-    _ <- run dbh "CREATE TABLE rep_numbers (\
+    _ <- run dbH "CREATE TABLE rep_numbers (\
                  \chat_id INTEGER NOT NULL PRIMARY KEY UNIQUE,\
                  \reply_number INTEGER NOT NULL)" []
-    Logger.logInfo logh "Table 'rep_numbers' was successfully created!"
+    Logger.logInfo logH "Table 'rep_numbers' was successfully created!"
   when ("modes" `notElem` tables) $ do 
-    _ <- run dbh "CREATE TABLE modes (\
+    _ <- run dbH "CREATE TABLE modes (\
                  \chat_id INTEGER NOT NULL PRIMARY KEY UNIQUE,\
                  \mode TEXT NOT NULL)" []
-    Logger.logInfo logh "Table 'modes' was successfully created!"
+    Logger.logInfo logH "Table 'modes' was successfully created!"
   when ("updates" `notElem` tables) $ do 
-    _ <- run dbh "CREATE TABLE updates (\
+    _ <- run dbH "CREATE TABLE updates (\
                  \update_ID INTEGER NOT NULL PRIMARY KEY UNIQUE,\
                  \processed BOOLEAN)" []
-    Logger.logInfo logh "Table 'updates' was successfully created!"
-  commit dbh
+    Logger.logInfo logH "Table 'updates' was successfully created!"
+  commit dbH
 
 {- | Gets id of last successfully processed update from DB -}
 getLastSucUpdate :: Handle IO -> IO (Maybe UpdateID)
 getLastSucUpdate handle = handleSql errorHandler $ do
-  let dbh = hDb handle
-      logh = hLogger handle
-  r <- quickQuery' dbh "SELECT update_ID \
+  let dbH = hDb handle
+      logH = hLogger handle
+  r <- quickQuery' dbH "SELECT update_ID \
                        \FROM updates \
                        \ORDER BY update_ID DESC \
                        \LIMIT 1" []
   case r of
     [[x]] -> do
-      Logger.logInfo logh $ "Last processed update with id: "
+      Logger.logInfo logH $ "Last processed update with id: "
         <> convert (fromSql x :: UpdateID)
       return $ Just $ fromSql x
     _ -> do
-      Logger.logWarning logh "There are no processed updates for now"
+      Logger.logWarning logH "There are no processed updates for now"
       return Nothing
   where errorHandler _ = do
           Exc.throwIO $ E.DbError "Error: Error in getLastSucUpdate!"
 
 putUpdate :: Handle IO -> UpdateID -> IO ()
 putUpdate handle updateID = handleSql errorHandler $ do
-  let dbh = hDb handle
-      logh = hLogger handle
-  r <- quickQuery' dbh "SELECT update_ID \
+  let dbH = hDb handle
+      logH = hLogger handle
+  r <- quickQuery' dbH "SELECT update_ID \
                        \FROM updates \
                        \WHERE update_ID = ?" 
         [toSql updateID]
   case r of
     [] -> do
-      _ <- run dbh "INSERT INTO updates (update_ID, processed) \
+      _ <- run dbH "INSERT INTO updates (update_ID, processed) \
                    \VALUES (?,?)"
             [toSql updateID, toSql True]
-      commit dbh
-      Logger.logInfo logh $ "Update with id: " 
+      commit dbH
+      Logger.logInfo logH $ "Update with id: " 
         <> convert updateID 
         <> " was successfully inserted in db."
-    _ -> Logger.logWarning logh $ "Update with id: "
+    _ -> Logger.logWarning logH $ "Update with id: "
            <> convert updateID
            <> " already exists in db."
   where errorHandler e = do
@@ -123,23 +123,23 @@ putUpdate handle updateID = handleSql errorHandler $ do
      If no exists data for given Chat in db then return initial number from config. -}
 getRepliesNumber :: Handle IO -> ChatID -> IO RepNum
 getRepliesNumber handle chatId = handleSql errorHandler $ do
-  let dbh = hDb handle
-      logh = hLogger handle
+  let dbH = hDb handle
+      logH = hLogger handle
       config = configDb handle
   -- check if chat_id already in the table:
-  r <- quickQuery' dbh "SELECT reply_number \
+  r <- quickQuery' dbH "SELECT reply_number \
                        \FROM rep_numbers \
                        \WHERE chat_ID = ?"
         [toSql chatId]
   case r of
     [[x]] -> do
-      Logger.logInfo logh $ "Will use: " 
+      Logger.logInfo logH $ "Will use: " 
         <> convert (fromSql x :: RepNum)
         <> " replies for Chat with id: " 
         <> convert chatId
       return $ fromSql x
     _ -> do
-      Logger.logInfo logh 
+      Logger.logInfo logH 
         $ "Will use initial number of replies for Chat with id: " 
           <> convert chatId
       return $ Settings.botInitialReplyNumber config
@@ -152,29 +152,29 @@ getRepliesNumber handle chatId = handleSql errorHandler $ do
      If chatId exists reply_number in db then change existed reply_number. -}
 setRepliesNumber :: Handle IO -> ChatID -> RepNum -> IO ()
 setRepliesNumber handle chatId repNum = handleSql errorHandler $ do
-  let dbh = hDb handle
-      logh = hLogger handle
+  let dbH = hDb handle
+      logH = hLogger handle
   -- check if chat_id already in the table:
-  r <- quickQuery' dbh "SELECT reply_number \
+  r <- quickQuery' dbH "SELECT reply_number \
                        \FROM rep_numbers \
                        \WHERE chat_ID = ?"
         [toSql chatId]
   case r of
     [] -> do
-      _ <- run dbh "INSERT INTO rep_numbers (chat_id, reply_number) \
+      _ <- run dbH "INSERT INTO rep_numbers (chat_id, reply_number) \
                    \VALUES (?,?)"
             [toSql chatId, toSql repNum]
-      commit dbh
-      Logger.logInfo logh $ "Reply_number for Chat with id: "
+      commit dbH
+      Logger.logInfo logH $ "Reply_number for Chat with id: "
         <> convert chatId 
         <> " was successfully inserted in db."
     _ -> do
-      _ <- run dbh "UPDATE rep_numbers \
+      _ <- run dbH "UPDATE rep_numbers \
                    \SET reply_number = ? \
                    \WHERE chat_id = ?"
             [toSql repNum, toSql chatId]
-      commit dbh
-      Logger.logInfo logh $ "Info: Reply_number for Chat with id: "
+      commit dbH
+      Logger.logInfo logH $ "Info: Reply_number for Chat with id: "
         <> convert chatId
         <> " was successfully changed in db."
   where errorHandler e = do
@@ -185,22 +185,22 @@ setRepliesNumber handle chatId repNum = handleSql errorHandler $ do
      If no exists data for given Chat in db then return default mode. -}
 getMode :: Handle IO -> ChatID -> IO Text
 getMode handle chatId = handleSql errorHandler $ do
-  let dbh = hDb handle
-      logh = hLogger handle
+  let dbH = hDb handle
+      logH = hLogger handle
   -- check if chat_id already in the table:
-  r <- quickQuery' dbh "SELECT mode \
+  r <- quickQuery' dbH "SELECT mode \
                        \FROM modes \
                        \WHERE chat_id = ?"
         [toSql chatId]
   case r of
     [[x]] -> do
-      Logger.logInfo logh $ "Will use: "
+      Logger.logInfo logH $ "Will use: "
         <> pack (fromSql x :: String)
         <> " mode for Chat with id: " 
         <> convert chatId
       return $ fromSql x
     _ -> do
-      Logger.logInfo logh $ "Will use default mode for Chat with id: "
+      Logger.logInfo logH $ "Will use default mode for Chat with id: "
         <> convert chatId
       return "reply"
   where errorHandler e = do
@@ -212,29 +212,29 @@ getMode handle chatId = handleSql errorHandler $ do
      If chatId exists mode in db then change existed mode. -}
 setMode :: Handle IO -> ChatID -> Mode -> IO ()
 setMode handle chatId mode = handleSql errorHandler $ do
-  let dbh = hDb handle
-      logh = hLogger handle
+  let dbH = hDb handle
+      logH = hLogger handle
   -- check if chat_id already in the table:
-  r <- quickQuery' dbh "SELECT mode \
+  r <- quickQuery' dbH "SELECT mode \
                        \FROM modes \
                        \WHERE chat_id = ?"
         [toSql chatId]
   case r of
     [] -> do
-      _ <- run dbh "INSERT INTO modes (chat_id, mode) \
+      _ <- run dbH "INSERT INTO modes (chat_id, mode) \
                    \VALUES (?,?)"
             [toSql chatId, toSql mode]
-      commit dbh
-      Logger.logInfo logh $ "Mode for Chat with id: "
+      commit dbH
+      Logger.logInfo logH $ "Mode for Chat with id: "
         <> convert chatId
         <> " was successfully inserted in db."
     _ -> do
-      _ <- run dbh "UPDATE modes \
+      _ <- run dbH "UPDATE modes \
                    \SET mode = ? \
                    \WHERE chat_ID = ?"
             [toSql mode, toSql chatId]
-      commit dbh
-      Logger.logInfo logh $ "Mode for Chat with id: "
+      commit dbH
+      Logger.logInfo logH $ "Mode for Chat with id: "
         <> convert chatId
         <> " was successfully changed in db."
   where errorHandler e = do

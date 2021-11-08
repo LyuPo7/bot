@@ -16,12 +16,12 @@ data Handle m = Handle {
 updateAttachments :: Monad m => Handle m ->
                      Maybe [Attachment] -> m (Maybe [Attachment])
 updateAttachments handle Nothing = do
-  let logh = hLogger handle
-  Logger.logDebug logh "Message hasn't Attachments."
+  let logH = hLogger handle
+  Logger.logDebug logH "Message hasn't Attachments."
   return Nothing
 updateAttachments handle (Just attachs) = do
-  let logh = hLogger handle
-  Logger.logDebug logh "Message has Attachments."
+  let logH = hLogger handle
+  Logger.logDebug logH "Message has Attachments."
   Just <$> mapM (updateAttachment handle) attachs
 
 updateAttachment :: Monad m => Handle m -> Attachment -> m Attachment

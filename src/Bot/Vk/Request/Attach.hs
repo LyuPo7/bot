@@ -8,12 +8,12 @@ import qualified Bot.Logger as Logger
 
 withHandleIO :: Logger.Handle IO -> ParserSpec.Handle IO -> ReqSpec.Handle IO ->
                 DocSpec.Handle IO -> (Handle IO -> IO a) -> IO a
-withHandleIO logger parserh reqh doch f = do
+withHandleIO logger parserH reqH docH f = do
   let handle = Handle {
     hLogger = logger,
-    hReq = reqh,
-    hParser = parserh,
+    hReq = reqH,
+    hParser = parserH,
 
-    updateDoc = DocSpec.updateDoc doch
+    updateDoc = DocSpec.updateDoc docH
   }
   f handle

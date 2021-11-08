@@ -42,14 +42,14 @@ checkConfig config
   | Settings.botInitialReplyNumber cSet > 5 = Left 
      $ E.ParseConfigError "Incorrect field in config.json: \
                           \'bot_initial_reply_number' > 5"
-  | Logger.cVerbocity cLog `notElem` [
+  | Logger.cVerbosity cLog `notElem` [
       Just Logger.Debug,
       Just Logger.Info,
       Just Logger.Warning,
       Just Logger.Error,
       Nothing
     ] = Left $ E.ParseConfigError "Incorrect field \
-                                  \'verbocity' in config.json"
+                                  \'verbosity' in config.json"
   | otherwise = Right config where
       cLog = cLogger config
       cSet = cSettings config

@@ -13,20 +13,20 @@ import Bot.Vk.RunSpec (Handle(..))
 withHandleIO :: Logger.Handle IO -> Settings.Config -> DBSpec.Handle IO ->
                 ReqSpec.Handle IO -> ParserSpec.Handle IO ->
                 AttachSpec.Handle IO -> (Handle IO -> IO a) -> IO a
-withHandleIO logger config dbh reqh parserh attachh f = do
+withHandleIO logger config dbh reqH parserH attachH f = do
   let handle = Handle {
     hLogger = logger,
     cRun = config,
     hDb = dbh,
-    hReq = reqh,
-    hParser = parserh,
-    hAttach = attachh,
+    hReq = reqH,
+    hParser = parserH,
+    hAttach = attachH,
     
-    parseUpdateData = Parser.parseUpdateData parserh,
-    parsePollResponse = Parser.parsePollResponse parserh,
-    parseUploadUrl = Parser.parseUploadUrl parserh,
-    parseUploadFile = Parser.parseUploadFile parserh,
-    parseUploadObject = Parser.parseUploadObject parserh,
+    parseUpdateData = Parser.parseUpdateData parserH,
+    parsePollResponse = Parser.parsePollResponse parserH,
+    parseUploadUrl = Parser.parseUploadUrl parserH,
+    parseUploadFile = Parser.parseUploadFile parserH,
+    parseUploadObject = Parser.parseUploadObject parserH,
     
     getLastSucUpdate = DB.getLastSucUpdate dbh,
     putUpdate = DB.putUpdate dbh,
@@ -35,12 +35,12 @@ withHandleIO logger config dbh reqh parserh attachh f = do
     getMode = DB.getMode dbh,
     setMode = DB.setMode dbh,
 
-    sendNEchoMessage = ReqSpec.sendNEchoMessage reqh,
-    sendRepeatMessage = ReqSpec.sendRepeatMessage reqh,
-    sendHelpMessage =ReqSpec.sendHelpMessage reqh,
-    getUpdate = ReqSpec.getUpdate reqh,
-    getServer = ReqSpec.getServer reqh,
+    sendNEchoMessage = ReqSpec.sendNEchoMessage reqH,
+    sendRepeatMessage = ReqSpec.sendRepeatMessage reqH,
+    sendHelpMessage =ReqSpec.sendHelpMessage reqH,
+    getUpdate = ReqSpec.getUpdate reqH,
+    getServer = ReqSpec.getServer reqH,
 
-    updateAttachments = AttachSpec.updateAttachments attachh
+    updateAttachments = AttachSpec.updateAttachments attachH
   }
   f handle

@@ -10,16 +10,16 @@ import qualified Bot.Vk.Request.DocumentImpl as DocImpl
 
 withHandleIO :: Logger.Handle IO -> ParserSpec.Handle IO ->
                 ReqSpec.Handle IO -> (Handle IO -> IO a) -> IO a
-withHandleIO logger parserh reqh f = do
+withHandleIO logger parserH reqH f = do
   let handle = Handle {
     hLogger = logger,
-    hReq = reqh,
-    hParser = parserh,
+    hReq = reqH,
+    hParser = parserH,
 
     getTemporaryDirectory = Dir.getTemporaryDirectory,
-    saveUploadedDoc = DocImpl.saveUploadedDoc reqh,
+    saveUploadedDoc = DocImpl.saveUploadedDoc reqH,
     downloadFile = DocImpl.downloadFile,
-    getUploadedServer = DocImpl.getUploadedServer reqh,
+    getUploadedServer = DocImpl.getUploadedServer reqH,
     uploadFile = DocImpl.uploadFile
   }
   f handle
