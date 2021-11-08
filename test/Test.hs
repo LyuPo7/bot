@@ -47,11 +47,11 @@ main :: IO ()
 main = do
   bstrTele <- readUpdateTele
   bstrFailTele <- readUpdateFailTele
-  objTele <- readobjFileTele
+  objTele <- readObjFileTele
 
   bstrVk <- readUpdateVk
   bstrFailVk <- readUpdateFailVk
-  objVk <- readobjFileVk
+  objVk <- readObjFileVk
 
   bstrServerVk <- readServerVk
   objServerVk <- readServerObjVk
@@ -90,7 +90,6 @@ main = do
   defaultMain (testGroup "All Tests" [
                   testGroup "Specs" specs,
                   testGroup "Properties" props
-                --, testGroup "Golden Tests" goldens
                 ])
 
 -- | Tele UpdateData file

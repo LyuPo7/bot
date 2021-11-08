@@ -24,7 +24,7 @@ main = Exc.handle errorHandler $ do
   config <- getConfig
   let cLog = cLogger config
       cSet = cSettings config
-      logh = Logger.newHandleIO cLog
+      logH = Logger.newHandleIO cLog
       api = Settings.botApi cSet
   case api of
     "telegram" -> do
@@ -44,7 +44,7 @@ main = Exc.handle errorHandler $ do
         Vk.withHandleIO hLogger cSet hDb hReq hParser hAttach $ \hVk ->
         SVk.run hVk
     _ -> do
-      Logger.logError logh "Incorrect field 'bot_api' in config.json"
+      Logger.logError logH "Incorrect field 'bot_api' in config.json"
       Exc.throwIO $ E.ParseConfigError "Incorrect field 'bot_api' in config.json" 
     where
       errorHandler :: E.BotError -> IO ()
