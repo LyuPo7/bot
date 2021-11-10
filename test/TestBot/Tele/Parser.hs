@@ -7,7 +7,7 @@ import qualified Data.ByteString.Lazy.UTF8 as B8
 import qualified TestBot.Tele.Handlers as H
 
 import qualified Bot.Tele.Parser.Parser as Parser
-import qualified Bot.Tele.Parser.Data as DParser
+import qualified Bot.Tele.Parser.Objects.UpdateData as UpData
 
 import Test.Hspec (Spec, shouldBe, it, describe)
 
@@ -16,11 +16,11 @@ spec_parseUpdateData obj bstr bstrFail =
   describe "Testing update parse for telegram bot" $ do
     it "Should successfully parse updates" $ do
       let result = Parser.parseUpdateData H.parserH bstr
-          check = read (B8.toString obj) :: DParser.UpdateData
+          check = read (B8.toString obj) :: UpData.UpdateData
       result `shouldBe` Identity check
     it "Should fail parse updates" $ do
       let result = Parser.parseUpdateData H.parserH bstrFail
-      result `shouldBe` Identity DParser.UpdateData {
-          DParser.ok = True,
-          DParser.result = []
+      result `shouldBe` Identity UpData.UpdateData {
+          UpData.ok = True,
+          UpData.result = []
         }

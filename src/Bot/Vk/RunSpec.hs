@@ -16,10 +16,21 @@ import qualified Bot.DB.DBSpec as DB
 import qualified Bot.Vk.Request.RequestsSpec as Req
 import qualified Bot.Vk.Request.AttachSpec as Attach
 import qualified Bot.Vk.Parser.ParserSpec as Parser
-import Bot.Vk.Parser.Data (Message(..), Server(..), ServerText(..), Update(..),
-                           UpdateData(..), Attachment, RepNum, Mode, UserID,
-                           UpdateID, Geo, UploadObjectResponse, UploadFileResponse,
-                           UploadUrlResponse, PollResponse(..))
+import Bot.Vk.Parser.Objects.Message (Message(..)) 
+import Bot.Vk.Parser.Objects.Server (Server(..)) 
+import Bot.Vk.Parser.Objects.UpdateData (UpdateData(..))
+import Bot.Vk.Parser.Objects.Attachment (Attachment(..))
+import Bot.Vk.Parser.Objects.Geo (Geo(..))
+import Bot.Vk.Parser.Objects.UploadObjectResponse (UploadObjectResponse(..))
+import Bot.Vk.Parser.Objects.UploadFileResponse (UploadFileResponse(..))
+import Bot.Vk.Parser.Objects.UploadUrlResponse (UploadUrlResponse(..))
+import Bot.Vk.Parser.Objects.PollResponse (PollResponse(..))
+
+import qualified Bot.Vk.Parser.Objects.Update as Update
+import qualified Bot.Vk.Parser.Objects.Message as Message
+import qualified Bot.Vk.Parser.Objects.Server as Server
+import qualified Bot.Vk.Parser.Objects.PollResponse as PollResp
+import Bot.Vk.Parser.Objects.Synonyms (RepNum, Mode, UserId, UpdateId)
 import Bot.Util (convert, readEitherMa)
 
 data Handle m = Handle {
@@ -36,17 +47,17 @@ data Handle m = Handle {
     parseUploadFile :: L8.ByteString -> m UploadFileResponse,
     parseUploadObject :: L8.ByteString -> m UploadObjectResponse,
     
-    getLastSucUpdate :: m (Maybe UpdateID),
-    putUpdate :: UpdateID -> m (),
-    getRepliesNumber :: UserID -> m RepNum,
-    setRepliesNumber :: UserID -> RepNum -> m (),
-    getMode :: UserID -> m Text,
-    setMode :: UserID -> Mode -> m (),
+    getLastSucUpdate :: m (Maybe UpdateId),
+    putUpdate :: UpdateId -> m (),
+    getRepliesNumber :: UserId -> m RepNum,
+    setRepliesNumber :: UserId -> RepNum -> m (),
+    getMode :: UserId -> m Text,
+    setMode :: UserId -> Mode -> m (),
 
-    sendNEchoMessage :: UserID -> Text -> Maybe [Attachment] ->
+    sendNEchoMessage :: UserId -> Text -> Maybe [Attachment] ->
                         Maybe Geo -> RepNum -> m (),
-    sendRepeatMessage :: UserID -> m (),
-    sendHelpMessage :: UserID -> m (),
+    sendRepeatMessage :: UserId -> m (),
+    sendHelpMessage :: UserId -> m (),
     updateAttachments :: Maybe [Attachment] -> m (Maybe [Attachment]),
     getUpdate :: Text -> Text -> Integer -> m B.ByteString,
     getServer :: m B.ByteString
@@ -61,12 +72,12 @@ run handle = do
   serverUp <- getServer handle
   serverParamsE <- EiT.runEitherT $ do
     params <- EiT.EitherT $ parsePollResponse handle serverUp
-    let tsText = serverText_ts $ pollResponse_response params
+    let tsText = Server.text_ts $ PollResp.response params
     tsInt <- EiT.EitherT $ readEitherMa tsText
     return Server {
-      server_key = serverText_key $ pollResponse_response params,
-      server_server = serverText_server $ pollResponse_response params,
-      server_ts = tsInt
+      Server.key = Server.text_key $ PollResp.response params,
+      Server.server = Server.text_server $ PollResp.response params,
+      Server.ts = tsInt
     }
   case serverParamsE of
     Left msg2 -> throwM $ E.ParseRequestError $ T.unpack msg2
@@ -76,16 +87,16 @@ checkMode :: Monad m => Handle m -> Server -> m ()
 checkMode handle serverParams = do
   let logH = hLogger handle
       -- Extract server 
-      server = server_server serverParams
-      key = server_key serverParams
-      tsCurrent = server_ts serverParams
+      serverLink = Server.server serverParams
+      serverKey = Server.key serverParams
+      tsCurrent = Server.ts serverParams
   -- Get last successfully processed update from DB
   processedUpdId <- getLastSucUpdate handle
   -- Get updates from bot
   let newUpdId = fmap (+1) processedUpdId
       tsDb = fromMaybe tsCurrent newUpdId
   Logger.logInfo logH ("Work with update: " <> convert tsDb)
-  responseUp <- getUpdate handle server key tsDb
+  responseUp <- getUpdate handle serverLink serverKey tsDb
   updateData <- parseUpdateData handle responseUp
   -- Extract result (updates) from updatesData:
   --          if no new messages print Warning
@@ -94,11 +105,11 @@ checkMode handle serverParams = do
     [] -> do
       Logger.logWarning logH "Where are no more updates for now!"
       Logger.logInfo logH "Waiting updates!"
-      checkMode handle serverParams {server_ts = tsDb - 1}
+      checkMode handle serverParams {Server.ts = tsDb - 1}
     (x:_) -> do
-      let updateType = update_type x -- Extract update_type from Update
-          message = update_object x -- Extract Message from Update
-          userId = message_userId message
+      let updateType = Update.update_type x -- Extract u_type from Update
+          message = Update.object x -- Extract Message from Update
+          userId = Message.user_id message
       mode <- getMode handle userId
       let action | mode == Settings.reply && updateType == T.pack "message_new" = do
                     _ <- replyMode handle message
@@ -109,16 +120,16 @@ checkMode handle serverParams = do
                  | otherwise = Logger.logError logH "Unsupported type of update."
       action
       putUpdate handle tsDb
-      checkMode handle serverParams {server_ts = tsDb + 1}
+      checkMode handle serverParams {Server.ts = tsDb + 1}
 
 replyMode :: Monad m => Handle m -> Message -> m Mode
 replyMode handle message = do
   let logH = hLogger handle
-      userId = message_userId message
-      messageText = message_body message
-      attachments = message_attachments message
-      geo = message_geo message
-  attsNew <- updateAttachments handle attachments
+      userId = Message.user_id message
+      messageText = Message.body message
+      messageAttachments = Message.attachments message
+      messageGeo = Message.geo message
+  attsNew <- updateAttachments handle messageAttachments
   Logger.logInfo logH $ "Checking message from user with id: " 
     <> convert userId
   let action | Settings.helpMessage == messageText = do 
@@ -133,15 +144,16 @@ replyMode handle message = do
              | otherwise = do
                 Logger.logInfo logH "It's text message from User."
                 repNum <- getRepliesNumber handle userId
-                sendNEchoMessage handle userId messageText attsNew geo repNum
+                sendNEchoMessage
+                  handle userId messageText attsNew messageGeo repNum
                 return Settings.reply
   action
 
 answerMode :: Monad m => Handle m -> Message -> m (Maybe RepNum)
 answerMode handle message = do
   let logH = hLogger handle
-      userId = message_userId message
-      messageText = T.unpack $ message_body message
+      userId = Message.user_id message
+      messageText = T.unpack $ Message.body message
       -- Extract pollData_result (message) from updatesData:
       --     if no new messages print Warning
   setMode handle userId Settings.reply

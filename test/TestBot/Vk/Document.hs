@@ -9,7 +9,7 @@ import qualified TestBot.Vk.GenData as GD
 import qualified TestBot.Vk.Handlers as H
 
 import qualified Bot.Vk.Request.DocumentSpec as DocSpec
-import qualified Bot.Vk.Parser.Data as PD
+import qualified Bot.Vk.Parser.Objects.Document as Doc
 
 spec_updateDoc :: Spec
 spec_updateDoc=
@@ -19,9 +19,9 @@ spec_updateDoc=
       doc <- Gen.sample GD.genDoc
       let result = DocSpec.updateDoc H.docH1 doc
       result `shouldBe` Identity doc {
-          PD.document_url = "https://lp.vk.com/link/12gh56",
-          PD.document_id = 123,
-          PD.document_ownerId = 12321
+          Doc.url = "https://lp.vk.com/link/12gh56",
+          Doc.id = 123,
+          Doc.owner_id = 12321
         }
     it "Should successfully return Document without changes \
       \if saveUploadedDoc return more than 1 correct Object" $ do

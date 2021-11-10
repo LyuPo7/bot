@@ -11,7 +11,13 @@ import qualified TestBot.Vk.GenData as GD
 import qualified TestBot.Vk.Handlers as H
 
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
-import qualified Bot.Vk.Parser.Data as PD
+import qualified Bot.Vk.Parser.Objects.Attachment as Attach
+import qualified Bot.Vk.Parser.Objects.Document as Doc
+import qualified Bot.Vk.Parser.Objects.Photo as Photo
+import qualified Bot.Vk.Parser.Objects.Video as Video
+import qualified Bot.Vk.Parser.Objects.Audio as Audio
+import qualified Bot.Vk.Parser.Objects.Geo as Geo
+import qualified Bot.Vk.Parser.Objects.Sticker as Sticker
 
 instance MonadThrow Identity where
   throwM e = undefined
@@ -20,55 +26,43 @@ spec_attachmentToString :: Spec
 spec_attachmentToString =
   describe "Testing attachmentToString" $ do
     it "Should successfully convert Attachment with Doc to String" $ do
-      let doc = PD.Document {
-            PD.document_id = 781,
-            PD.document_ownerId = 129,
-            PD.document_title = "book.pdf",
-            PD.document_url = "https://server/link/222",
-            PD.document_accessKey = "x\n 0\n \NAK^IMYz.<E"
+      let doc = Doc.Document {
+            Doc.id = 781,
+            Doc.owner_id = 129,
+            Doc.title = "book.pdf",
+            Doc.url = "https://server/link/222",
+            Doc.access_key = "x\n 0\n \NAK^IMYz.<E"
           }
-          docAttach = PD.defaultAttach {
-            PD.attach_type = "doc",
-            PD.attach_doc = Just doc
-          }
+          docAttach = Attach.AttachDoc doc
           result = ReqSpec.attachmentToString docAttach
           check = "doc129_781"
       result `shouldBe` Just check
     it "Should successfully convert Attachment with Photo to String" $ do
-      let photo = PD.Photo {
-            PD.photo_id = 810,
-            PD.photo_ownerId = 589,
-            PD.photo_accessKey = "<97z\vYG\v$L"
+      let photo = Photo.Photo {
+            Photo.id = 810,
+            Photo.owner_id = 589,
+            Photo.access_key = "<97z\vYG\v$L"
           }
-          photoAttach = PD.defaultAttach {
-            PD.attach_type = "photo",
-            PD.attach_photo = Just photo
-          }
+          photoAttach = Attach.AttachPhoto photo
           result = ReqSpec.attachmentToString photoAttach
           check = "photo589_810_<97z\vYG\v$L"
       result `shouldBe` Just check
     it "Should successfully convert Attachment with Video to String" $ do
-      let video = PD.Video {
-            PD.video_id = 567,
-            PD.video_ownerId = 387,
-            PD.video_accessKey = "\DC47H)S:~:*3"
+      let video = Video.Video {
+            Video.id = 567,
+            Video.owner_id = 387,
+            Video.access_key = "\DC47H)S:~:*3"
           }
-          videoAttach = PD.defaultAttach {
-            PD.attach_type = "video",
-            PD.attach_video = Just video
-          }
+          videoAttach = Attach.AttachVideo video
           result = ReqSpec.attachmentToString videoAttach
           check = "video387_567_\DC47H)S:~:*3"
       result `shouldBe` Just check
     it "Should successfully convert Attachment with Audio to String" $ do
-      let audio = PD.Audio {
-            PD.audio_id = 787,
-            PD.audio_ownerId = 861
+      let audio = Audio.Audio {
+            Audio.id = 787,
+            Audio.owner_id = 861
           }
-          audioAttach = PD.defaultAttach {
-            PD.attach_type = "audio",
-            PD.attach_audio = Just audio
-          }
+          audioAttach = Attach.AttachAudio audio
           result = ReqSpec.attachmentToString audioAttach
           check = "audio861_787"
       result `shouldBe` Just check
@@ -81,43 +75,31 @@ spec_attachmentToString =
 spec_attachmentsToQuery :: Spec
 spec_attachmentsToQuery =
   describe "Testing attachmentsToQuery" $ do
-    let doc = PD.Document {
-          PD.document_id = 781, 
-          PD.document_ownerId = 129,
-          PD.document_title = "book.pdf",
-          PD.document_url = "https://server/link/222",
-          PD.document_accessKey = "x\n 0\n \NAK^IMYz.<E"
+    let doc = Doc.Document {
+          Doc.id = 781, 
+          Doc.owner_id = 129,
+          Doc.title = "book.pdf",
+          Doc.url = "https://server/link/222",
+          Doc.access_key = "x\n 0\n \NAK^IMYz.<E"
         }
-        docAttach = PD.defaultAttach {
-          PD.attach_type = "doc",
-          PD.attach_doc = Just doc
+        docAttach = Attach.AttachDoc doc
+        photo = Photo.Photo {
+          Photo.id = 810,
+          Photo.owner_id = 589,
+          Photo.access_key = "<97z\vYG\v$L"
         }
-        photo = PD.Photo {
-          PD.photo_id = 810,
-          PD.photo_ownerId = 589,
-          PD.photo_accessKey = "<97z\vYG\v$L"
+        photoAttach = Attach.AttachPhoto photo
+        audio = Audio.Audio {
+          Audio.id = 787,
+          Audio.owner_id = 861
         }
-        photoAttach = PD.defaultAttach {
-          PD.attach_type = "photo",
-          PD.attach_photo = Just photo
+        audioAttach = Attach.AttachAudio audio
+        video = Video.Video {
+          Video.id = 567,
+          Video.owner_id = 387,
+          Video.access_key = "\DC47H)S:~:*3"
         }
-        audio = PD.Audio {
-          PD.audio_id = 787,
-          PD.audio_ownerId = 861
-        }
-        audioAttach = PD.defaultAttach {
-          PD.attach_type = "audio",
-          PD.attach_audio = Just audio
-        }
-        video = PD.Video {
-          PD.video_id = 567,
-          PD.video_ownerId = 387,
-          PD.video_accessKey = "\DC47H)S:~:*3"
-        }
-        videoAttach = PD.defaultAttach {
-          PD.attach_type = "video",
-          PD.attach_video = Just video
-        }
+        videoAttach = Attach.AttachVideo video
         attachs = Just [docAttach, photoAttach, videoAttach, audioAttach]
         check = Just "doc129_781,photo589_810_<97z\vYG\v$L,\
                      \video387_567_\DC47H)S:~:*3,audio861_787"
@@ -157,13 +139,10 @@ spec_returnStickerId =
     it "Should successfully (return StickerID) if its type is 'sticker'" $ do
       attachs <- Gen.sample $
         Gen.maybe (Gen.list (Range.constant 0 10) GD.genNotStickerAttach)
-      let stick = PD.Sticker {
-            PD.sticker_id = 281
+      let sticker = Sticker.Sticker {
+            Sticker.id = 281
           }
-          stickAttach = PD.defaultAttach {
-            PD.attach_type = "sticker",
-            PD.attach_sticker = Just stick
-          }
+          stickAttach = Attach.AttachSticker sticker
           allAttachs = case attachs of
             Nothing -> Just [stickAttach]
             Just _ -> (++) <$> Just [stickAttach] <*> attachs
@@ -197,28 +176,22 @@ spec_createHelpMessage =
 spec_createEchoMessage :: Spec
 spec_createEchoMessage =
   describe "Testing createEchoMessage" $ do
-    let doc = PD.Document {
-          PD.document_id = 781,
-          PD.document_ownerId = 129,
-          PD.document_title = "book.pdf",
-          PD.document_url = "https://server/link/222",
-          PD.document_accessKey = "x\n 0\n \NAK^IMYz.<E"
+    let doc = Doc.Document {
+          Doc.id = 781,
+          Doc.owner_id = 129,
+          Doc.title = "book.pdf",
+          Doc.url = "https://server/link/222",
+          Doc.access_key = "x\n 0\n \NAK^IMYz.<E"
         }
-        docAttach = PD.defaultAttach {
-          PD.attach_type = "doc",
-          PD.attach_doc = Just doc
+        docAttach = Attach.AttachDoc doc
+        photo = Photo.Photo {
+          Photo.id = 810,
+          Photo.owner_id = 589,
+          Photo.access_key = "<97z\vYG\v$L"
         }
-        photo = PD.Photo {
-          PD.photo_id = 810,
-          PD.photo_ownerId = 589,
-          PD.photo_accessKey = "<97z\vYG\v$L"
-        }
-        photoAttach = PD.defaultAttach {
-          PD.attach_type = "photo",
-          PD.attach_photo = Just photo
-        }
-        geo = PD.Geo {
-          PD.geo_coordinates = "99.999 109.107"
+        photoAttach = Attach.AttachPhoto photo
+        geo = Geo.Geo {
+          Geo.coordinates = "99.999 109.107"
         }
     it "Should successfully create Echo Message without Geo, \
        \without [Attachment]" $ do
@@ -273,8 +246,8 @@ spec_createEchoMessage =
 spec_geoToLatLong :: Spec
 spec_geoToLatLong =
   describe "Testing geoToLatLong" $ do
-    let geo = PD.Geo {
-      PD.geo_coordinates = "99.999 109.107"
+    let geo = Geo.Geo {
+      Geo.coordinates = "99.999 109.107"
     }
     it "Should successfully return Nothing if input is Nothing" $ do
       let result = ReqSpec.geoToLatLong Nothing

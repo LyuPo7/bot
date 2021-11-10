@@ -9,7 +9,7 @@ import qualified Bot.DB.DBSpec as DBSpec
 import qualified Bot.Tele.Parser.ParserSpec as ParserSpec
 import qualified Bot.Tele.Request.RequestsSpec as ReqSpec
 import qualified Bot.Tele.RunSpec as RunSpec
-import qualified Bot.Tele.Parser.Data as DParser
+import qualified Bot.Tele.Parser.Objects.UpdateData as UpData
 
 logH :: Logger.Handle Identity
 logH = Logger.Handle {
@@ -71,9 +71,9 @@ runH = RunSpec.Handle {
     RunSpec.hParser = parserH,
     
     RunSpec.parseUpdateData = \_ -> return 
-      $ DParser.UpdateData {
-          DParser.ok = True,
-          DParser.result = []
+      $ UpData.UpdateData {
+          UpData.ok = True,
+          UpData.result = []
         },
     
     RunSpec.getLastSucUpdate = return (Just 100),

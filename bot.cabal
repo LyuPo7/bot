@@ -31,25 +31,67 @@ library
       Bot.Exception
       Bot.Logger
       Bot.Settings
-      Bot.Tele.Parser.Data
+      Bot.Tele.Parser.Objects.Chat
+      Bot.Tele.Parser.Objects.Message
+      Bot.Tele.Parser.Objects.MessageEntity
+      Bot.Tele.Parser.Objects.Synonyms
+      Bot.Tele.Parser.Objects.Update
+      Bot.Tele.Parser.Objects.UpdateData
       Bot.Tele.Parser.Parser
       Bot.Tele.Parser.ParserSpec
-      Bot.Tele.Request.Data
+      Bot.Tele.Request.Objects.BotCommand
+      Bot.Tele.Request.Objects.BotCommandScope
+      Bot.Tele.Request.Objects.InlineKeyboardButton
+      Bot.Tele.Request.Objects.InlineKeyboardMarkup
+      Bot.Tele.Request.Objects.RequestOptions
+      Bot.Tele.Request.Objects.TeleRequest
       Bot.Tele.Request.Requests
       Bot.Tele.Request.RequestsImpl
       Bot.Tele.Request.RequestsSpec
       Bot.Tele.Run
       Bot.Tele.RunSpec
       Bot.Util
-      Bot.Vk.Parser.Data
+      Bot.Vk.Parser.Objects.Action
+      Bot.Vk.Parser.Objects.Attachment
+      Bot.Vk.Parser.Objects.Audio
+      Bot.Vk.Parser.Objects.Button
+      Bot.Vk.Parser.Objects.Document
+      Bot.Vk.Parser.Objects.Geo
+      Bot.Vk.Parser.Objects.Gift
+      Bot.Vk.Parser.Objects.Keyboard
+      Bot.Vk.Parser.Objects.KeyboardData
+      Bot.Vk.Parser.Objects.Link
+      Bot.Vk.Parser.Objects.Market
+      Bot.Vk.Parser.Objects.MarketAlbum
+      Bot.Vk.Parser.Objects.Message
+      Bot.Vk.Parser.Objects.Photo
+      Bot.Vk.Parser.Objects.PollResponse
+      Bot.Vk.Parser.Objects.Server
+      Bot.Vk.Parser.Objects.Sticker
+      Bot.Vk.Parser.Objects.Synonyms
+      Bot.Vk.Parser.Objects.Update
+      Bot.Vk.Parser.Objects.UpdateData
+      Bot.Vk.Parser.Objects.UploadFileResponse
+      Bot.Vk.Parser.Objects.UploadObject
+      Bot.Vk.Parser.Objects.UploadObjectResponse
+      Bot.Vk.Parser.Objects.UploadUrl
+      Bot.Vk.Parser.Objects.UploadUrlResponse
+      Bot.Vk.Parser.Objects.Video
+      Bot.Vk.Parser.Objects.Wall
+      Bot.Vk.Parser.Objects.WallReply
       Bot.Vk.Parser.Parser
       Bot.Vk.Parser.ParserSpec
       Bot.Vk.Request.Attach
       Bot.Vk.Request.AttachSpec
-      Bot.Vk.Request.Data
       Bot.Vk.Request.Document
       Bot.Vk.Request.DocumentImpl
       Bot.Vk.Request.DocumentSpec
+      Bot.Vk.Request.Objects.GetLongPollServer
+      Bot.Vk.Request.Objects.GetUploadLink
+      Bot.Vk.Request.Objects.LongPollServer
+      Bot.Vk.Request.Objects.SaveDoc
+      Bot.Vk.Request.Objects.SendMessage
+      Bot.Vk.Request.Objects.VkRequest
       Bot.Vk.Request.Requests
       Bot.Vk.Request.RequestsImpl
       Bot.Vk.Request.RequestsSpec

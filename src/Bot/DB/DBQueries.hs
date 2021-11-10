@@ -12,7 +12,7 @@ import Bot.DB.DBSpec (Handle(..))
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
 import qualified Bot.Exception as E
-import Bot.Tele.Parser.Data (UpdateID, ChatID, Mode, RepNum)
+import Bot.Tele.Parser.Objects.Synonyms (UpdateId, ChatId, Mode, RepNum)
 import Bot.Util (convert)
 
 withHandleIO :: Logger.Handle IO ->
@@ -76,7 +76,7 @@ prepDB handle = do
   commit dbH
 
 {- | Gets id of last successfully processed update from DB -}
-getLastSucUpdate :: Handle IO -> IO (Maybe UpdateID)
+getLastSucUpdate :: Handle IO -> IO (Maybe UpdateId)
 getLastSucUpdate handle = handleSql errorHandler $ do
   let dbH = hDb handle
       logH = hLogger handle
@@ -87,7 +87,7 @@ getLastSucUpdate handle = handleSql errorHandler $ do
   case r of
     [[x]] -> do
       Logger.logInfo logH $ "Last processed update with id: "
-        <> convert (fromSql x :: UpdateID)
+        <> convert (fromSql x :: UpdateId)
       return $ Just $ fromSql x
     _ -> do
       Logger.logWarning logH "There are no processed updates for now"
@@ -95,25 +95,25 @@ getLastSucUpdate handle = handleSql errorHandler $ do
   where errorHandler _ = do
           Exc.throwIO $ E.DbError "Error: Error in getLastSucUpdate!"
 
-putUpdate :: Handle IO -> UpdateID -> IO ()
-putUpdate handle updateID = handleSql errorHandler $ do
+putUpdate :: Handle IO -> UpdateId -> IO ()
+putUpdate handle updateId = handleSql errorHandler $ do
   let dbH = hDb handle
       logH = hLogger handle
   r <- quickQuery' dbH "SELECT update_ID \
                        \FROM updates \
                        \WHERE update_ID = ?" 
-        [toSql updateID]
+        [toSql updateId]
   case r of
     [] -> do
       _ <- run dbH "INSERT INTO updates (update_ID, processed) \
                    \VALUES (?,?)"
-            [toSql updateID, toSql True]
+            [toSql updateId, toSql True]
       commit dbH
       Logger.logInfo logH $ "Update with id: " 
-        <> convert updateID 
+        <> convert updateId 
         <> " was successfully inserted in db."
     _ -> Logger.logWarning logH $ "Update with id: "
-           <> convert updateID
+           <> convert updateId
            <> " already exists in db."
   where errorHandler e = do
           Exc.throwIO $ E.DbError $ "Error: Error in putUpdate!\n"
@@ -121,7 +121,7 @@ putUpdate handle updateID = handleSql errorHandler $ do
 
 {- | Gets a reply number for given Chat from the database (table rep_numbers).
      If no exists data for given Chat in db then return initial number from config. -}
-getRepliesNumber :: Handle IO -> ChatID -> IO RepNum
+getRepliesNumber :: Handle IO -> ChatId -> IO RepNum
 getRepliesNumber handle chatId = handleSql errorHandler $ do
   let dbH = hDb handle
       logH = hLogger handle
@@ -150,7 +150,7 @@ getRepliesNumber handle chatId = handleSql errorHandler $ do
 {- | Sets a reply number for given Chat to the database (table rep_numbers).
      If no exists data for given Chat in db then sets the given number
      If chatId exists reply_number in db then change existed reply_number. -}
-setRepliesNumber :: Handle IO -> ChatID -> RepNum -> IO ()
+setRepliesNumber :: Handle IO -> ChatId -> RepNum -> IO ()
 setRepliesNumber handle chatId repNum = handleSql errorHandler $ do
   let dbH = hDb handle
       logH = hLogger handle
@@ -183,7 +183,7 @@ setRepliesNumber handle chatId repNum = handleSql errorHandler $ do
 
 {- | Gets a mode for given Chat from the database (table modes).
      If no exists data for given Chat in db then return default mode. -}
-getMode :: Handle IO -> ChatID -> IO Text
+getMode :: Handle IO -> ChatId -> IO Text
 getMode handle chatId = handleSql errorHandler $ do
   let dbH = hDb handle
       logH = hLogger handle
@@ -210,7 +210,7 @@ getMode handle chatId = handleSql errorHandler $ do
 {- | Sets a mode for given Chat to the database (table modes).
      If no exists data for given Chat in db then sets the given number
      If chatId exists mode in db then change existed mode. -}
-setMode :: Handle IO -> ChatID -> Mode -> IO ()
+setMode :: Handle IO -> ChatId -> Mode -> IO ()
 setMode handle chatId mode = handleSql errorHandler $ do
   let dbH = hDb handle
       logH = hLogger handle

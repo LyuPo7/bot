@@ -14,7 +14,9 @@ import qualified Bot.Exception as E
 import Bot.Tele.Parser.ParserSpec (Handle(..))
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
-import Bot.Tele.Request.Data (TeleRequest, RequestOptions, getRequest)
+import qualified Bot.Tele.Request.Objects.TeleRequest as TeleReq
+import Bot.Tele.Request.Objects.TeleRequest (TeleRequest)
+import Bot.Tele.Request.Objects.RequestOptions (RequestOptions)
 import Bot.Util (convert)
 
 {-- | Request to api --}
@@ -24,7 +26,7 @@ makeRequest handle teleRequest options = do
       config = cPar handle
       token = Settings.botToken config
       hostApi = Settings.getHost Settings.apiTele
-      methodApi = getRequest teleRequest
+      methodApi = TeleReq.getRequest teleRequest
       api = T.concat [hostApi, token, methodApi]
   manager <- newManager tlsManagerSettings
   initialRequest <- parseRequest $ T.unpack api

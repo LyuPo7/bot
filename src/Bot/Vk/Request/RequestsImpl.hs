@@ -14,7 +14,7 @@ import qualified Bot.Exception as E
 import Bot.Logger (Handle(..))
 import qualified Bot.Logger as Logger
 import qualified Bot.Settings as Settings
-import Bot.Vk.Request.Data (VkRequest, getRequest)
+import Bot.Vk.Request.Objects.VkRequest (VkRequest, getRequest)
 import Bot.Util (convert)
 
 getUpdate :: Handle IO -> Text -> Text -> Integer -> IO B.ByteString

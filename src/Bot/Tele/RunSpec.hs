@@ -11,9 +11,13 @@ import qualified Bot.Settings as Settings
 import qualified Bot.DB.DBSpec as DBSpec
 import qualified Bot.Tele.Request.RequestsSpec as ReqSpec
 import qualified Bot.Tele.Parser.ParserSpec as ParserSpec
-import Bot.Tele.Parser.Data (Message(..), Chat(..), Update(..), 
-                             UpdateData(..), MessageEntity(..),
-                             RepNum, UpdateID, Mode, ChatID, MessageID)
+import qualified Bot.Tele.Parser.Objects.Chat as Chat
+import qualified Bot.Tele.Parser.Objects.Update as Update
+import Bot.Tele.Parser.Objects.UpdateData (UpdateData(..))
+import Bot.Tele.Parser.Objects.Update (Update(..))
+import Bot.Tele.Parser.Objects.Message (Message(..))
+import Bot.Tele.Parser.Objects.MessageEntity (MessageEntity(..))
+import Bot.Tele.Parser.Objects.Synonyms (RepNum, UpdateId, Mode, ChatId, MessageId)
 import Bot.Util (convert)
 
 data Handle m = Handle {
@@ -25,18 +29,18 @@ data Handle m = Handle {
   
   parseUpdateData :: L8.ByteString -> m UpdateData,
   
-  getLastSucUpdate :: m (Maybe UpdateID),
-  putUpdate :: UpdateID -> m (),
-  getRepliesNumber :: ChatID -> m RepNum,
-  setRepliesNumber :: ChatID -> RepNum -> m (),
-  getMode :: ChatID -> m Text,
-  setMode :: ChatID -> Mode -> m (),
+  getLastSucUpdate :: m (Maybe UpdateId),
+  putUpdate :: UpdateId -> m (),
+  getRepliesNumber :: ChatId -> m RepNum,
+  setRepliesNumber :: ChatId -> RepNum -> m (),
+  getMode :: ChatId -> m Text,
+  setMode :: ChatId -> Mode -> m (),
 
-  getUpdate :: Maybe UpdateID -> m L8.ByteString,
-  sendTextMessage :: ChatID -> Text -> m (),
-  sendEchoMessage :: ChatID -> MessageID -> m (),
-  sendNEchoMessage :: ChatID -> MessageID -> RepNum -> m (),
-  sendQueryNumber :: ChatID -> Text -> m L8.ByteString,
+  getUpdate :: Maybe UpdateId -> m L8.ByteString,
+  sendTextMessage :: ChatId -> Text -> m (),
+  sendEchoMessage :: ChatId -> MessageId -> m (),
+  sendNEchoMessage :: ChatId -> MessageId -> RepNum -> m (),
+  sendQueryNumber :: ChatId -> Text -> m L8.ByteString,
   setCommands :: m ()
 }
 
@@ -52,7 +56,7 @@ run handle = do
   return ()
 
 {-- | Check update mode --}
-checkMode :: Monad m => Handle m -> m (Maybe UpdateID)
+checkMode :: Monad m => Handle m -> m (Maybe UpdateId)
 checkMode handle = do
   let logH = hLogger handle
   -- Get last successfully processed update from DB
@@ -70,27 +74,27 @@ checkMode handle = do
       _ <- checkMode handle
       return Nothing
     [x] -> do
-      let updateId = update_updateId x -- Extract update_id from Update
-          checkMessage = update_message x -- Extract message from Update
+      let updateId = Update.id x -- Extract id from Update
+          checkMessage = message x -- Extract message from Update
       Logger.logInfo logH $ "Checking update with id: " <> convert updateId
       case checkMessage of
         Nothing -> do 
           Logger.logWarning logH "Where are no new messages!"
           return $ Just updateId
-        Just message -> do
+        Just userMessage -> do
           -- check if in MessageEntities appears "bot_command"
-          let chatId = chat_id $ message_chat message -- Extract chat_id
+          let chatId = Chat.id $ chat userMessage -- Extract chat_id
           mode <- getMode handle chatId -- Get current work mode User
           let action -- realise depending on mode
                 | mode == Settings.reply = do
-                  _ <- replyMode handle message
+                  _ <- replyMode handle userMessage
                   Logger.logDebug logH "Bot in reply mode."
                 | mode == Settings.answer = do
-                  _ <- answerMode handle message
+                  _ <- answerMode handle userMessage
                   Logger.logDebug logH "Bot in answer mode."
                 | otherwise = Logger.logError logH "Unknown Bot mode."
           action
-          putUpdate handle updateId -- put update_id in db
+          putUpdate handle updateId -- put id in db
           _ <- checkMode handle
           return $ Just updateId
     _ -> do
@@ -100,15 +104,15 @@ checkMode handle = do
 
 {-- | Reply mode --}
 replyMode :: Monad m => Handle m -> Message -> m Mode
-replyMode handle message = do
+replyMode handle userMessage = do
   let logH = hLogger handle
       config = cRun handle
       messageType = filter 
-        ((== "bot_command") . messageent_type) 
-        <$> message_entities message
-      chatId = chat_id $ message_chat message -- Extract chat_id from Message
-      messageId = message_messageId message -- Extract message_id from Message
-      messageText = message_text message -- Extract text from Message
+        ((== "bot_command") . entity_type) 
+        <$> entities userMessage
+      chatId = Chat.id $ chat userMessage -- Extract chat_id from Message
+      messageId = message_id userMessage -- Extract id from Message
+      messageText = text userMessage -- Extract text from Message
   case messageType of
     Nothing -> do
       repNum <- getRepliesNumber handle chatId -- Get current replyNum mode Chat
@@ -140,13 +144,13 @@ replyMode handle message = do
 
 {-- | Waiting answer mode --}
 answerMode :: Monad m => Handle m -> Message -> m (Maybe RepNum)
-answerMode handle message = do
+answerMode handle userMessage = do
   let logH = hLogger handle
-      messageId = message_messageId message
+      messageId = message_id userMessage
       -- Extract chat_id from Message
-      chatId = chat_id $ message_chat message
+      chatId = Chat.id $ chat userMessage
       -- Extract text from Message
-      messageText = T.unpack $ fromMaybe "" $ message_text message 
+      messageText = T.unpack $ fromMaybe "" $ text userMessage 
   setMode handle chatId Settings.reply
   case (readMaybe messageText :: Maybe Integer) of -- Trying parse answer
     Just repNum -> do

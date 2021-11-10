@@ -3,7 +3,8 @@ module Bot.Vk.Request.AttachSpec where
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
 import qualified Bot.Logger as Logger
-import Bot.Vk.Parser.Data (Attachment(..), Document)
+import Bot.Vk.Parser.Objects.Document (Document(..))
+import Bot.Vk.Parser.Objects.Attachment (Attachment(..))
 
 data Handle m = Handle {
   hLogger :: Logger.Handle m,
@@ -26,12 +27,8 @@ updateAttachments handle (Just attachs) = do
 
 updateAttachment :: Monad m => Handle m -> Attachment -> m Attachment
 updateAttachment handle attach = do
-  let attachType = attach_type attach
-  case attachType of
-    "doc" -> do
-      case attach_doc attach of
-        Nothing -> return attach
-        Just doc -> do
-          docNew <- updateDoc handle doc
-          return attach { attach_doc = Just docNew }
+  case attach of
+    AttachDoc doc -> do
+      docNew <- updateDoc handle doc
+      return $ AttachDoc docNew
     _ -> return attach

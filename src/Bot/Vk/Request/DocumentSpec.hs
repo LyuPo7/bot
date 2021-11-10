@@ -9,10 +9,13 @@ import qualified Bot.Vk.Parser.Parser as Parser
 import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
 import qualified Bot.Logger as Logger
-import Bot.Vk.Parser.Data (Document(..), UploadObject(..), 
-                           UploadObjectResponse(..), 
-                           UploadFileResponse(..), 
-                           UploadUrlResponse(..), UploadUrl(..))
+import Bot.Vk.Parser.Objects.Document (Document(..))
+import qualified Bot.Vk.Parser.Objects.Document as Doc
+import qualified Bot.Vk.Parser.Objects.UploadObject as UpObject
+import qualified Bot.Vk.Parser.Objects.UploadUrl as UpUrl
+import qualified Bot.Vk.Parser.Objects.UploadObjectResponse as UpObjectResp
+import qualified Bot.Vk.Parser.Objects.UploadFileResponse as UpFileResp
+import qualified Bot.Vk.Parser.Objects.UploadUrlResponse as UpUrlResp
 
 data Handle m = Handle {
   hLogger :: Logger.Handle m,
@@ -32,23 +35,23 @@ updateDoc handle doc = do
   let logH = hLogger handle
       parseH = hParser handle
       -- extract url from file
-      link = document_url doc
-      title = document_title doc
-      userId = document_ownerId doc
+      link = Doc.url doc
+      docTitle = Doc.title doc
+      userId = Doc.owner_id doc
   -- create temp directory
   tempDir <- getTemporaryDirectory handle
-  let fileName = tempDir </> T.unpack title
+  let fileName = tempDir </> T.unpack docTitle
   -- download file
   downloadFile handle link fileName
   Logger.logInfo logH "File was downloaded"
   -- get server for upload file
   serverUp <- getUploadedServer handle userId (T.pack "doc")
   urlResp <- Parser.parseUploadUrl parseH serverUp
-  let url = maybe (T.pack "") upUrl_uploadUrl (upUrlResponse_response urlResp)
+  let docUrl = maybe (T.pack "") UpUrl.upload_url (UpUrlResp.response urlResp)
   -- upload file
-  fileUp <- uploadFile handle url fileName
+  fileUp <- uploadFile handle docUrl fileName
   fileResp <- Parser.parseUploadFile parseH fileUp
-  case upFileResponse_file fileResp of
+  case UpFileResp.file fileResp of
     Nothing -> do
       Logger.logError logH "File wasn't uploaded"
       return doc
@@ -57,15 +60,13 @@ updateDoc handle doc = do
       -- save file
       objUp <- saveUploadedDoc handle file
       obj <- Parser.parseUploadObject parseH objUp
-      -- remove tempFile
-      --removeDirectoryRecursive tempDir
-      case upObjResponse_response obj of
+      case UpObjectResp.response obj of
         [x] -> do
           Logger.logInfo logH "Doc changed"
           return doc {
-            document_id = upObj_id x,
-            document_ownerId = upObj_ownerId x,
-            document_url = upObj_url x
+            Doc.id = UpObject.id x,
+            Doc.owner_id = UpObject.owner_id x,
+            Doc.url = UpObject.url x
           }
         _ -> do
           -- Maybe only one uploaded object

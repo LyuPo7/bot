@@ -10,7 +10,8 @@ import qualified TestBot.Vk.GenData as GD
 import qualified TestBot.Vk.Handlers as H
 
 import qualified Bot.Vk.Request.AttachSpec as AttachSpec
-import qualified Bot.Vk.Parser.Data as PD
+import qualified Bot.Vk.Parser.Objects.Attachment as Attach
+import qualified Bot.Vk.Parser.Objects.Document as Doc
 
 spec_updateAttachment :: Spec
 spec_updateAttachment = 
@@ -20,26 +21,21 @@ spec_updateAttachment =
       let result = AttachSpec.updateAttachment H.attachH1 attach
       result `shouldBe` Identity attach
     it "Should successfully update Attachment if its type is 'doc'" $ do
-      let doc = PD.Document {
-            PD.document_id = 781,
-            PD.document_ownerId = 129,
-            PD.document_title = "book.pdf",
-            PD.document_url = "https://server/link/222",
-            PD.document_accessKey = "x\n 0\n \NAK^IMYz.<E"
+      let doc = Doc.Document {
+            Doc.id = 781,
+            Doc.owner_id = 129,
+            Doc.title = "book.pdf",
+            Doc.url = "https://server/link/222",
+            Doc.access_key = "x\n 0\n \NAK^IMYz.<E"
           }
-          docAttach = PD.defaultAttach {
-            PD.attach_type = "doc",
-            PD.attach_doc = Just doc
-          }
+          docAttach = Attach.AttachDoc doc
           result = AttachSpec.updateAttachment H.attachH2 docAttach
           newDoc = doc {
-            PD.document_id = 123,
-            PD.document_ownerId = 555,
-            PD.document_url = "https://server/link/222"
+            Doc.id = 123,
+            Doc.owner_id = 555,
+            Doc.url = "https://server/link/222"
           }
-          newDocAttach = docAttach {
-            PD.attach_doc = Just newDoc
-          }
+          newDocAttach = Attach.AttachDoc newDoc
       result `shouldBe` Identity newDocAttach
 
 spec_updateAttachments :: Spec

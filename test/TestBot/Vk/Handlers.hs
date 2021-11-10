@@ -11,7 +11,13 @@ import qualified Bot.Vk.Parser.ParserSpec as ParserSpec
 import qualified Bot.Vk.Request.RequestsSpec as ReqSpec
 import qualified Bot.Vk.Request.DocumentSpec as DocSpec
 import qualified Bot.Vk.RunSpec as RunSpec
-import qualified Bot.Vk.Parser.Data as PD
+import qualified Bot.Vk.Parser.Objects.UploadObjectResponse as UpObjResp
+import qualified Bot.Vk.Parser.Objects.UploadFileResponse as UpFileResp
+import qualified Bot.Vk.Parser.Objects.UploadUrlResponse as UpUrlResp
+import qualified Bot.Vk.Parser.Objects.PollResponse as PollResp
+import qualified Bot.Vk.Parser.Objects.Server as Server
+import qualified Bot.Vk.Parser.Objects.UpdateData as UpData
+import qualified Bot.Vk.Parser.Objects.Document as Doc
 
 conn :: Connection
 conn = undefined
@@ -83,9 +89,9 @@ attachH2 = AttachSpec.Handle {
     AttachSpec.hParser = parserH,
 
     AttachSpec.updateDoc = \doc -> Identity doc {
-        PD.document_id = 123,
-        PD.document_ownerId = 555,
-        PD.document_url = "https://server/link/222"
+        Doc.id = 123,
+        Doc.owner_id = 555,
+        Doc.url = "https://server/link/222"
       }
 }
 
@@ -117,29 +123,29 @@ runH = RunSpec.Handle {
     RunSpec.hAttach = attachH1,
     
     RunSpec.parsePollResponse = \_ -> return $ Right 
-      $ PD.PollResponse {
-          PD.pollResponse_response = PD.ServerText {
-              PD.serverText_key = "347e47284fc18830341f78af8a14b434b0cf359e",
-              PD.serverText_server = "https://lp.vk.com/wh205828081",
-              PD.serverText_ts = "543"
+      $ PollResp.PollResponse {
+          PollResp.response = Server.ServerText {
+              Server.text_key = "347e47284fc18830341f78af8a14b434b0cf359e",
+              Server.text_server = "https://lp.vk.com/wh205828081",
+              Server.text_ts = "543"
           }
         },
     RunSpec.parseUpdateData = \_ -> return 
-      $ PD.UpdateData {
-          PD.ts = "10",
-          PD.updates = []
+      $ UpData.UpdateData {
+          UpData.ts = "10",
+          UpData.updates = []
         },
     RunSpec.parseUploadUrl = \_ -> return 
-      $ PD.UploadUrlResponse {
-          PD.upUrlResponse_response = Nothing
+      $ UpUrlResp.UploadUrlResponse {
+          UpUrlResp.response = Nothing
         },
     RunSpec.parseUploadFile = \_ -> return 
-      $ PD.UploadFileResponse {
-          PD.upFileResponse_file = Nothing
+      $ UpFileResp.UploadFileResponse {
+          UpFileResp.file = Nothing
         },
     RunSpec.parseUploadObject = \_ -> return 
-      $ PD.UploadObjectResponse {
-          PD.upObjResponse_response = []
+      $ UpObjResp.UploadObjectResponse {
+          UpObjResp.response = []
         },
     
     RunSpec.getLastSucUpdate = return (Just 100),

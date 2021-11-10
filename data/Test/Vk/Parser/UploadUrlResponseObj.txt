@@ -1,1 +1,1 @@
-UploadUrlResponse {upUrlResponse_response = Just (UploadUrl {upUrl_uploadUrl = "https://lp.vk.com/link/12gh56"})}
+UploadUrlResponse {response = Just (UploadUrl {upload_url = "https://lp.vk.com/link/12gh56"})}

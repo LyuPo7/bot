@@ -11,7 +11,7 @@
         <li>Supports 2 api:
           <ul>
              <li><b>telegram;</b></li>
-             <li><b>vk (supported Version 5.81);</b></li>
+             <li><b>vk (supported Version 5.5);</b></li>
             </ul>
         </li>
         <li>Supports 4 levels of logging:
