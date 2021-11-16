@@ -42,7 +42,7 @@ getLastSucUpdate handle = handleSql errorHandler $ do
   case r of
     [[x]] -> do
       Logger.logInfo logH $ "Last processed update with id: "
-        <> BotUtil.convert (fromSql x :: BotSynonyms.UpdateId)
+        <> BotUtil.convertValue (fromSql x :: BotSynonyms.UpdateId)
       return $ Just $ fromSql x
     _ -> do
       Logger.logWarning logH "There are no processed updates for now"
@@ -65,10 +65,10 @@ putUpdate handle updateId = handleSql errorHandler $ do
             [toSql updateId, toSql True]
       commit dbConn
       Logger.logInfo logH $ "Update with id: " 
-        <> BotUtil.convert updateId 
+        <> BotUtil.convertValue updateId 
         <> " was successfully inserted in db."
     _ -> Logger.logWarning logH $ "Update with id: "
-           <> BotUtil.convert updateId
+           <> BotUtil.convertValue updateId
            <> " already exists in db."
   where errorHandler e = do
           Exc.throwIO $ E.DbError $ "Error: Error in putUpdate!\n"
@@ -89,14 +89,14 @@ getRepliesNumber handle chatId = handleSql errorHandler $ do
   case r of
     [[x]] -> do
       Logger.logInfo logH $ "Will use: " 
-        <> BotUtil.convert (fromSql x :: BotSynonyms.RepNum)
+        <> BotUtil.convertValue (fromSql x :: BotSynonyms.RepNum)
         <> " replies for Chat with id: " 
-        <> BotUtil.convert chatId
+        <> BotUtil.convertValue chatId
       return $ fromSql x
     _ -> do
       Logger.logInfo logH 
         $ "Will use initial number of replies for Chat with id: " 
-          <> BotUtil.convert chatId
+          <> BotUtil.convertValue chatId
       return $ Settings.botInitialReplyNumber config
   where errorHandler e = do
           Exc.throwIO $ E.DbError $ "Error: Error in getRepliesNumber!\n"
@@ -121,7 +121,7 @@ setRepliesNumber handle chatId repNum = handleSql errorHandler $ do
             [toSql chatId, toSql repNum]
       commit dbConn
       Logger.logInfo logH $ "Reply_number for Chat with id: "
-        <> BotUtil.convert chatId 
+        <> BotUtil.convertValue chatId 
         <> " was successfully inserted in db."
     _ -> do
       _ <- run dbConn "UPDATE rep_numbers \
@@ -130,7 +130,7 @@ setRepliesNumber handle chatId repNum = handleSql errorHandler $ do
             [toSql repNum, toSql chatId]
       commit dbConn
       Logger.logInfo logH $ "Info: Reply_number for Chat with id: "
-        <> BotUtil.convert chatId
+        <> BotUtil.convertValue chatId
         <> " was successfully changed in db."
   where errorHandler e = do
           Exc.throwIO $ E.DbError $ "Error: Error in setRepliesNumber!\n"
@@ -150,13 +150,13 @@ getMode handle chatId = handleSql errorHandler $ do
   case r of
     [[x]] -> do
       Logger.logInfo logH $ "Will use: "
-        <> BotUtil.convert x
+        <> BotUtil.convertValue x
         <> " mode for Chat with id: " 
-        <> BotUtil.convert chatId
+        <> BotUtil.convertValue chatId
       return $ fromSql x
     _ -> do
       Logger.logInfo logH $ "Will use default mode for Chat with id: "
-        <> BotUtil.convert chatId
+        <> BotUtil.convertValue chatId
       return BotMode.ReplyMode
   where errorHandler e = do
           Exc.throwIO $ E.DbError $ "Error in getMode!\n"
@@ -181,9 +181,9 @@ setMode handle chatId mode = handleSql errorHandler $ do
             [toSql chatId, toSql mode]
       commit dbConn
       Logger.logInfo logH $ "Mode: " 
-        <> BotUtil.convert mode
+        <> BotUtil.convertValue mode
         <> " for Chat with id: "
-        <> BotUtil.convert chatId
+        <> BotUtil.convertValue chatId
         <> " was successfully inserted in db."
     _ -> do
       _ <- run dbConn "UPDATE modes \
@@ -192,7 +192,7 @@ setMode handle chatId mode = handleSql errorHandler $ do
             [toSql mode, toSql chatId]
       commit dbConn
       Logger.logInfo logH $ "Mode for Chat with id: "
-        <> BotUtil.convert chatId
+        <> BotUtil.convertValue chatId
         <> " was successfully changed in db."
   where errorHandler e = do
           Exc.throwIO $ E.DbError $ "Error in setMode!\n"

@@ -206,9 +206,9 @@ setGetUpdate _ botUpdate = do
                   <> "?act=a_check&key="
                   <> serverKey
                   <> "&ts="
-                  <> BotUtil.convert tsCurrent
+                  <> BotUtil.convertValue tsCurrent
                   <> "&wait="
-                  <> BotUtil.convert Settings.timeout
+                  <> BotUtil.convertValue Settings.timeout
       reqOptions = BotReqOptions.VkReqOptions $
                    VkReqOptions.RequestOptions vkReqOptions
       apiMethod = BotMethod.VkMethod VkMethod.getUpdate
@@ -240,7 +240,7 @@ makeRequest handle botMethod botOptions = do
       return $ responseBody response
     else do
       Logger.logDebug logH $ "Unsuccessful request to api with code: "
-       <> BotUtil.convert codeResp
+       <> BotUtil.convertValue codeResp
       Exc.throwIO $ E.ConnectionError codeResp
 
 downloadDoc :: Monad m => BotParser.Handle m ->
@@ -319,9 +319,9 @@ attachmentToString attach = case attach of
         photoId = VkPhoto.id photo
         key = VkPhoto.access_key photo
     return $ "photo" 
-      <> BotUtil.convert ownerId 
+      <> BotUtil.convertValue ownerId 
       <> "_"
-      <> BotUtil.convert photoId
+      <> BotUtil.convertValue photoId
       <> "_"
       <> key
   VkAttach.AttachVideo video -> do
@@ -329,25 +329,25 @@ attachmentToString attach = case attach of
         videoId = VkVideo.id video
         key = VkVideo.access_key video
     return $ "video" 
-      <> BotUtil.convert ownerId 
+      <> BotUtil.convertValue ownerId 
       <> "_"
-      <> BotUtil.convert videoId
+      <> BotUtil.convertValue videoId
       <> "_"
       <> key
   VkAttach.AttachAudio audio -> do
     let ownerId = VkAudio.owner_id audio
         audioId = VkAudio.id audio
     return $ "audio" 
-      <> BotUtil.convert ownerId 
+      <> BotUtil.convertValue ownerId 
       <> "_"
-      <> BotUtil.convert audioId
+      <> BotUtil.convertValue audioId
   VkAttach.AttachDoc doc -> do
     let ownerId = VkDoc.owner_id doc
         docId = VkDoc.id doc
     return $ "doc"
-      <> BotUtil.convert ownerId 
+      <> BotUtil.convertValue ownerId 
       <> "_"
-      <> BotUtil.convert docId
+      <> BotUtil.convertValue docId
   _ -> Nothing
 
 returnStickerId :: Maybe [VkAttach.Attachment] -> Maybe BotSynonyms.StickerId

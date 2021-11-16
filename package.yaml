@@ -46,6 +46,7 @@ dependencies:
 - exceptions
 - filepath
 - transformers-either
+- convertible
 
 default-extensions: OverloadedStrings
 

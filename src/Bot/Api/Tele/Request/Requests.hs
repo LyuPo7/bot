@@ -147,8 +147,8 @@ makeRequest handle botMethod botOptions = do
       methodApi = TeleMethod.getMethod apiMethod
       api = T.concat [hostApi, token, methodApi]
   manager <- newManager tlsManagerSettings
-  Logger.logDebug logH $ "Request method: " <> BotUtil.convert apiMethod
-  Logger.logDebug logH $ "Request options: " <> BotUtil.convert options
+  Logger.logDebug logH $ "Request method: " <> BotUtil.convertValue apiMethod
+  Logger.logDebug logH $ "Request options: " <> BotUtil.convertValue options
   initialRequest <- parseRequest $ T.unpack api
   let request = initialRequest { 
     method = "POST",
@@ -165,6 +165,6 @@ makeRequest handle botMethod botOptions = do
       return $ responseBody response
     else do
       Logger.logWarning logH $ "Unsuccessful request to api with code: "
-        <> BotUtil.convert codeResp
+        <> BotUtil.convertValue codeResp
       B.putStr $ responseBody response
       Exc.throwIO $ E.ConnectionError codeResp

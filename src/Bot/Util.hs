@@ -4,10 +4,10 @@ import qualified Data.Text as T
 import Data.Text (Text)
 import Text.Read (readEither)
 
-convert :: Show a => a -> Text
-convert = T.pack . show
+convertValue :: Show a => a -> Text
+convertValue = T.pack . show
 
-readEitherMa :: (Monad m, Read a) => Text -> m (Either Text a)
-readEitherMa arg = case readEither $ T.unpack arg of
+readValue :: (Monad m, Read a) => Text -> m (Either Text a)
+readValue arg = case readEither $ T.unpack arg of
   Right y -> return $ Right y
-  Left _ -> return $ Left $ "Incorrect key: " <> arg
+  Left _ -> return $ Left $ "Incorrect value: " <> arg

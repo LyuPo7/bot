@@ -81,7 +81,7 @@ getFirstUpdate handle = do
   serverParamsE <- EiT.runEitherT $ do
     params <- EiT.EitherT $ VkParser.parsePollResponse parserH serverUp
     let tsText = VkServer.text_ts $ VkPollResp.response params
-    tsInt <- EiT.EitherT $ BotUtil.readEitherMa tsText
+    tsInt <- EiT.EitherT $ BotUtil.readValue tsText
     return VkServer.Server {
       VkServer.key = VkServer.text_key $ VkPollResp.response params,
       VkServer.server = VkServer.text_server $ VkPollResp.response params,

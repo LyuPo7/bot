@@ -25,17 +25,71 @@ source-repository head
 
 library
   exposed-modules:
+      Bot.Api.Tele.Mode.Mode
+      Bot.Api.Tele.Objects.Button
+      Bot.Api.Tele.Objects.Chat
+      Bot.Api.Tele.Objects.Command
+      Bot.Api.Tele.Objects.CommandScope
+      Bot.Api.Tele.Objects.Keyboard
+      Bot.Api.Tele.Objects.Message
+      Bot.Api.Tele.Objects.MessageEntity
+      Bot.Api.Tele.Objects.Method
+      Bot.Api.Tele.Objects.RequestOptions
+      Bot.Api.Tele.Objects.Update
+      Bot.Api.Tele.Objects.UpdateData
+      Bot.Api.Tele.Parser.Parser
+      Bot.Api.Tele.Request.Requests
+      Bot.Api.Vk.Mode.Mode
+      Bot.Api.Vk.Objects.Action
+      Bot.Api.Vk.Objects.Attachment
+      Bot.Api.Vk.Objects.Audio
+      Bot.Api.Vk.Objects.Button
+      Bot.Api.Vk.Objects.Document
+      Bot.Api.Vk.Objects.Geo
+      Bot.Api.Vk.Objects.GetLongPollServer
+      Bot.Api.Vk.Objects.GetUploadLink
+      Bot.Api.Vk.Objects.Gift
+      Bot.Api.Vk.Objects.Keyboard
+      Bot.Api.Vk.Objects.KeyboardData
+      Bot.Api.Vk.Objects.Link
+      Bot.Api.Vk.Objects.LongPollServer
+      Bot.Api.Vk.Objects.Market
+      Bot.Api.Vk.Objects.MarketAlbum
+      Bot.Api.Vk.Objects.Message
+      Bot.Api.Vk.Objects.Method
+      Bot.Api.Vk.Objects.Photo
+      Bot.Api.Vk.Objects.PollResponse
+      Bot.Api.Vk.Objects.RequestOptions
+      Bot.Api.Vk.Objects.SaveDoc
+      Bot.Api.Vk.Objects.SendMessage
+      Bot.Api.Vk.Objects.Server
+      Bot.Api.Vk.Objects.Sticker
+      Bot.Api.Vk.Objects.Update
+      Bot.Api.Vk.Objects.UpdateData
+      Bot.Api.Vk.Objects.UploadFileResponse
+      Bot.Api.Vk.Objects.UploadObject
+      Bot.Api.Vk.Objects.UploadObjectResponse
+      Bot.Api.Vk.Objects.UploadUrl
+      Bot.Api.Vk.Objects.UploadUrlResponse
+      Bot.Api.Vk.Objects.Video
+      Bot.Api.Vk.Objects.Wall
+      Bot.Api.Vk.Objects.WallReply
+      Bot.Api.Vk.Parser.Parser
+      Bot.Api.Vk.Request.Requests
       Bot.Config
       Bot.DB.DB
       Bot.DB.DBImplementation
       Bot.DB.DBQ
       Bot.DB.DBQImplementation
       Bot.Exception
-      Bot.Logger
+      Bot.Logger.Logger
+      Bot.Mode.Mode
       Bot.Objects.Button
       Bot.Objects.Document
       Bot.Objects.Message
+      Bot.Objects.MessageType
       Bot.Objects.Method
+      Bot.Objects.Mode
       Bot.Objects.RequestOptions
       Bot.Objects.Synonyms
       Bot.Objects.Update
@@ -44,60 +98,7 @@ library
       Bot.Settings
       Bot.System.System
       Bot.System.SystemImplementation
-      Bot.Tele.Objects.Button
-      Bot.Tele.Objects.Chat
-      Bot.Tele.Objects.Command
-      Bot.Tele.Objects.CommandScope
-      Bot.Tele.Objects.Keyboard
-      Bot.Tele.Objects.Message
-      Bot.Tele.Objects.MessageEntity
-      Bot.Tele.Objects.Method
-      Bot.Tele.Objects.RequestOptions
-      Bot.Tele.Objects.Update
-      Bot.Tele.Objects.UpdateData
-      Bot.Tele.Parser.Parser
-      Bot.Tele.Request.Requests
-      Bot.Tele.Run
-      Bot.Tele.RunSpec
       Bot.Util
-      Bot.Vk.Objects.Action
-      Bot.Vk.Objects.Attachment
-      Bot.Vk.Objects.Audio
-      Bot.Vk.Objects.Button
-      Bot.Vk.Objects.Document
-      Bot.Vk.Objects.Geo
-      Bot.Vk.Objects.GetLongPollServer
-      Bot.Vk.Objects.GetUploadLink
-      Bot.Vk.Objects.Gift
-      Bot.Vk.Objects.Keyboard
-      Bot.Vk.Objects.KeyboardData
-      Bot.Vk.Objects.Link
-      Bot.Vk.Objects.LongPollServer
-      Bot.Vk.Objects.Market
-      Bot.Vk.Objects.MarketAlbum
-      Bot.Vk.Objects.Message
-      Bot.Vk.Objects.Method
-      Bot.Vk.Objects.Photo
-      Bot.Vk.Objects.PollResponse
-      Bot.Vk.Objects.RequestOptions
-      Bot.Vk.Objects.SaveDoc
-      Bot.Vk.Objects.SendMessage
-      Bot.Vk.Objects.Server
-      Bot.Vk.Objects.Sticker
-      Bot.Vk.Objects.Update
-      Bot.Vk.Objects.UpdateData
-      Bot.Vk.Objects.UploadFileResponse
-      Bot.Vk.Objects.UploadObject
-      Bot.Vk.Objects.UploadObjectResponse
-      Bot.Vk.Objects.UploadUrl
-      Bot.Vk.Objects.UploadUrlResponse
-      Bot.Vk.Objects.Video
-      Bot.Vk.Objects.Wall
-      Bot.Vk.Objects.WallReply
-      Bot.Vk.Parser.Parser
-      Bot.Vk.Request.Requests
-      Bot.Vk.Run
-      Bot.Vk.RunSpec
   other-modules:
       Paths_bot
   hs-source-dirs:
@@ -112,6 +113,7 @@ library
     , base >=4.7 && <5
     , bytestring
     , containers
+    , convertible
     , data-default
     , directory
     , exceptions
@@ -151,6 +153,7 @@ executable bot-exe
     , bot
     , bytestring
     , containers
+    , convertible
     , data-default
     , directory
     , exceptions
@@ -202,6 +205,7 @@ test-suite bot-test
     , bot
     , bytestring
     , containers
+    , convertible
     , data-default
     , directory
     , exceptions

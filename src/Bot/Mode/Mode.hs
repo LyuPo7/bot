@@ -60,7 +60,7 @@ checkMode handle prevUpdate = do
       return Nothing
     Just (updateId, userMessage) -> do
       Logger.logInfo logH $ "Checking update with id: "
-        <> BotUtil.convert updateId
+        <> BotUtil.convertValue updateId
       chatId <- getChatId handle userMessage
       mode <- BotDBQ.getMode dbH chatId
       case mode of
@@ -72,7 +72,7 @@ checkMode handle prevUpdate = do
           Logger.logDebug logH "Bot in answer mode."
         BotMode.UnknownMode -> do
           Logger.logError logH $ "Unknown Bot mode: "
-            <> BotUtil.convert mode
+            <> BotUtil.convertValue mode
       BotDBQ.putUpdate dbH updateId
       newUpdate <- getNextUpdate handle prevUpdate
       _ <- checkMode handle newUpdate
@@ -120,7 +120,7 @@ answerMode handle userMessage = do
   case (readMaybe messageText :: Maybe Integer) of
     Just repNum -> do
       Logger.logInfo logH $ "Info: Received user's answer in chat with id: "
-        <> BotUtil.convert chatId
+        <> BotUtil.convertValue chatId
       BotDBQ.setRepliesNumber dbH chatId repNum
       return $ Just repNum
     Nothing -> do
