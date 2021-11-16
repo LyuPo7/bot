@@ -34,7 +34,6 @@ withHandleIO logger config f = do
       Exc.throwIO $ E.ParseConfigError "Incorrect field 'bot_api' \
                                        \in config.json"
 
--- | Initialize DB and return database Connection
 connect :: FilePath -> IO Connection
 connect dbFile = do connectSqlite3 dbFile
 

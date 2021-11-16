@@ -30,7 +30,6 @@ withHandleIO logger dbH f = do
   }
   f handle
 
-{- | Gets id of last successfully processed update from DB -}
 getLastSucUpdate :: BotDB.Handle IO -> IO (Maybe BotSynonyms.UpdateId)
 getLastSucUpdate handle = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
@@ -74,14 +73,11 @@ putUpdate handle updateId = handleSql errorHandler $ do
           Exc.throwIO $ E.DbError $ "Error: Error in putUpdate!\n"
             <> show e
 
-{- | Gets a reply number for given Chat from the database (table rep_numbers).
-     If no exists data for given Chat in db then return initial number from config. -}
 getRepliesNumber :: BotDB.Handle IO -> BotSynonyms.ChatId -> IO BotSynonyms.RepNum
 getRepliesNumber handle chatId = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle
       config = BotDB.cDb handle
-  -- check if chat_id already in the table:
   r <- quickQuery' dbConn "SELECT reply_number \
                           \FROM rep_numbers \
                           \WHERE chat_ID = ?"
@@ -102,14 +98,10 @@ getRepliesNumber handle chatId = handleSql errorHandler $ do
           Exc.throwIO $ E.DbError $ "Error: Error in getRepliesNumber!\n"
             <> show e
 
-{- | Sets a reply number for given Chat to the database (table rep_numbers).
-     If no exists data for given Chat in db then sets the given number
-     If chatId exists reply_number in db then change existed reply_number. -}
 setRepliesNumber :: BotDB.Handle IO -> BotSynonyms.ChatId -> BotSynonyms.RepNum -> IO ()
 setRepliesNumber handle chatId repNum = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle
-  -- check if chat_id already in the table:
   r <- quickQuery' dbConn "SELECT reply_number \
                           \FROM rep_numbers \
                           \WHERE chat_ID = ?"
@@ -136,13 +128,10 @@ setRepliesNumber handle chatId repNum = handleSql errorHandler $ do
           Exc.throwIO $ E.DbError $ "Error: Error in setRepliesNumber!\n"
             <> show e
 
-{- | Gets a mode for given Chat from the database (table modes).
-     If no exists data for given Chat in db then return default mode. -}
 getMode :: BotDB.Handle IO -> BotSynonyms.ChatId -> IO BotMode.Mode
 getMode handle chatId = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle
-  -- check if chat_id already in the table:
   r <- quickQuery' dbConn "SELECT mode \
                           \FROM modes \
                           \WHERE chat_id = ?"
@@ -162,14 +151,10 @@ getMode handle chatId = handleSql errorHandler $ do
           Exc.throwIO $ E.DbError $ "Error in getMode!\n"
             <> show e
 
-{- | Sets a mode for given Chat to the database (table modes).
-     If no exists data for given Chat in db then sets the given number
-     If chatId exists mode in db then change existed mode. -}
 setMode :: BotDB.Handle IO -> BotSynonyms.ChatId -> BotMode.Mode -> IO ()
 setMode handle chatId mode = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle
-  -- check if chat_id already in the table:
   r <- quickQuery' dbConn "SELECT mode \
                           \FROM modes \
                           \WHERE chat_id = ?"

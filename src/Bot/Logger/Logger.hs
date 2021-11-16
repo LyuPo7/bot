@@ -14,13 +14,11 @@ import Control.Monad (when, mzero)
 
 import Data.Time (defaultTimeLocale, formatTime, getZonedTime)
 
--- | Logger Handle
 data Handle m = Handle {
   log :: LogMessage -> Text -> m (),
   hConfig :: Config
 }
 
--- | Logger Config
 newtype Config = Config {
   cVerbosity :: Maybe Level
 } deriving (Show, Generic, Eq)
@@ -29,7 +27,6 @@ instance A.FromJSON Config where
   parseJSON = A.withObject "General Config" $ \o ->
     Config <$> o A..:? "verbosity"
 
--- | create Handle IO
 withHandleIO :: Config -> (Handle IO -> IO a) -> IO a
 withHandleIO config f = f $ newHandleIO config
 
@@ -52,13 +49,11 @@ newHandleIO config = do
             <> str)
   }
 
--- | Logger Level
-data Level
-  = Debug -- Debug messages
-  | Info -- Info message
-  | Warning -- Warning message
-  | Error -- Error message
-  deriving (Eq, Ord, Enum, Bounded, Read, Generic)
+data Level = Debug
+           | Info
+           | Warning
+           | Error
+           deriving (Eq, Ord, Enum, Bounded, Read, Generic)
 
 instance Show Level where
   show Debug = "[DEBUG]"
@@ -81,7 +76,6 @@ instance FromJSON Level where
       "error" -> pure Error
       _ -> mzero
 
--- | Logger messages
 newtype LogMessage = LogMessage { 
   level :: Level
 }
@@ -92,7 +86,6 @@ logInfo = (`log` LogMessage {level = Info})
 logWarning = (`log` LogMessage {level = Warning})
 logError = (`log` LogMessage {level = Error})
 
--- | Set time for Logger messages
 getTime :: IO Text
 getTime = do 
   T.pack . formatTime defaultTimeLocale (T.unpack defaultTimeFormat) 
@@ -101,7 +94,6 @@ getTime = do
 defaultTimeFormat :: Text
 defaultTimeFormat = "%_Y-%m-%d %T.%3q"
 
--- | Set color for Logger messages
 resetColor :: Text
 resetColor = normalCS
 

@@ -11,7 +11,6 @@ import qualified Bot.Exception as E
 import qualified Bot.Settings as Settings
 import qualified Bot.Logger.Logger as Logger
 
--- | General Bot Config
 data Config = Config {
   cSettings :: Settings.Config,
   cLogger :: Logger.Config
@@ -23,7 +22,6 @@ instance A.FromJSON Config where
       <$> o A..: "api_settings"
       <*> o A..: "logger_settings"
 
--- | Get settings from config
 getConfig :: IO Config
 getConfig = do
   conf <- readConfig
@@ -54,11 +52,9 @@ checkConfig config
       cLog = cLogger config
       cSet = cSettings config
 
--- | Read the config JSON file.
 readConfig :: IO B.ByteString
 readConfig = B.readFile Settings.configFile
       
--- | Config parser
 parseConfig :: B.ByteString -> Either E.BotError Config
 parseConfig config = do
   let d = A.eitherDecode config :: Either String Config
