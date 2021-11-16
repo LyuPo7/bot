@@ -9,7 +9,7 @@ import GHC.Generics (Generic)
 
 import qualified Bot.Exception as E
 import qualified Bot.Settings as Settings
-import qualified Bot.Logger as Logger
+import qualified Bot.Logger.Logger as Logger
 
 -- | General Bot Config
 data Config = Config {

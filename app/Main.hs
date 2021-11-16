@@ -5,18 +5,17 @@ import qualified Control.Exception as Exc
 import Bot.Config
 import qualified Bot.Exception as E
 import qualified Bot.Settings as Settings
-import qualified Bot.Logger as Logger
-import qualified Bot.DB.DBQueries as DB
-import qualified Bot.Tele.Request.Requests as TReq
-import qualified Bot.Tele.Parser.Parser as TParser
-import qualified Bot.Tele.Run as Tele
-import qualified Bot.Tele.RunSpec as STele
-import qualified Bot.Vk.Request.Requests as VReq
-import qualified Bot.Vk.Request.Attach as VAttach
-import qualified Bot.Vk.Request.Document as VDoc
-import qualified Bot.Vk.Parser.Parser as VParser
-import qualified Bot.Vk.Run as Vk
-import qualified Bot.Vk.RunSpec as SVk
+import qualified Bot.Logger.Logger as Logger
+import qualified Bot.DB.DBImplementation as BotDB
+import qualified Bot.DB.DBQImplementation as BotDBQ
+import qualified Bot.System.SystemImplementation as BotSystem
+import qualified Bot.Mode.Mode as BotMode
+import qualified Bot.Api.Tele.Request.Requests as TeleReq
+import qualified Bot.Api.Tele.Parser.Parser as TeleParser
+import qualified Bot.Api.Tele.Mode.Mode as TeleMode
+import qualified Bot.Api.Vk.Request.Requests as VkReq
+import qualified Bot.Api.Vk.Parser.Parser as VkParser
+import qualified Bot.Api.Vk.Mode.Mode as VkMode
 
 main :: IO ()
 main = Exc.handle errorHandler $ do
@@ -29,20 +28,22 @@ main = Exc.handle errorHandler $ do
   case api of
     "telegram" -> do
       Logger.withHandleIO cLog $ \hLogger ->
-        DB.withHandleIO hLogger cSet $ \hDb ->
-        TParser.withHandleIO hLogger cSet $ \hParser ->
-        TReq.withHandleIO hLogger hParser cSet $ \hReq ->
-        Tele.withHandleIO hLogger cSet hDb hReq hParser $ \hTele ->
-        STele.run hTele
+        BotSystem.withHandleIO hLogger cSet $ \hSys ->
+        BotDB.withHandleIO hLogger cSet $ \hDbConn ->
+        BotDBQ.withHandleIO hLogger hDbConn $ \hDb ->
+        TeleParser.withHandleIO hLogger hSys cSet $ \hParser ->
+        TeleReq.withHandleIO hLogger hDb hParser cSet $ \hReq ->
+        TeleMode.withHandleIO hLogger cSet hDb hReq hParser $ \hTele ->
+        BotMode.startMode hTele
     "vk" -> do
       Logger.withHandleIO cLog $ \hLogger ->
-        DB.withHandleIO hLogger cSet $ \hDb ->
-        VParser.withHandleIO hLogger $ \hParser ->
-        VReq.withHandleIO hLogger cSet hParser $ \hReq ->
-        VDoc.withHandleIO hLogger hParser hReq $ \hDoc ->
-        VAttach.withHandleIO hLogger hParser hReq hDoc $ \hAttach ->
-        Vk.withHandleIO hLogger cSet hDb hReq hParser hAttach $ \hVk ->
-        SVk.run hVk
+        BotSystem.withHandleIO hLogger cSet $ \hSys ->
+        BotDB.withHandleIO hLogger cSet $ \hDbConn ->
+        BotDBQ.withHandleIO hLogger hDbConn $ \hDb ->
+        VkParser.withHandleIO hLogger hSys cSet $ \hParser ->
+        VkReq.withHandleIO hLogger hDb hParser cSet $ \hReq ->
+        VkMode.withHandleIO hLogger cSet hDb hReq hParser $ \hVk ->
+        BotMode.startMode hVk
     _ -> do
       Logger.logError logH "Incorrect field 'bot_api' in config.json"
       Exc.throwIO $ E.ParseConfigError "Incorrect field 'bot_api' in config.json" 

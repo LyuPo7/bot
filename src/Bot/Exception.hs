@@ -7,6 +7,10 @@ import Control.Exception (Exception)
 data BotError = ParseRequestError String
                | ParseConfigError String
                | ConnectionError Int
+               | GetServerError
+               | UploadedServerError
+               | UploadedDocError
+               | StartMessageError
                | DbError String
                | Default String
                deriving (Exception, Eq)
@@ -16,7 +20,11 @@ instance Show BotError where
                                ++ err
   show (ParseConfigError err) = "Error while parsing config file \
                                 \(config.json): " ++ err
-  show (ConnectionError code) = "Unsuccessfull request to api with code: "
+  show (ConnectionError code) = "Unsuccessful request to api with code: "
                               ++ show code
+  show GetServerError = "Incorrect API for getServer function!"
+  show UploadedServerError = "Incorrect API for uploading files!"
+  show UploadedDocError = "Incorrect API for uploading documents!"
+  show StartMessageError = "This API hasn't 'start' message"
   show (Default _) = "Default error"
   show (DbError err) = "Db error: " ++ err
