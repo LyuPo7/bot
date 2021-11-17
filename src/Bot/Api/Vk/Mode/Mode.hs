@@ -1,7 +1,7 @@
 module Bot.Api.Vk.Mode.Mode where
 
 import qualified Data.Text as T
-import qualified Control.Monad.Trans.Either as EiT
+import Control.Monad.Trans.Either (newEitherT, runEitherT)
 import Data.Text (Text)
 import Data.Maybe (fromMaybe)
 import Control.Monad.Catch (MonadThrow, throwM)
@@ -78,10 +78,10 @@ getFirstUpdate :: (MonadThrow m, Monad m) => BotReq.Handle m -> m BotUpdate.Upda
 getFirstUpdate handle = do
   let parserH = BotReq.hParser handle
   serverUp <- BotReq.getServer handle
-  serverParamsE <- EiT.runEitherT $ do
-    params <- EiT.EitherT $ VkParser.parsePollResponse parserH serverUp
+  serverParamsE <- runEitherT $ do
+    params <- newEitherT $ VkParser.parsePollResponse parserH serverUp
     let tsText = VkServer.text_ts $ VkPollResp.response params
-    tsInt <- EiT.EitherT $ BotUtil.readValue tsText
+    tsInt <- newEitherT $ BotUtil.readValue tsText
     return VkServer.Server {
       VkServer.key = VkServer.text_key $ VkPollResp.response params,
       VkServer.server = VkServer.text_server $ VkPollResp.response params,
