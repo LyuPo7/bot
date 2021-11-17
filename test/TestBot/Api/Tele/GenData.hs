@@ -1,79 +1,79 @@
-module TestBot.Tele.GenData where
+module TestBot.Api.Tele.GenData where
 
 import Hedgehog (Gen)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
-import qualified Bot.Tele.Parser.Objects.UpdateData as UpData
-import qualified Bot.Tele.Parser.Objects.Update as Update
-import qualified Bot.Tele.Parser.Objects.Message as Message
-import qualified Bot.Tele.Parser.Objects.MessageEntity as MessageEntity
-import qualified Bot.Tele.Parser.Objects.Chat as Chat
+import qualified Bot.Api.Tele.Objects.UpdateData as TeleUpData
+import qualified Bot.Api.Tele.Objects.Update as TeleUpdate
+import qualified Bot.Api.Tele.Objects.Message as TeleMessage
+import qualified Bot.Api.Tele.Objects.MessageEntity as TeleMessageEntity
+import qualified Bot.Api.Tele.Objects.Chat as TeleChat
 
 genId :: Gen Int
 genId = Gen.int (Range.constant 0 1000)
 
-genChat :: Gen Chat.Chat
-genChat = Chat.Chat
+genChat :: Gen TeleChat.Chat
+genChat = TeleChat.Chat
   <$> (toInteger <$> genId)
 
-genMessageEntity :: Gen MessageEntity.MessageEntity
-genMessageEntity = MessageEntity.MessageEntity 
+genMessageEntity :: Gen TeleMessageEntity.MessageEntity
+genMessageEntity = TeleMessageEntity.MessageEntity 
   <$> Gen.element ["mention", "hashtag", "cashtag", 
                    "bot_command", "url", "email", 
                    "phone_number", "bold", "italic", 
                    "underline", "strikethrough", "code", "pre",
                    "text_link", "text_mention"]
 
-genMessageEntityWoBotCom :: Gen MessageEntity.MessageEntity
-genMessageEntityWoBotCom = MessageEntity.MessageEntity 
+genMessageEntityWoBotCom :: Gen TeleMessageEntity.MessageEntity
+genMessageEntityWoBotCom = TeleMessageEntity.MessageEntity 
   <$> Gen.element ["mention", "hashtag", "cashtag", 
                    "url", "email", 
                    "phone_number", "bold", "italic", 
                    "underline", "strikethrough", "code", "pre",
                    "text_link", "text_mention"]
 
-genMessage :: Gen Message.Message
-genMessage = Message.Message
+genMessage :: Gen TeleMessage.Message
+genMessage = TeleMessage.Message
   <$> (toInteger <$> genId)
   <*> genChat
   <*> Gen.element [Nothing, Just "Hi!", Just "Let's talk!"]
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genMessageEntity)
 
-genNum5Message :: Gen Message.Message
-genNum5Message = Message.Message
+genNum5Message :: Gen TeleMessage.Message
+genNum5Message = TeleMessage.Message
   <$> (toInteger <$> genId)
   <*> genChat
   <*> Gen.element [Just "5"]
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genMessageEntity)
 
-genBotHelpMessage :: Gen Message.Message
-genBotHelpMessage = Message.Message
+genBotHelpMessage :: Gen TeleMessage.Message
+genBotHelpMessage = TeleMessage.Message
   <$> (toInteger <$> genId)
   <*> genChat
   <*> Gen.element [Just "/start", Just "/help"]
-  <*> Gen.constant (Just [MessageEntity.MessageEntity "bot_command"])
+  <*> Gen.constant (Just [TeleMessageEntity.MessageEntity "bot_command"])
 
-genBotRepeatMessage :: Gen Message.Message
-genBotRepeatMessage = Message.Message
+genBotRepeatMessage :: Gen TeleMessage.Message
+genBotRepeatMessage = TeleMessage.Message
   <$> (toInteger <$> genId)
   <*> genChat
   <*> Gen.constant (Just "/repeat")
-  <*> Gen.constant (Just [MessageEntity.MessageEntity "bot_command"])
+  <*> Gen.constant (Just [TeleMessageEntity.MessageEntity "bot_command"])
 
-genMessageWoBotCom :: Gen Message.Message
-genMessageWoBotCom = Message.Message
+genMessageWoBotCom :: Gen TeleMessage.Message
+genMessageWoBotCom = TeleMessage.Message
   <$> (toInteger <$> genId)
   <*> genChat
   <*> Gen.element [Nothing, Just "Hi!", Just "Let's talk!"]
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genMessageEntityWoBotCom)
 
-genUpdate :: Gen Update.Update
-genUpdate = Update.Update
+genUpdate :: Gen TeleUpdate.Update
+genUpdate = TeleUpdate.Update
   <$> (toInteger <$> genId)
   <*> Gen.maybe genMessage
 
-genUpdateData :: Gen UpData.UpdateData
-genUpdateData = UpData.UpdateData
+genUpdateData :: Gen TeleUpData.UpdateData
+genUpdateData = TeleUpData.UpdateData
   <$> Gen.bool
   <*> Gen.list (Range.constant 0 10) genUpdate

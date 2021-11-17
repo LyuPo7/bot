@@ -9,7 +9,7 @@ import Data.Aeson.Types (ToJSON(..))
 data Command = Command {
   command :: Text, -- 1-32 characters.
   description :: Text -- 3-256 characters.
-} deriving (Show, Generic, ToJSON)
+} deriving (Show, Eq, Generic, ToJSON)
 
 helpCommand :: Command
 helpCommand = Command {

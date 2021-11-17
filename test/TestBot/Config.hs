@@ -4,14 +4,14 @@ import Hedgehog (Gen, Property, property, (===), forAll)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
-import qualified Bot.Config as Cnfg
-import qualified Bot.Logger as Logger
+import qualified Bot.Config as Config
+import qualified Bot.Logger.Logger as Logger
 import qualified Bot.Settings as Settings
 
 prop_checkConfig :: Property
 prop_checkConfig = property $ do
       config <- forAll genValidConfig
-      Cnfg.checkConfig config === Right config
+      Config.checkConfig config === Right config
       
 genId :: Gen Int
 genId = Gen.int (Range.constant 0 1000)
@@ -34,7 +34,7 @@ genValidSetConfig = Settings.Config
   <*> Gen.element ["Bot!"]
   <*> Gen.maybe (toInteger <$> Gen.int (Range.constant 0 1000))
 
-genValidConfig :: Gen Cnfg.Config
-genValidConfig = Cnfg.Config
+genValidConfig :: Gen Config.Config
+genValidConfig = Config.Config
   <$> genValidSetConfig
   <*> genValidLogConfig

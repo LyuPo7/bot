@@ -4,7 +4,7 @@ import Data.Text (Text)
 
 newtype Method = Method {
   getMethod :: Text
-} deriving (Show)
+} deriving (Show, Eq)
 
 getUpdates :: Method
 getUpdates = Method "/getUpdates"

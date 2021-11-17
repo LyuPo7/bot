@@ -45,7 +45,7 @@ data RequestOptions =
     commands :: [TeleCommand.Command],
     scope :: Maybe TeleCommandScope.CommandScope,
     language_code :: Maybe Text -- A two-letter ISO 639-1 language code.
-  } deriving (Show, Generic, ToJSON)
+  } deriving (Show, Eq, Generic, ToJSON)
 
 -- | Default methods for Requests
 createGetUpdates :: BotSynonyms.UpdateId -> RequestOptions

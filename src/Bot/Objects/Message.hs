@@ -9,3 +9,4 @@ data Message = TeleMessage {
              | VkMessage {
                  vkMessage :: VkMessage.Message
                }
+            deriving (Show, Eq)

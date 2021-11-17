@@ -82,13 +82,14 @@ getUpdate handle update = do
   makeRequest handle method updateOptions
 
 sendEchoMessage :: (MonadThrow m, Monad m) => Handle m ->
-                    BotMessage.Message -> m ()
+                    BotMessage.Message -> m BotMessage.Message
 sendEchoMessage handle message = do
   let logH = hLogger handle
   newMessage <- updateMessage handle message
   (method, echoMessageOptions) <- setEchoMessage handle newMessage
   _ <- makeRequest handle method echoMessageOptions
   Logger.logInfo logH "Echo-Message was forwarded."
+  return newMessage
 
 sendNEchoMessage :: (MonadThrow m, Monad m) => Handle m -> BotMessage.Message ->
                     BotSynonyms.RepNum -> m ()
@@ -96,10 +97,11 @@ sendNEchoMessage handle _ 0 = do
   let logH = hLogger handle
   Logger.logInfo logH "Echo-Messages were sent."
 sendNEchoMessage handle message n = do
-  sendEchoMessage handle message
+  _ <- sendEchoMessage handle message
   sendNEchoMessage handle message (n - 1)
 
-sendHelpMessage :: Monad m => Handle m -> BotMessage.Message -> m ()
+sendHelpMessage :: Monad m => Handle m -> BotMessage.Message ->
+                   m (BotMethod.Method, BotReqOptions.RequestOptions)
 sendHelpMessage handle message = do
   let logH = hLogger handle
       config = cReq handle
@@ -107,6 +109,7 @@ sendHelpMessage handle message = do
   (method, helpMessageOptions) <- setHelpMessage handle message helpText
   _ <- makeRequest handle method helpMessageOptions
   Logger.logInfo logH "Help-Message was sent."
+  return (method, helpMessageOptions)
 
 sendStartMessage :: (MonadThrow m, Monad m) => Handle m ->
                      BotMessage.Message -> m ()

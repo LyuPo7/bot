@@ -85,18 +85,17 @@ tests:
     main:                Test.hs
     source-dirs:         test
     other-modules: [
-      TestBot.Tele.Parser,
       TestBot.Config,
-      TestBot.Tele.Run,
-      TestBot.Vk.Parser,
-      TestBot.Vk.Attach,
-      TestBot.Vk.Request,
-      TestBot.Vk.Document,
-      TestBot.Vk.Run,
-      TestBot.Vk.GenData,
-      TestBot.Vk.Handlers,
-      TestBot.Tele.GenData,
-      TestBot.Tele.Handlers
+      TestBot.Request.Request,
+      TestBot.Mode.Mode,
+      TestBot.Api.Tele.Parser.Parser,
+      TestBot.Api.Vk.Parser.Parser,
+      TestBot.Api.Vk.GenData,
+      TestBot.Api.Vk.Handlers,
+      TestBot.Api.Tele.GenData,
+      TestBot.Api.Tele.Handlers,
+      TestBot.Handlers,
+      TestBot.GenData
       ]
     ghc-options:
     - -threaded

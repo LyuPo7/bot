@@ -4,4 +4,4 @@ import Data.Text (Text)
 
 newtype RequestOptions = RequestOptions {
   reqOption :: Text
-} deriving (Show)
+} deriving (Show, Eq)

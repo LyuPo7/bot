@@ -93,7 +93,7 @@ replyMode handle userMessage = do
       return BotMode.ReplyMode
     BotMessageType.HelpMessage -> do
       Logger.logInfo logH "User's /help message"
-      BotReq.sendHelpMessage reqH userMessage
+      _ <- BotReq.sendHelpMessage reqH userMessage
       return BotMode.ReplyMode
     BotMessageType.RepeatMessage -> do
       _ <- BotReq.sendKeyboard reqH userMessage

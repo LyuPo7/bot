@@ -3,47 +3,31 @@ import Test.Tasty.Hspec (testSpecs)
 import Test.Tasty.Hedgehog (testProperty)
 import qualified Data.ByteString.Lazy as B
 
-import qualified TestBot.Config as Cnfg
-import qualified TestBot.Tele.Parser as TeleParser
-import qualified TestBot.Vk.Parser as VkParser
-import qualified TestBot.Vk.Attach as VkAttach
-import qualified TestBot.Vk.Document as VkDoc
-import qualified TestBot.Vk.Request as VkReq
-import qualified TestBot.Tele.Run as TeleRun
-import qualified TestBot.Vk.Run as VkRun
+import qualified TestBot.Config as Config
+import qualified TestBot.Api.Tele.Parser.Parser as TeleParser
+import qualified TestBot.Api.Vk.Parser.Parser as VkParser
+import qualified TestBot.Request.Request as BotReq
+import qualified TestBot.Mode.Mode as BotMode
 
 props :: [TestTree]
 props = [
-  testProperty "Tele: Successful checkConfig for each valid Config"
-    Cnfg.prop_checkConfig,
-  testProperty "Tele: Unsuccessful answerMode parse for each text Message \
+  testProperty "Successful checkConfig for each valid Config"
+    Config.prop_checkConfig,
+  testProperty "Unsuccessful answerMode parse for each text Message \
                \while waiting answer number"
-               TeleRun.prop_answerModeFail,
-  testProperty "Tele: Successful answerMode parse for each Message \
+               BotMode.prop_answerModeFail,
+  testProperty "Successful answerMode parse for each Message \
                \with number 5 in body while waiting answer number" 
-               TeleRun.prop_answerModeSuc,
-  testProperty "Tele: Successful replyMode for /help, /start bot command"
-    TeleRun.prop_replyModeReplySuc,
-  testProperty "Tele: Successful replyMode for /reply bot command"
-    TeleRun.prop_replyModeAnswerSuc,
-  testProperty "Tele: Successful replyMode for message without bot command"
-    TeleRun.prop_replyModeOrdinarySuc,
-  testProperty "Vk: Unsuccessful answerMode parse for each text Message \
-               \while waiting answer number"
-               VkRun.prop_answerModeFail,
-  testProperty "Vk: Successful answerMode parse for each Message \
-               \with number 5 in body while waiting answer number"
-               VkRun.prop_answerModeSuc,
-  testProperty "Vk: Successful replyMode for /help bot command"
-    VkRun.prop_replyModeReplySuc,
-  testProperty "Vk: Successful replyMode for /reply bot command"
-    VkRun.prop_replyModeAnswerSuc,
-  testProperty "Vk: Successful replyMode for message without bot command"
-    VkRun.prop_replyModeOrdinarySuc
+               BotMode.prop_answerModeSuc,
+  testProperty "Successful replyMode for /help, /start bot command"
+               BotMode.prop_replyModeReplySuc,
+  testProperty "Successful replyMode for /reply bot command"
+               BotMode.prop_replyModeAnswerSuc,
+  testProperty "Successful replyMode for message without bot command"
+               BotMode.prop_replyModeOrdinarySuc
   ]
 
 main :: IO ()
---main = defaultMain $ testGroup "(no tests)" []
 main = do
   bstrTele <- readUpdateTele
   bstrFailTele <- readUpdateFailTele
@@ -75,17 +59,14 @@ main = do
                VkParser.spec_parseUploadUrl objUpUrlVk bstrUpUrlVk bstrUpUrlFailVk,
                VkParser.spec_parseUploadFile objUpFileVk bstrUpFileVk bstrUpFileFailVk,
                VkParser.spec_parseUploadObject objUpObjVk bstrUpObjVk bstrUpObjFailVk,
-               VkAttach.spec_updateAttachment,
-               VkAttach.spec_updateAttachments,
-               VkReq.spec_returnStickerId,
-               VkReq.spec_attachmentToString,
-               VkReq.spec_attachmentsToQuery,
-               VkReq.spec_createHelpMessage,
-               VkReq.spec_createEchoMessage,
-               VkReq.spec_createRepeatMessage,
-               VkReq.spec_createServerQuery,
-               VkReq.spec_geoToLatLong,
-               VkDoc.spec_updateDoc
+               BotReq.spec_getServer,
+               BotReq.spec_getUploadedServer,
+               BotReq.spec_getUpdate,
+               BotReq.spec_sendEchoMessage,
+               BotReq.spec_sendHelpMessage,
+               BotReq.spec_saveUploadedDoc,
+               BotReq.spec_updateMessage,
+               BotReq.spec_updateDoc
              ]
   defaultMain (testGroup "All Tests" [
                   testGroup "Specs" specs,

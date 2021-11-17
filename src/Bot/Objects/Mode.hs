@@ -7,7 +7,7 @@ import Data.Convertible.Base (Convertible(..))
 data Mode = ReplyMode
           | AnswerMode
           | UnknownMode
-          deriving (Show)
+          deriving (Show, Eq)
 
 instance Convertible Mode SqlValue where
   safeConvert ReplyMode = Right $ SqlByteString "reply"

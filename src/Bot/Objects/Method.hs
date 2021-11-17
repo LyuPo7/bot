@@ -9,3 +9,4 @@ data Method = TeleMethod {
             | VkMethod {
                 vkMethod :: VkMethod.Method
               }
+            deriving (Show, Eq)

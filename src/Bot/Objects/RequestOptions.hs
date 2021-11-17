@@ -9,3 +9,4 @@ data RequestOptions = TeleReqOptions {
                     | VkReqOptions {
                         vkReqOptions :: VkReqOptions.RequestOptions
                       }
+                    deriving (Show, Eq)

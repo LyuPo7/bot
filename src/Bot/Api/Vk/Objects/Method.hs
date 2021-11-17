@@ -6,7 +6,7 @@ import Bot.Settings as Settings
 
 newtype Method = Method {
   getMethod :: Text
-}
+} deriving (Show, Eq)
 
 getLongPollServer :: Method
 getLongPollServer = Method $ hostApi <> method

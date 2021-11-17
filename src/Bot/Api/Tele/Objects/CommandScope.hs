@@ -9,7 +9,7 @@ import Data.Aeson.Types (ToJSON(..), fieldLabelModifier,
 
 newtype CommandScope = CommandScope {
   scope_type :: Text -- must be "default".
-} deriving (Show, Generic)
+} deriving (Show, Eq, Generic)
 
 instance ToJSON CommandScope where
   toJSON = genericToJSON defaultOptions {

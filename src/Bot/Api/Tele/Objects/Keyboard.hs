@@ -11,7 +11,7 @@ data Keyboard = Keyboard {
   keyboard :: [[TeleButton.Button]],
   resize_keyboard :: Maybe Bool,
   one_time_keyboard :: Maybe Bool
-} deriving (Show, Generic, ToJSON)
+} deriving (Show, Eq, Generic, ToJSON)
 
 createKeyboard :: [[TeleButton.Button]] -> Keyboard
 createKeyboard buttons = Keyboard {

@@ -9,7 +9,7 @@ import Data.Aeson.Types (ToJSON(..))
 data Button = Button {
   text :: Text,
   callback_data :: Maybe Text
-} deriving (Show, Generic, ToJSON)
+} deriving (Show, Eq, Generic, ToJSON)
 
 createButton :: Text -> Text -> Button
 createButton buttonText callback = Button {
