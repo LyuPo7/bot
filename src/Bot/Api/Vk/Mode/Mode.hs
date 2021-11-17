@@ -47,12 +47,12 @@ withHandleIO logger config dbH reqH parserH f = do
   }
   f handle
 
-getLastUpdate :: Monad m => BotReq.Handle m -> BotUpdate.Update -> m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
-getLastUpdate handle botPrevUpdate = do
+getLastUpdate :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotUpdate.Update ->
+                 m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
+getLastUpdate handle (BotUpdate.VkUpdate serverParams) = do
   let logH = BotReq.hLogger handle
       dbH = BotReq.hDb handle
       parserH = BotReq.hParser handle
-      serverParams = BotUpdate.vkUpdate botPrevUpdate
       tsCurrent = VkServer.ts serverParams
   processedUpdId <- BotDBQ.getLastSucUpdate dbH
   let newUpdId = fmap (+1) processedUpdId
@@ -73,8 +73,11 @@ getLastUpdate handle botPrevUpdate = do
         _ -> do
           Logger.logError logH "Unsupported type of update."
           return Nothing
+getLastUpdate _ botUpdate@(_) = do
+  throwM $ E.ApiObjectError $ show botUpdate
 
-getFirstUpdate :: (MonadThrow m, Monad m) => BotReq.Handle m -> m BotUpdate.Update
+getFirstUpdate :: (MonadThrow m, Monad m) =>
+                   BotReq.Handle m -> m BotUpdate.Update
 getFirstUpdate handle = do
   let parserH = BotReq.hParser handle
   serverUp <- BotReq.getServer handle
@@ -91,36 +94,41 @@ getFirstUpdate handle = do
     Left msg2 -> throwM $ E.ParseRequestError $ T.unpack msg2
     Right serverParams -> return $ BotUpdate.VkUpdate serverParams
 
-getNextUpdate :: Monad m => BotReq.Handle m -> BotUpdate.Update -> m BotUpdate.Update
-getNextUpdate _ botUpdate = do
-  let update = BotUpdate.vkUpdate botUpdate
-      updateId = VkServer.ts update
+getNextUpdate :: (MonadThrow m, Monad m) => BotReq.Handle m ->
+                  BotUpdate.Update -> m BotUpdate.Update
+getNextUpdate _ (BotUpdate.VkUpdate update) = do
+  let updateId = VkServer.ts update
       newUpdate = update {VkServer.ts = updateId + 1}
   return $ BotUpdate.VkUpdate newUpdate
+getNextUpdate _ botUpdate@(_) = do
+  throwM $ E.ApiObjectError $ show botUpdate
   
-getPrevUpdate :: Monad m => BotReq.Handle m -> BotUpdate.Update -> m BotUpdate.Update
-getPrevUpdate _ botUpdate = do
-  let update = BotUpdate.vkUpdate botUpdate
-      updateId = VkServer.ts update
+getPrevUpdate :: (MonadThrow m, Monad m) => BotReq.Handle m ->
+                  BotUpdate.Update -> m BotUpdate.Update
+getPrevUpdate _ (BotUpdate.VkUpdate update) = do
+  let updateId = VkServer.ts update
       newUpdate = update {VkServer.ts = updateId - 1}
   return $ BotUpdate.VkUpdate newUpdate
+getPrevUpdate _ botUpdate@(_) = do
+  throwM $ E.ApiObjectError $ show botUpdate
 
-getChatId :: Monad m => BotReq.Handle m -> BotMessage.Message -> m BotSynonyms.ChatId
-getChatId _ botMessage = do
-  let userMessage = BotMessage.vkMessage botMessage
+getChatId :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message -> m BotSynonyms.ChatId
+getChatId _ (BotMessage.VkMessage userMessage) = do
   return $ VkMessage.user_id userMessage
+getChatId _ botMessage@(_) = do
+  throwM $ E.ApiObjectError $ show botMessage
 
-getMessageText :: Monad m => BotReq.Handle m -> BotMessage.Message -> m (Maybe Text)
-getMessageText _ botMessage = do
-  let userMessage = BotMessage.vkMessage botMessage
+getMessageText :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message -> m (Maybe Text)
+getMessageText _ (BotMessage.VkMessage userMessage) = do
   return $ Just $ VkMessage.body userMessage
+getMessageText _ botMessage@(_) = do
+  throwM $ E.ApiObjectError $ show botMessage
 
-getMessageType :: Monad m => BotReq.Handle m -> BotMessage.Message ->
+getMessageType :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message ->
                   m BotMessageType.MessageType
-getMessageType _ botMessage = do
-  let userMessage = BotMessage.vkMessage botMessage
-      messageText = VkMessage.body userMessage
-  let action
+getMessageType _ (BotMessage.VkMessage userMessage) = do
+  let messageText = VkMessage.body userMessage
+      action
         | Settings.helpMessage == messageText = do
             return BotMessageType.HelpMessage
         | Settings.repeatMessage == messageText = do
@@ -128,3 +136,5 @@ getMessageType _ botMessage = do
         | otherwise = do
             return BotMessageType.TextMessage
   action
+getMessageType _ botMessage@(_) = do
+  throwM $ E.ApiObjectError $ show botMessage

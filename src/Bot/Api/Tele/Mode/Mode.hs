@@ -2,7 +2,9 @@ module Bot.Api.Tele.Mode.Mode where
 
 import Data.Text (Text)
 import Data.Maybe (fromMaybe)
+import Control.Monad.Catch (MonadThrow, throwM)
 
+import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
 import qualified Bot.Settings as Settings
 import qualified Bot.DB.DBQ as BotDBQ
@@ -78,31 +80,36 @@ getLastUpdate handle _ = do
 getFirstUpdate :: Monad m => BotReq.Handle m -> m BotUpdate.Update
 getFirstUpdate _ = return $ BotUpdate.TeleUpdate 0
 
-getNextUpdate :: Monad m => BotReq.Handle m -> BotUpdate.Update -> m BotUpdate.Update
-getNextUpdate _ botUpdate = do
-  let updateId = BotUpdate.teleUpdate botUpdate
+getNextUpdate :: (MonadThrow m, Monad m) => BotReq.Handle m ->
+                  BotUpdate.Update -> m BotUpdate.Update
+getNextUpdate _ (BotUpdate.TeleUpdate updateId) = do
   return $ BotUpdate.TeleUpdate (updateId + 1)
-  
-getPrevUpdate :: Monad m => BotReq.Handle m -> BotUpdate.Update -> m BotUpdate.Update
-getPrevUpdate _ botUpdate = do
-  let updateId = BotUpdate.teleUpdate botUpdate
+getNextUpdate _ botUpdate@(_) = do
+  throwM $ E.ApiObjectError $ show botUpdate
+
+getPrevUpdate :: (MonadThrow m, Monad m) => BotReq.Handle m ->
+                  BotUpdate.Update -> m BotUpdate.Update
+getPrevUpdate _ (BotUpdate.TeleUpdate updateId) = do
   return $ BotUpdate.TeleUpdate (updateId - 1)
+getPrevUpdate _ botUpdate@(_) = do
+  throwM $ E.ApiObjectError $ show botUpdate
 
-getChatId :: Monad m => BotReq.Handle m -> BotMessage.Message -> m BotSynonyms.ChatId
-getChatId _ botMessage = do
-  let userMessage = BotMessage.teleMessage botMessage
+getChatId :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message -> m BotSynonyms.ChatId
+getChatId _ (BotMessage.TeleMessage userMessage) = do
   return $ TeleChat.id $ TeleMessage.chat userMessage
+getChatId _ botMessage@(_) = do
+  throwM $ E.ApiObjectError $ show botMessage
 
-getMessageText :: Monad m => BotReq.Handle m -> BotMessage.Message -> m (Maybe Text)
-getMessageText _ botMessage = do
-  let userMessage = BotMessage.teleMessage botMessage
+getMessageText :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message -> m (Maybe Text)
+getMessageText _ (BotMessage.TeleMessage userMessage) = do
   return $ TeleMessage.text userMessage
+getMessageText _ botMessage@(_) = do
+  throwM $ E.ApiObjectError $ show botMessage
 
-getMessageType :: Monad m => BotReq.Handle m -> BotMessage.Message ->
+getMessageType :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message ->
                   m BotMessageType.MessageType
-getMessageType _ botMessage = do
-  let userMessage = BotMessage.teleMessage botMessage
-      messageText = TeleMessage.text userMessage
+getMessageType _ (BotMessage.TeleMessage userMessage) = do
+  let messageText = TeleMessage.text userMessage
       entitiesM = filter 
         ((== "bot_command") . TeleMessageEntity.entity_type) 
         <$> TeleMessage.entities userMessage
@@ -119,5 +126,6 @@ getMessageType _ botMessage = do
             | otherwise = do
               return BotMessageType.UnsupportedMessage
       action
-      
+getMessageType _ botMessage@(_) = do
+  throwM $ E.ApiObjectError $ show botMessage
   

@@ -11,6 +11,8 @@ data BotError = ParseRequestError String
                | UploadedServerError
                | UploadedDocError
                | StartMessageError
+               | ApiObjectError String
+               | ApiMethodError
                | DbError String
                | Default String
                deriving (Exception, Eq)
@@ -26,5 +28,7 @@ instance Show BotError where
   show UploadedServerError = "Incorrect API for uploading files!"
   show UploadedDocError = "Incorrect API for uploading documents!"
   show StartMessageError = "This API hasn't 'start' message"
+  show (ApiObjectError err) = "Incorrect Object for this Api: " ++ err
+  show ApiMethodError = "Incorrect Method for this Api!"
   show (Default _) = "Default error"
   show (DbError err) = "Db error: " ++ err
