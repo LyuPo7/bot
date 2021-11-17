@@ -114,11 +114,11 @@ spec_sendHelpMessage =
           result = BotReq.sendHelpMessage TeleHandlers.reqH botMessage
           options = BotReqOptions.TeleReqOptions $ TeleReqOptions.SendMessage {
             TeleReqOptions.chat_id = 222,
-            TeleReqOptions.text = Settings.botDescription $ TeleHandlers.runC,
+            TeleReqOptions.text = Settings.botDescription TeleHandlers.runC,
             TeleReqOptions.disable_notification = Nothing,
             TeleReqOptions.reply_to_message_id = Nothing
           }
-          method = BotMethod.TeleMethod $ TeleMethod.sendMessage
+          method = BotMethod.TeleMethod TeleMethod.sendMessage
       result `shouldBe` Just (method, options)
     it "Should return string and method for Api supporting JSON-content-type" $ do
       let doc = VkDoc.Document {
@@ -145,7 +145,7 @@ spec_sendHelpMessage =
                                         \message=Hi%21%20I%27m%20bot%3D%29&\
                                         \user_id=21&\
                                         \v=5.81"
-          method = BotMethod.VkMethod $ VkMethod.sendMessage
+          method = BotMethod.VkMethod VkMethod.sendMessage
       result `shouldBe` Just (method, options)
 
 spec_saveUploadedDoc :: Spec

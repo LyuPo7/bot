@@ -74,8 +74,8 @@ reqH = BotReq.Handle {
   BotReq.cReq = runC,
 
   BotReq.makeRequest = \_ _ -> return "ok",
-  BotReq.setUploadedServer = \_ -> Nothing,
-  BotReq.setUploadedDoc = \_ -> Nothing,
+  BotReq.setUploadedServer = const Nothing,
+  BotReq.setUploadedDoc = const Nothing,
   BotReq.setGetServer = Nothing,
   BotReq.setGetUpdate = TeleReq.setGetUpdate parserH,
   BotReq.setEchoMessage = TeleReq.setEchoMessage parserH,
@@ -85,7 +85,7 @@ reqH = BotReq.Handle {
   BotReq.setCommands = TeleReq.setCommands parserH,
 
   BotReq.downloadDoc = \_ _ -> Nothing,
-  BotReq.extractDoc = \_ -> Nothing,
+  BotReq.extractDoc = const Nothing,
   BotReq.changeMessage = \message _-> return message,
   BotReq.changeDoc = \doc _ -> return doc
 }
