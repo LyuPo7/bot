@@ -151,7 +151,7 @@ setEchoMessage handle (BotMessage.VkMessage message) = do
                    VkReqOptions.RequestOptions vkReqOptions
       apiMethod = BotMethod.VkMethod VkMethod.sendMessage
   return (apiMethod, reqOptions)
-setEchoMessage _ botMessage@(_) = do
+setEchoMessage _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setHelpMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> BotMessage.Message ->
@@ -170,7 +170,7 @@ setHelpMessage handle (BotMessage.VkMessage message) description = do
                    VkReqOptions.RequestOptions vkReqOptions
       apiMethod = BotMethod.VkMethod VkMethod.sendMessage
   return (apiMethod, reqOptions)
-setHelpMessage _ botMessage@(_) _ = do
+setHelpMessage _ botMessage _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setKeyboardMessage :: (MonadThrow m, Monad m) => BotParser.Handle m ->
@@ -194,7 +194,7 @@ setKeyboardMessage handle (BotMessage.VkMessage message) _ question = do
                    VkReqOptions.RequestOptions vkReqOptionsWKeyboard
       apiMethod = BotMethod.VkMethod VkMethod.sendMessage
   return (apiMethod, reqOptions)
-setKeyboardMessage _ botMessage@(_) _ _ = do
+setKeyboardMessage _ botMessage _ _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setGetUpdate :: (MonadThrow m, Monad m) =>
@@ -216,7 +216,7 @@ setGetUpdate _  (BotUpdate.VkUpdate server) = do
                    VkReqOptions.RequestOptions vkReqOptions
       apiMethod = BotMethod.VkMethod VkMethod.getUpdate
   return (apiMethod, reqOptions)
-setGetUpdate _ botUpdate@(_) = do
+setGetUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
 makeRequest :: BotParser.Handle IO -> BotMethod.Method ->
@@ -247,7 +247,7 @@ makeRequest handle (BotMethod.VkMethod apiMethod)
        <> BotUtil.convertValue codeResp
       Exc.throwIO $ E.ConnectionError codeResp
 makeRequest _ _ _ = do
-  throwM $ E.ApiMethodError
+  throwM E.ApiMethodError
 
 downloadDoc :: Monad m => BotParser.Handle m ->
                BotDoc.Document -> B.ByteString -> m (Maybe Text)
@@ -290,7 +290,7 @@ extractDoc _ (BotMessage.VkMessage message) = do
     Just attachs -> do
       let vkDocs = [ doc | (VkAttach.AttachDoc doc) <- attachs ]
       return $ Just $ map BotDoc.VkDoc vkDocs
-extractDoc _ botMessage@(_) = do
+extractDoc _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 changeMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> 
@@ -307,7 +307,7 @@ changeMessage _ botMessage@(BotMessage.VkMessage message) botDocs = do
               newAttachs = attachNoDocs `union` map VkAttach.AttachDoc docs
               newMessage = message {VkMessage.attachments = Just newAttachs}
           return $ BotMessage.VkMessage newMessage
-changeMessage _ botMessage@(_) _ = do
+changeMessage _ botMessage _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 attachmentsToQuery :: Maybe [VkAttach.Attachment] -> Maybe Text

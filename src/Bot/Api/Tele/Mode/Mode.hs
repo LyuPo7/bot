@@ -84,26 +84,26 @@ getNextUpdate :: (MonadThrow m, Monad m) => BotReq.Handle m ->
                   BotUpdate.Update -> m BotUpdate.Update
 getNextUpdate _ (BotUpdate.TeleUpdate updateId) = do
   return $ BotUpdate.TeleUpdate (updateId + 1)
-getNextUpdate _ botUpdate@(_) = do
+getNextUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
 getPrevUpdate :: (MonadThrow m, Monad m) => BotReq.Handle m ->
                   BotUpdate.Update -> m BotUpdate.Update
 getPrevUpdate _ (BotUpdate.TeleUpdate updateId) = do
   return $ BotUpdate.TeleUpdate (updateId - 1)
-getPrevUpdate _ botUpdate@(_) = do
+getPrevUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
 getChatId :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message -> m BotSynonyms.ChatId
 getChatId _ (BotMessage.TeleMessage userMessage) = do
   return $ TeleChat.id $ TeleMessage.chat userMessage
-getChatId _ botMessage@(_) = do
+getChatId _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 getMessageText :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message -> m (Maybe Text)
 getMessageText _ (BotMessage.TeleMessage userMessage) = do
   return $ TeleMessage.text userMessage
-getMessageText _ botMessage@(_) = do
+getMessageText _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 getMessageType :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message ->
@@ -126,6 +126,6 @@ getMessageType _ (BotMessage.TeleMessage userMessage) = do
             | otherwise = do
               return BotMessageType.UnsupportedMessage
       action
-getMessageType _ botMessage@(_) = do
+getMessageType _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
   

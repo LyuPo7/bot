@@ -7,7 +7,6 @@ import Data.Text (Text)
 import Control.Monad.Catch (MonadThrow, throwM)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types.Status (statusCode, statusCode)
-import Data.Aeson (encode)
 import Network.HTTP.Client (Request(..), RequestBody(..), 
                             newManager, parseRequest, httpLbs,
                             responseStatus, responseBody)
@@ -30,6 +29,11 @@ import qualified Bot.Api.Tele.Objects.Message as TeleMessage
 import qualified Bot.Api.Tele.Objects.Chat as TeleChat
 import qualified Bot.Api.Tele.Objects.Keyboard as TeleKeyboard
 import qualified Bot.Api.Tele.Objects.Button as TeleButton
+import qualified Bot.Api.Tele.Objects.GetUpdates as TeleGetUpdates
+import qualified Bot.Api.Tele.Objects.SendMessage as TeleSendMessage
+import qualified Bot.Api.Tele.Objects.KeyboardMessage as TeleKeyboardMessage
+import qualified Bot.Api.Tele.Objects.CopyMessage as TeleCopyMessage
+import qualified Bot.Api.Tele.Objects.SetCommands as TeleSetCommands
 import qualified Bot.Util as BotUtil
 
 withHandleIO :: Logger.Handle IO -> BotDBQ.Handle IO -> BotParser.Handle IO ->
@@ -63,10 +67,11 @@ setGetUpdate :: (MonadThrow m, Monad m) => BotParser.Handle m -> BotUpdate.Updat
                 m (BotMethod.Method, BotReqOptions.RequestOptions)
 setGetUpdate _ (BotUpdate.TeleUpdate updateId) = do
   let reqOptions = BotReqOptions.TeleReqOptions $
-                   TeleReqOptions.createGetUpdates updateId
+                   TeleReqOptions.GetUpdates $
+                   TeleGetUpdates.createGetUpdates updateId
       apiMethod = BotMethod.TeleMethod TeleMethod.getUpdates
   return (apiMethod, reqOptions)
-setGetUpdate _ botUpdate@(_) = do
+setGetUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
 setEchoMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> BotMessage.Message ->
@@ -75,10 +80,12 @@ setEchoMessage _ (BotMessage.TeleMessage message) = do
   let chatId = TeleChat.id $ TeleMessage.chat message
       messageId = TeleMessage.message_id message
       reqOptions = BotReqOptions.TeleReqOptions
-        (TeleReqOptions.createEchoMessage chatId messageId)
+        (TeleReqOptions.CopyMessage $
+         TeleCopyMessage.createEchoMessage chatId messageId
+        )
       apiMethod = BotMethod.TeleMethod TeleMethod.copyMessage
   return (apiMethod, reqOptions)
-setEchoMessage _ botMessage@(_) = do
+setEchoMessage _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setHelpMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> BotMessage.Message ->
@@ -87,10 +94,12 @@ setHelpMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> BotMessage.Me
 setHelpMessage _ (BotMessage.TeleMessage message) description = do
   let chatId = TeleChat.id $ TeleMessage.chat message
       reqOptions = BotReqOptions.TeleReqOptions 
-        (TeleReqOptions.createTextMessage chatId description)
+        (TeleReqOptions.SendMessage $
+         TeleSendMessage.createTextMessage chatId description
+        )
       apiMethod = BotMethod.TeleMethod TeleMethod.sendMessage
   return (apiMethod, reqOptions)
-setHelpMessage _ botMessage@(_) _ = do
+setHelpMessage _ botMessage _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setStartMessage :: (MonadThrow m, Monad m) => BotParser.Handle m ->
@@ -100,10 +109,12 @@ setStartMessage :: (MonadThrow m, Monad m) => BotParser.Handle m ->
 setStartMessage _ (BotMessage.TeleMessage message) startText = do
   let chatId = TeleChat.id $ TeleMessage.chat message
       reqOptions = BotReqOptions.TeleReqOptions
-        (TeleReqOptions.createTextMessage chatId startText)
+        (TeleReqOptions.SendMessage $
+         TeleSendMessage.createTextMessage chatId startText
+        )
       apiMethod = BotMethod.TeleMethod TeleMethod.sendMessage
   return $ Just (apiMethod, reqOptions)
-setStartMessage _ botMessage@(_) _ = do
+setStartMessage _ botMessage _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setKeyboardMessage :: (MonadThrow m, Monad m) => BotParser.Handle m ->
@@ -128,15 +139,17 @@ setKeyboardMessage _ (BotMessage.TeleMessage message) buttons question = do
         [[b1Tele, b2Tele, b3Tele, b4Tele, b5Tele]]
       apiMethod = BotMethod.TeleMethod TeleMethod.sendMessage
       reqOptions = BotReqOptions.TeleReqOptions
-        (TeleReqOptions.createKeyboardMessage chatId question keyboard)
+        (TeleReqOptions.SendKeyboard $ 
+         TeleKeyboardMessage.createKeyboardMessage chatId question keyboard
+        )
   return (apiMethod, reqOptions)
-setKeyboardMessage _ botMessage@(_) _ _ = do
+setKeyboardMessage _ botMessage _ _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setCommands :: Monad m => BotParser.Handle m ->
                m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions))
 setCommands _ = do
-  let commands = TeleReqOptions.createCommands
+  let commands = TeleReqOptions.SetCommands TeleSetCommands.createCommands
       apiMethod = BotMethod.TeleMethod TeleMethod.setCommands
       reqOptions = BotReqOptions.TeleReqOptions commands
   return $ Just (apiMethod, reqOptions)
@@ -157,7 +170,7 @@ makeRequest handle (BotMethod.TeleMethod apiMethod)
   initialRequest <- parseRequest $ T.unpack api
   let request = initialRequest { 
     method = "POST",
-    requestBody = RequestBodyLBS $ encode options,
+    requestBody = RequestBodyLBS $ TeleReqOptions.encodeRequestOptions options,
     requestHeaders = [ ( "Content-Type",
                          "application/json; charset=utf-8")
                       ]
@@ -174,4 +187,4 @@ makeRequest handle (BotMethod.TeleMethod apiMethod)
       B.putStr $ responseBody response
       Exc.throwIO $ E.ConnectionError codeResp
 makeRequest _ _ _ = do
-  throwM $ E.ApiMethodError
+  throwM E.ApiMethodError

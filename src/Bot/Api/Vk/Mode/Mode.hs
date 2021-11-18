@@ -73,7 +73,7 @@ getLastUpdate handle (BotUpdate.VkUpdate serverParams) = do
         _ -> do
           Logger.logError logH "Unsupported type of update."
           return Nothing
-getLastUpdate _ botUpdate@(_) = do
+getLastUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
 getFirstUpdate :: (MonadThrow m, Monad m) =>
@@ -100,7 +100,7 @@ getNextUpdate _ (BotUpdate.VkUpdate update) = do
   let updateId = VkServer.ts update
       newUpdate = update {VkServer.ts = updateId + 1}
   return $ BotUpdate.VkUpdate newUpdate
-getNextUpdate _ botUpdate@(_) = do
+getNextUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
   
 getPrevUpdate :: (MonadThrow m, Monad m) => BotReq.Handle m ->
@@ -109,19 +109,19 @@ getPrevUpdate _ (BotUpdate.VkUpdate update) = do
   let updateId = VkServer.ts update
       newUpdate = update {VkServer.ts = updateId - 1}
   return $ BotUpdate.VkUpdate newUpdate
-getPrevUpdate _ botUpdate@(_) = do
+getPrevUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
 getChatId :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message -> m BotSynonyms.ChatId
 getChatId _ (BotMessage.VkMessage userMessage) = do
   return $ VkMessage.user_id userMessage
-getChatId _ botMessage@(_) = do
+getChatId _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 getMessageText :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message -> m (Maybe Text)
 getMessageText _ (BotMessage.VkMessage userMessage) = do
   return $ Just $ VkMessage.body userMessage
-getMessageText _ botMessage@(_) = do
+getMessageText _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 getMessageType :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message ->
@@ -136,5 +136,5 @@ getMessageType _ (BotMessage.VkMessage userMessage) = do
         | otherwise = do
             return BotMessageType.TextMessage
   action
-getMessageType _ botMessage@(_) = do
+getMessageType _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage

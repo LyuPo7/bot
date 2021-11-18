@@ -30,11 +30,16 @@ library
       Bot.Api.Tele.Objects.Chat
       Bot.Api.Tele.Objects.Command
       Bot.Api.Tele.Objects.CommandScope
+      Bot.Api.Tele.Objects.CopyMessage
+      Bot.Api.Tele.Objects.GetUpdates
       Bot.Api.Tele.Objects.Keyboard
+      Bot.Api.Tele.Objects.KeyboardMessage
       Bot.Api.Tele.Objects.Message
       Bot.Api.Tele.Objects.MessageEntity
       Bot.Api.Tele.Objects.Method
       Bot.Api.Tele.Objects.RequestOptions
+      Bot.Api.Tele.Objects.SendMessage
+      Bot.Api.Tele.Objects.SetCommands
       Bot.Api.Tele.Objects.Update
       Bot.Api.Tele.Objects.UpdateData
       Bot.Api.Tele.Parser.Parser

@@ -30,6 +30,11 @@ import qualified Bot.Api.Tele.Objects.Chat as TeleChat
 import qualified Bot.Api.Tele.Objects.MessageEntity as TeleMessageEntity
 import qualified Bot.Api.Tele.Objects.Method as TeleMethod
 import qualified Bot.Api.Tele.Objects.RequestOptions as TeleReqOptions
+import qualified Bot.Api.Tele.Objects.GetUpdates as TeleGetUpdates
+import qualified Bot.Api.Tele.Objects.SendMessage as TeleSendMessage
+import qualified Bot.Api.Tele.Objects.KeyboardMessage as TeleKeyboardMessage
+import qualified Bot.Api.Tele.Objects.CopyMessage as TeleCopyMessage
+import qualified Bot.Api.Tele.Objects.SetCommands as TeleSetCommands
 
 spec_getServer :: Spec
 spec_getServer =
@@ -59,7 +64,7 @@ spec_getUpdate :: Spec
 spec_getUpdate =
   describe "Testing getUpdate" $ do
     it "Should return ByteString containing update info" $ do
-      botUpdate <- Gen.sample BotGD.genBotUpdate
+      botUpdate <- Gen.sample BotGD.genBotVkUpdate
       let result = BotReq.getUpdate VkHandlers.reqH botUpdate
           check = "ok"
       result `shouldBe` Just check
@@ -112,12 +117,15 @@ spec_sendHelpMessage =
           }
           botMessage = BotMessage.TeleMessage message
           result = BotReq.sendHelpMessage TeleHandlers.reqH botMessage
-          options = BotReqOptions.TeleReqOptions $ TeleReqOptions.SendMessage {
-            TeleReqOptions.chat_id = 222,
-            TeleReqOptions.text = Settings.botDescription TeleHandlers.runC,
-            TeleReqOptions.disable_notification = Nothing,
-            TeleReqOptions.reply_to_message_id = Nothing
-          }
+          options = BotReqOptions.TeleReqOptions $ 
+                    TeleReqOptions.SendMessage $
+                    TeleSendMessage.SendMessage {
+                      TeleSendMessage.chat_id = 222,
+                      TeleSendMessage.text = Settings.botDescription
+                                             TeleHandlers.runC,
+                      TeleSendMessage.disable_notification = Nothing,
+                      TeleSendMessage.reply_to_message_id = Nothing
+                    }
           method = BotMethod.TeleMethod TeleMethod.sendMessage
       result `shouldBe` Just (method, options)
     it "Should return string and method for Api supporting JSON-content-type" $ do
