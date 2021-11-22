@@ -6,20 +6,12 @@ import Data.Aeson (eitherDecode)
 import Data.Text (Text)
 
 import qualified Bot.Parser.Parser as BotParser
-import qualified Bot.Settings as Settings
 import qualified Bot.Logger.Logger as Logger
-import qualified Bot.System.System as BotSystem
 import qualified Bot.Api.Vk.Objects.UpdateData as VkUpData
 import qualified Bot.Api.Vk.Objects.PollResponse as VkPollResp
 import qualified Bot.Api.Vk.Objects.UploadObjectResponse as VkUpObjResp
 import qualified Bot.Api.Vk.Objects.UploadFileResponse as VkUpFileResp
 import qualified Bot.Api.Vk.Objects.UploadUrlResponse as VkUpUrlResp
-
-withHandleIO :: Logger.Handle IO -> BotSystem.Handle IO ->
-                Settings.Config -> (BotParser.Handle IO -> IO a) -> IO a
-withHandleIO logger hSys cParser f = do
-  let handle = BotParser.Handle logger hSys cParser
-  f handle
 
 parsePollResponse :: Monad m => BotParser.Handle m -> L8.ByteString ->
                          m (Either Text VkPollResp.PollResponse)

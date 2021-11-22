@@ -99,6 +99,7 @@ library
       Bot.Objects.Synonyms
       Bot.Objects.Update
       Bot.Parser.Parser
+      Bot.Parser.ParserImplementation
       Bot.Request.Request
       Bot.Settings
       Bot.System.System

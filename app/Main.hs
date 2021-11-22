@@ -11,10 +11,9 @@ import qualified Bot.DB.DBQImplementation as BotDBQ
 import qualified Bot.System.SystemImplementation as BotSystem
 import qualified Bot.Mode.Mode as BotMode
 import qualified Bot.Api.Tele.Request.Requests as TeleReq
-import qualified Bot.Api.Tele.Parser.Parser as TeleParser
+import qualified Bot.Parser.ParserImplementation as ParserImpl
 import qualified Bot.Api.Tele.Mode.Mode as TeleMode
 import qualified Bot.Api.Vk.Request.Requests as VkReq
-import qualified Bot.Api.Vk.Parser.Parser as VkParser
 import qualified Bot.Api.Vk.Mode.Mode as VkMode
 
 main :: IO ()
@@ -31,7 +30,7 @@ main = Exc.handle errorHandler $ do
         BotSystem.withHandleIO hLogger cSet $ \hSys ->
         BotDB.withHandleIO hLogger cSet $ \hDbConn ->
         BotDBQ.withHandleIO hLogger hDbConn $ \hDb ->
-        TeleParser.withHandleIO hLogger hSys cSet $ \hParser ->
+        ParserImpl.withHandleIO hLogger hSys cSet $ \hParser ->
         TeleReq.withHandleIO hLogger hDb hParser cSet $ \hReq ->
         TeleMode.withHandleIO hLogger cSet hDb hReq hParser $ \hTele ->
         BotMode.startMode hTele
@@ -40,7 +39,7 @@ main = Exc.handle errorHandler $ do
         BotSystem.withHandleIO hLogger cSet $ \hSys ->
         BotDB.withHandleIO hLogger cSet $ \hDbConn ->
         BotDBQ.withHandleIO hLogger hDbConn $ \hDb ->
-        VkParser.withHandleIO hLogger hSys cSet $ \hParser ->
+        ParserImpl.withHandleIO hLogger hSys cSet $ \hParser ->
         VkReq.withHandleIO hLogger hDb hParser cSet $ \hReq ->
         VkMode.withHandleIO hLogger cSet hDb hReq hParser $ \hVk ->
         BotMode.startMode hVk
