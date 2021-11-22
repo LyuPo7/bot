@@ -17,7 +17,6 @@ import qualified Bot.DB.DBQ as BotDBQ
 import qualified Bot.Settings as Settings
 import qualified Bot.Parser.Parser as BotParser
 import qualified Bot.Request.Request as BotReq
-import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.Method as BotMethod
 import qualified Bot.Objects.RequestOptions as BotReqOptions
 import qualified Bot.Objects.Button as BotButton
@@ -51,8 +50,8 @@ withHandleIO logger dbH parserH config f = do
     BotReq.setGetServer = return Nothing,
     BotReq.setGetUpdate = setGetUpdate parserH,
     BotReq.setEchoMessage = setEchoMessage parserH,
-    BotReq.setHelpMessage = setHelpMessage parserH,
-    BotReq.setStartMessage = setStartMessage parserH,
+    BotReq.setHelpMessage = setTextMessage parserH,
+    BotReq.setStartMessage = setTextMessage parserH,
     BotReq.setKeyboardMessage = setKeyboardMessage parserH,
     BotReq.setCommands = setCommands parserH,
 
@@ -88,33 +87,20 @@ setEchoMessage _ (BotMessage.TeleMessage message) = do
 setEchoMessage _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
-setHelpMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> BotMessage.Message ->
-                  BotSynonyms.Description ->
-                  m (BotMethod.Method, BotReqOptions.RequestOptions)
-setHelpMessage _ (BotMessage.TeleMessage message) description = do
+setTextMessage :: (MonadThrow m, Monad m) =>
+                  BotParser.Handle m ->
+                  BotMessage.Message ->
+                  Text ->
+                  m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions))
+setTextMessage _ (BotMessage.TeleMessage message) text = do
   let chatId = TeleChat.id $ TeleMessage.chat message
       reqOptions = BotReqOptions.TeleReqOptions 
         (TeleReqOptions.SendMessage $
-         TeleSendMessage.createTextMessage chatId description
-        )
-      apiMethod = BotMethod.TeleMethod TeleMethod.sendMessage
-  return (apiMethod, reqOptions)
-setHelpMessage _ botMessage _ = do
-  throwM $ E.ApiObjectError $ show botMessage
-
-setStartMessage :: (MonadThrow m, Monad m) => BotParser.Handle m ->
-                   BotMessage.Message ->
-                   Text ->
-                   m (Maybe(BotMethod.Method, BotReqOptions.RequestOptions))
-setStartMessage _ (BotMessage.TeleMessage message) startText = do
-  let chatId = TeleChat.id $ TeleMessage.chat message
-      reqOptions = BotReqOptions.TeleReqOptions
-        (TeleReqOptions.SendMessage $
-         TeleSendMessage.createTextMessage chatId startText
+         TeleSendMessage.createTextMessage chatId text
         )
       apiMethod = BotMethod.TeleMethod TeleMethod.sendMessage
   return $ Just (apiMethod, reqOptions)
-setStartMessage _ botMessage _ = do
+setTextMessage _ botMessage _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setKeyboardMessage :: (MonadThrow m, Monad m) => BotParser.Handle m ->

@@ -79,8 +79,8 @@ reqH = BotReq.Handle {
   BotReq.setGetServer = Nothing,
   BotReq.setGetUpdate = TeleReq.setGetUpdate parserH,
   BotReq.setEchoMessage = TeleReq.setEchoMessage parserH,
-  BotReq.setHelpMessage = TeleReq.setHelpMessage parserH,
-  BotReq.setStartMessage = TeleReq.setStartMessage parserH,
+  BotReq.setHelpMessage = TeleReq.setTextMessage parserH,
+  BotReq.setStartMessage = TeleReq.setTextMessage parserH,
   BotReq.setKeyboardMessage = TeleReq.setKeyboardMessage parserH,
   BotReq.setCommands = TeleReq.setCommands parserH,
 

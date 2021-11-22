@@ -10,6 +10,7 @@ data BotError = ParseRequestError String
                | GetServerError
                | UploadedServerError
                | UploadedDocError
+               | HelpMessageError
                | StartMessageError
                | ApiObjectError String
                | ApiMethodError
@@ -27,7 +28,8 @@ instance Show BotError where
   show GetServerError = "Incorrect API for getServer function!"
   show UploadedServerError = "Incorrect API for uploading files!"
   show UploadedDocError = "Incorrect API for uploading documents!"
-  show StartMessageError = "This API hasn't 'start' message"
+  show HelpMessageError = "This API hasn't '/help' message"
+  show StartMessageError = "This API hasn't '/start' message"
   show (ApiObjectError err) = "Incorrect Object for this Api: " ++ err
   show ApiMethodError = "Incorrect Method for this Api!"
   show (Default _) = "Default error"

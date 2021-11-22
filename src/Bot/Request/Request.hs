@@ -36,7 +36,7 @@ data Handle m = Handle {
   setEchoMessage :: BotMessage.Message ->
                     m (BotMethod.Method, BotReqOptions.RequestOptions),
   setHelpMessage :: BotMessage.Message -> Text ->
-                    m (BotMethod.Method, BotReqOptions.RequestOptions),
+                    m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions)),
   setStartMessage :: BotMessage.Message -> Text ->
                      m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions)),
   setKeyboardMessage :: BotMessage.Message -> [BotButton.Button] ->
@@ -100,16 +100,22 @@ sendNEchoMessage handle message n = do
   _ <- sendEchoMessage handle message
   sendNEchoMessage handle message (n - 1)
 
-sendHelpMessage :: Monad m => Handle m -> BotMessage.Message ->
-                   m (BotMethod.Method, BotReqOptions.RequestOptions)
+sendHelpMessage :: (MonadThrow m, Monad m) => Handle m ->
+                    BotMessage.Message ->
+                    m (BotMethod.Method, BotReqOptions.RequestOptions)
 sendHelpMessage handle message = do
   let logH = hLogger handle
       config = cReq handle
       helpText = Settings.botDescription config
-  (method, helpMessageOptions) <- setHelpMessage handle message helpText
-  _ <- makeRequest handle method helpMessageOptions
-  Logger.logInfo logH "Help-Message was sent."
-  return (method, helpMessageOptions)
+  methodAndOptM <- setHelpMessage handle message helpText
+  case methodAndOptM of
+    Nothing -> do
+      Logger.logWarning logH "No exist '/help' command for this API"
+      Catch.throwM E.HelpMessageError
+    Just (method, helpMessageOptions) -> do
+      _ <- makeRequest handle method helpMessageOptions
+      Logger.logInfo logH "Help-Message was sent."
+      return (method, helpMessageOptions)
 
 sendStartMessage :: (MonadThrow m, Monad m) => Handle m ->
                      BotMessage.Message -> m ()
@@ -119,7 +125,7 @@ sendStartMessage handle message = do
   methodAndOptM <- setStartMessage handle message startText
   case methodAndOptM of
     Nothing -> do
-      Logger.logWarning logH "No needs uploaded server for this API"
+      Logger.logWarning logH "No exist '/start' command for this API"
       Catch.throwM E.StartMessageError
     Just (method, startMessageOptions) -> do
       _ <- makeRequest handle method startMessageOptions

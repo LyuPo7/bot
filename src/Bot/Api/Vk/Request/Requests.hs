@@ -156,7 +156,7 @@ setEchoMessage _ botMessage = do
 
 setHelpMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> BotMessage.Message ->
                   BotSynonyms.Description ->
-                  m (BotMethod.Method, BotReqOptions.RequestOptions)
+                  m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions))
 setHelpMessage handle (BotMessage.VkMessage message) description = do
   let config = BotParser.cParser handle
       token = Settings.botToken config
@@ -169,7 +169,7 @@ setHelpMessage handle (BotMessage.VkMessage message) description = do
       reqOptions = BotReqOptions.VkReqOptions $
                    VkReqOptions.RequestOptions vkReqOptions
       apiMethod = BotMethod.VkMethod VkMethod.sendMessage
-  return (apiMethod, reqOptions)
+  return $ Just (apiMethod, reqOptions)
 setHelpMessage _ botMessage _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
