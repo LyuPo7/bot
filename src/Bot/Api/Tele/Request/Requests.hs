@@ -1,15 +1,10 @@
 module Bot.Api.Tele.Request.Requests where
 
 import qualified Data.ByteString.Lazy as B
-import qualified Control.Exception as Exc
 import qualified Data.Text as T
 import Data.Text (Text)
 import Control.Monad.Catch (MonadThrow, throwM)
-import Network.HTTP.Client.TLS (tlsManagerSettings)
-import Network.HTTP.Types.Status (statusCode, statusCode)
-import Network.HTTP.Client (Request(..), RequestBody(..), 
-                            newManager, parseRequest, httpLbs,
-                            responseStatus, responseBody)
+import  qualified Network.HTTP.Client as HTTPClient
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
@@ -33,7 +28,6 @@ import qualified Bot.Api.Tele.Objects.SendMessage as TeleSendMessage
 import qualified Bot.Api.Tele.Objects.KeyboardMessage as TeleKeyboardMessage
 import qualified Bot.Api.Tele.Objects.CopyMessage as TeleCopyMessage
 import qualified Bot.Api.Tele.Objects.SetCommands as TeleSetCommands
-import qualified Bot.Util as BotUtil
 
 withHandleIO :: Logger.Handle IO -> BotDBQ.Handle IO -> BotParser.Handle IO ->
                 Settings.Config -> (BotReq.Handle IO -> IO a) -> IO a
@@ -44,7 +38,7 @@ withHandleIO logger dbH parserH config f = do
     BotReq.hParser = parserH,
     BotReq.cReq = config,
 
-    BotReq.makeRequest = makeRequest parserH,
+    BotReq.createRequest = createRequest parserH,
     BotReq.setUploadedServer = \_ -> return Nothing,
     BotReq.setUploadedDoc = \_ -> return Nothing,
     BotReq.setGetServer = return Nothing,
@@ -58,7 +52,10 @@ withHandleIO logger dbH parserH config f = do
     BotReq.downloadDoc = \_ _ -> return Nothing,
     BotReq.extractDoc = \_ -> return Nothing,
     BotReq.changeMessage = \message _-> return message,
-    BotReq.changeDoc = \doc _ -> return doc
+    BotReq.changeDoc = \doc _ -> return doc,
+
+    BotReq.newManager = HTTPClient.newManager,
+    BotReq.httpLbs = HTTPClient.httpLbs
   }
   f handle
 
@@ -140,37 +137,19 @@ setCommands _ = do
       reqOptions = BotReqOptions.TeleReqOptions commands
   return $ Just (apiMethod, reqOptions)
 
-makeRequest :: BotParser.Handle IO -> BotMethod.Method ->
-               BotReqOptions.RequestOptions -> IO B.ByteString
-makeRequest handle (BotMethod.TeleMethod apiMethod)
-                   (BotReqOptions.TeleReqOptions options) = do
-  let logH = BotParser.hLogger handle
-      config = BotParser.cParser handle
+createRequest :: (Monad m, MonadThrow m) =>
+                  BotParser.Handle m ->
+                  BotMethod.Method ->
+                  BotReqOptions.RequestOptions ->
+                  m (Text, B.ByteString)
+createRequest handle (BotMethod.TeleMethod apiMethod)
+                     (BotReqOptions.TeleReqOptions options) = do
+  let config = BotParser.cParser handle
       token = Settings.botToken config
       hostApi = Settings.getHost Settings.apiTele
       methodApi = TeleMethod.getMethod apiMethod
       api = T.concat [hostApi, token, methodApi]
-  manager <- newManager tlsManagerSettings
-  Logger.logDebug logH $ "Request method: " <> BotUtil.convertValue apiMethod
-  Logger.logDebug logH $ "Request options: " <> BotUtil.convertValue options
-  initialRequest <- parseRequest $ T.unpack api
-  let request = initialRequest { 
-    method = "POST",
-    requestBody = RequestBodyLBS $ TeleReqOptions.encodeRequestOptions options,
-    requestHeaders = [ ( "Content-Type",
-                         "application/json; charset=utf-8")
-                      ]
-  }
-  response <- httpLbs request manager
-  let codeResp = statusCode $ responseStatus response
-  if codeResp == 200
-    then do
-      Logger.logInfo logH "Successful request to api."
-      return $ responseBody response
-    else do
-      Logger.logWarning logH $ "Unsuccessful request to api with code: "
-        <> BotUtil.convertValue codeResp
-      B.putStr $ responseBody response
-      Exc.throwIO $ E.ConnectionError codeResp
-makeRequest _ _ _ = do
+      apiOptions = TeleReqOptions.encodeRequestOptions options
+  return (api, apiOptions)
+createRequest _ _ _ = do
   throwM E.ApiMethodError

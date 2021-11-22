@@ -73,7 +73,7 @@ reqH = BotReq.Handle {
   BotReq.hParser = parserH,
   BotReq.cReq = runC,
 
-  BotReq.makeRequest = \_ _ -> return "ok",
+  BotReq.createRequest = \_ _ -> return ("https://api.vk.com", "ok"),
   BotReq.setUploadedServer = VkReq.setUploadedServer parserH,
   BotReq.setUploadedDoc = VkReq.setUploadedDoc parserH,
   BotReq.setGetServer = VkReq.setGetServer parserH,
@@ -87,7 +87,10 @@ reqH = BotReq.Handle {
   BotReq.downloadDoc = VkReq.downloadDoc parserH,
   BotReq.extractDoc = VkReq.extractDoc parserH,
   BotReq.changeMessage = VkReq.changeMessage parserH,
-  BotReq.changeDoc = VkReq.changeDoc parserH
+  BotReq.changeDoc = VkReq.changeDoc parserH,
+
+  BotReq.newManager = \_ -> return undefined,
+  BotReq.httpLbs = \ _ _ -> return (BotHandlers.resp  "ok")
 }
 
 modeH :: BotMode.Handle Maybe

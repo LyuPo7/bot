@@ -44,12 +44,13 @@ withHandleIO logger config dbH reqH parserH f = do
   }
   f handle
 
-setupBot :: Monad m => BotReq.Handle m -> m ()
+setupBot :: (Monad m, MonadThrow m) => BotReq.Handle m -> m ()
 setupBot handle = do
   BotReq.sendCommands handle
 
-getLastUpdate :: Monad m => BotReq.Handle m -> BotUpdate.Update ->
-                 m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
+getLastUpdate :: (Monad m, MonadThrow m) => BotReq.Handle m ->
+                  BotUpdate.Update ->
+                  m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
 getLastUpdate handle _ = do
   let logH = BotReq.hLogger handle
       dbH = BotReq.hDb handle

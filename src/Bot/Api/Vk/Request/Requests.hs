@@ -7,15 +7,10 @@ import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Web.FormUrlEncoded as Url
 import qualified Data.Text as T
-import qualified Control.Exception as Exc
 import Data.Text (Text)
 import Text.Read (readMaybe)
 import Control.Monad.Catch (MonadThrow, throwM)
-import Network.HTTP.Client.TLS (tlsManagerSettings)
-import Network.HTTP.Types.Status (statusCode, statusCode)
-import Network.HTTP.Client (Request(..),
-                            newManager, parseRequest, httpLbs,
-                            responseStatus, responseBody)
+import  qualified Network.HTTP.Client as HTTPClient
 
 import qualified Bot.Settings as Settings
 import qualified Bot.Exception as E
@@ -63,7 +58,7 @@ withHandleIO logger dbH parserH config f = do
     BotReq.hParser = parserH,
     BotReq.cReq = config,
 
-    BotReq.makeRequest = makeRequest parserH,
+    BotReq.createRequest = createRequest parserH,
     BotReq.setUploadedServer = setUploadedServer parserH,
     BotReq.setUploadedDoc = setUploadedDoc parserH,
     BotReq.setGetServer = setGetServer parserH,
@@ -77,7 +72,10 @@ withHandleIO logger dbH parserH config f = do
     BotReq.downloadDoc = downloadDoc parserH,
     BotReq.extractDoc = extractDoc parserH,
     BotReq.changeMessage = changeMessage parserH,
-    BotReq.changeDoc = changeDoc parserH
+    BotReq.changeDoc = changeDoc parserH,
+
+    BotReq.newManager = HTTPClient.newManager,
+    BotReq.httpLbs = HTTPClient.httpLbs
   }
   f handle
 
@@ -219,34 +217,18 @@ setGetUpdate _  (BotUpdate.VkUpdate server) = do
 setGetUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
-makeRequest :: BotParser.Handle IO -> BotMethod.Method ->
-               BotReqOptions.RequestOptions -> IO B.ByteString
-makeRequest handle (BotMethod.VkMethod apiMethod)
+createRequest :: (Monad m, MonadThrow m) =>
+                  BotParser.Handle m ->
+                  BotMethod.Method ->
+                  BotReqOptions.RequestOptions ->
+                  m (Text, B.ByteString)
+createRequest _ (BotMethod.VkMethod apiMethod)
                    (BotReqOptions.VkReqOptions options) = do
-  let logH = BotParser.hLogger handle
-      methodApi = VkMethod.getMethod apiMethod
+  let methodApi = VkMethod.getMethod apiMethod
       optionsApi = VkReqOptions.reqOption options
-      apiOpt = T.intercalate "?" (filter (not . T.null) [methodApi, optionsApi])
-  manager <- newManager tlsManagerSettings
-  Logger.logDebug logH $ "Request request: " <> apiOpt
-  initialRequest <- parseRequest $ T.unpack apiOpt
-  let request = initialRequest {
-    method = "POST",
-    requestHeaders = [ 
-        ("Content-Type", "application/json; charset=utf-8")
-    ]
-  }
-  response <- httpLbs request manager
-  let codeResp = statusCode $ responseStatus response
-  if codeResp == 200
-    then do
-      Logger.logDebug logH "Successful request to api."
-      return $ responseBody response
-    else do
-      Logger.logDebug logH $ "Unsuccessful request to api with code: "
-       <> BotUtil.convertValue codeResp
-      Exc.throwIO $ E.ConnectionError codeResp
-makeRequest _ _ _ = do
+      api = T.intercalate "?" (filter (not . T.null) [methodApi, optionsApi])
+  return (api, "")
+createRequest _ _ _ = do
   throwM E.ApiMethodError
 
 downloadDoc :: Monad m => BotParser.Handle m ->

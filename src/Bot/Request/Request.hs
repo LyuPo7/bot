@@ -1,9 +1,13 @@
 module Bot.Request.Request where
 
 import qualified Data.ByteString.Lazy as B
+import qualified Data.Text as T
 import qualified Control.Monad.Catch as Catch
 import Data.Text (Text)
-import Control.Monad.Catch (MonadThrow)
+import Control.Monad.Catch (MonadThrow, throwM)
+import Network.HTTP.Client.TLS (tlsManagerSettings)
+import Network.HTTP.Types.Status (statusCode)
+import qualified Network.HTTP.Client as HTTPClient
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
@@ -17,15 +21,16 @@ import qualified Bot.Objects.Message as BotMessage
 import qualified Bot.Objects.Button as BotButton
 import qualified Bot.Objects.Document as BotDoc
 import qualified Bot.Settings as Settings
+import qualified Bot.Util as BotUtil
 
 data Handle m = Handle {
   hLogger :: Logger.Handle m,
   hDb :: BotDBQ.Handle m,
   cReq :: Settings.Config,
   hParser :: BotParser.Handle m,
-
-  makeRequest :: BotMethod.Method -> BotReqOptions.RequestOptions ->
-                 m B.ByteString,
+  
+  createRequest :: BotMethod.Method -> BotReqOptions.RequestOptions ->
+                   m (Text, B.ByteString),
   setUploadedServer :: BotDoc.Document ->
                     m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions)),
   setUploadedDoc :: Text ->
@@ -48,10 +53,16 @@ data Handle m = Handle {
   extractDoc :: BotMessage.Message -> m (Maybe [BotDoc.Document]),
   changeMessage :: BotMessage.Message -> [BotDoc.Document] ->
                    m BotMessage.Message,
-  changeDoc :: BotDoc.Document -> B.ByteString -> m BotDoc.Document
+  changeDoc :: BotDoc.Document -> B.ByteString -> m BotDoc.Document,
+
+  newManager :: HTTPClient.ManagerSettings -> m HTTPClient.Manager,
+  httpLbs :: HTTPClient.Request -> HTTPClient.Manager ->
+             m (HTTPClient.Response B.ByteString)
 }
 
-getServer :: (MonadThrow m, Monad m) => Handle m -> m B.ByteString
+getServer :: (MonadThrow m, Monad m) =>
+              Handle m ->
+              m B.ByteString
 getServer handle = do
   let logH = hLogger handle
   methodAndOptM <- setGetServer handle
@@ -76,7 +87,8 @@ getUploadedServer handle doc = do
       Logger.logInfo logH "Get Uploaded server parameters for upload file."
       makeRequest handle method serverOptions
 
-getUpdate :: Monad m => Handle m -> BotUpdate.Update -> m B.ByteString
+getUpdate :: (Monad m, MonadThrow m) => Handle m ->
+              BotUpdate.Update -> m B.ByteString
 getUpdate handle update = do
   (method, updateOptions) <- setGetUpdate handle update
   makeRequest handle method updateOptions
@@ -131,7 +143,7 @@ sendStartMessage handle message = do
       _ <- makeRequest handle method startMessageOptions
       Logger.logInfo logH "Start-Message was sent."
 
-sendKeyboard :: Monad m => Handle m -> BotMessage.Message -> m B.ByteString
+sendKeyboard :: (Monad m, MonadThrow m) => Handle m -> BotMessage.Message -> m B.ByteString
 sendKeyboard handle message = do
   let logH = hLogger handle
       config = cReq handle
@@ -147,7 +159,7 @@ sendKeyboard handle message = do
   Logger.logInfo logH "Keyboard was sent."
   makeRequest handle method keyboardMessageOptions
 
-sendCommands :: Monad m => Handle m -> m ()
+sendCommands :: (Monad m, MonadThrow m) => Handle m -> m ()
 sendCommands handle = do
   let logH = hLogger handle
   methodAndOptM <- setCommands handle
@@ -194,3 +206,29 @@ updateDoc handle doc = do
       Logger.logInfo logH "File was uploaded"
       objUp <- saveUploadedDoc handle file
       changeDoc handle doc objUp
+
+makeRequest :: (Monad m, MonadThrow m) => Handle m ->
+                BotMethod.Method ->
+                BotReqOptions.RequestOptions -> m B.ByteString
+makeRequest handle botApiMethod botOptions = do
+  let logH = hLogger handle
+  (api, apiOptions) <- createRequest handle botApiMethod botOptions
+  manager <- newManager handle tlsManagerSettings
+  initialRequest <- HTTPClient.parseRequest $ T.unpack api
+  let request = initialRequest {
+    HTTPClient.method = "POST",
+    HTTPClient.requestBody = HTTPClient.RequestBodyLBS apiOptions,
+    HTTPClient.requestHeaders = [ ( "Content-Type",
+                         "application/json; charset=utf-8")
+                      ]
+  }
+  response <- httpLbs handle request manager
+  let codeResp = statusCode $ HTTPClient.responseStatus response
+  if codeResp == 200
+    then do
+      Logger.logInfo logH "Successful request to api."
+      return $ HTTPClient.responseBody response
+    else do
+      Logger.logWarning logH $ "Unsuccessful request to api with code: "
+        <> BotUtil.convertValue codeResp
+      throwM $ E.ConnectionError codeResp
