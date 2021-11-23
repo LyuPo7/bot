@@ -9,8 +9,8 @@ import GHC.Generics (Generic)
 import qualified Bot.Objects.Synonyms as BotSynonyms
 
 data SendMessage = SendMessage {
-  access_token :: BotSynonyms.AccessToken,
-  user_id :: BotSynonyms.UserId,
+  access_token :: BotSynonyms.Token,
+  user_id :: BotSynonyms.ChatId,
   message :: Text,
   v :: BotSynonyms.Version,
   attachment :: Maybe Text,
@@ -19,8 +19,10 @@ data SendMessage = SendMessage {
   long :: Maybe Double
 } deriving (Generic, ToForm)
 
-defaultMessage :: BotSynonyms.UserId -> BotSynonyms.Token ->
-                  BotSynonyms.Version -> SendMessage
+defaultMessage :: BotSynonyms.ChatId ->
+                  BotSynonyms.Token ->
+                  BotSynonyms.Version ->
+                  SendMessage
 defaultMessage userId token vkVersion = SendMessage { 
   access_token = token,
   user_id = userId,

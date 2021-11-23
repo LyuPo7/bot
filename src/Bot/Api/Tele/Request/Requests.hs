@@ -2,9 +2,10 @@ module Bot.Api.Tele.Request.Requests where
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.Text as T
+import  qualified Network.HTTP.Client as HTTPClient
 import Data.Text (Text)
 import Control.Monad.Catch (MonadThrow, throwM)
-import  qualified Network.HTTP.Client as HTTPClient
+import Data.Convertible.Base (convert)
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
@@ -148,7 +149,7 @@ createRequest handle (BotMethod.TeleMethod apiMethod)
       token = Settings.botToken config
       hostApi = Settings.getHost Settings.apiTele
       methodApi = TeleMethod.getMethod apiMethod
-      api = T.concat [hostApi, token, methodApi]
+      api = T.concat [hostApi, convert token, methodApi]
       apiOptions = TeleReqOptions.encodeRequestOptions options
   return (api, apiOptions)
 createRequest _ _ _ = do

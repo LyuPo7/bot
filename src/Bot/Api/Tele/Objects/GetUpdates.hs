@@ -10,13 +10,14 @@ import qualified Bot.Settings as Settings
 import qualified Bot.Objects.Synonyms as BotSynonyms
 
 data GetUpdates = GetUpdates {
-  offset :: Maybe BotSynonyms.Offset,
+  offset :: Maybe BotSynonyms.UpdateId,
   limit :: Maybe BotSynonyms.RecordLimit,
   timeout :: Maybe BotSynonyms.Timeout,
   allowed_updates :: Maybe [Text]
 } deriving (Show, Eq, Generic, ToJSON)
 
-createGetUpdates :: BotSynonyms.UpdateId -> GetUpdates
+createGetUpdates :: BotSynonyms.UpdateId ->
+                    GetUpdates
 createGetUpdates updateId = GetUpdates {
   offset = Just updateId,
   limit = Nothing,

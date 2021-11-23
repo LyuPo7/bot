@@ -4,6 +4,7 @@ import Hedgehog (Gen)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
+import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Api.Tele.Objects.UpdateData as TeleUpData
 import qualified Bot.Api.Tele.Objects.Update as TeleUpdate
 import qualified Bot.Api.Tele.Objects.Message as TeleMessage
@@ -35,35 +36,35 @@ genMessageEntityWoBotCom = TeleMessageEntity.MessageEntity
 
 genMessage :: Gen TeleMessage.Message
 genMessage = TeleMessage.Message
-  <$> (toInteger <$> genId)
+  <$> (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> genChat
   <*> Gen.element [Nothing, Just "Hi!", Just "Let's talk!"]
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genMessageEntity)
 
 genNum5Message :: Gen TeleMessage.Message
 genNum5Message = TeleMessage.Message
-  <$> (toInteger <$> genId)
+  <$> (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> genChat
   <*> Gen.element [Just "5"]
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genMessageEntity)
 
 genBotHelpMessage :: Gen TeleMessage.Message
 genBotHelpMessage = TeleMessage.Message
-  <$> (toInteger <$> genId)
+  <$> (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> genChat
   <*> Gen.element [Just "/start", Just "/help"]
   <*> Gen.constant (Just [TeleMessageEntity.MessageEntity "bot_command"])
 
 genBotRepeatMessage :: Gen TeleMessage.Message
 genBotRepeatMessage = TeleMessage.Message
-  <$> (toInteger <$> genId)
+  <$> (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> genChat
   <*> Gen.constant (Just "/repeat")
   <*> Gen.constant (Just [TeleMessageEntity.MessageEntity "bot_command"])
 
 genMessageWoBotCom :: Gen TeleMessage.Message
 genMessageWoBotCom = TeleMessage.Message
-  <$> (toInteger <$> genId)
+  <$> (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> genChat
   <*> Gen.element [Nothing, Just "Hi!", Just "Let's talk!"]
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genMessageEntityWoBotCom)
@@ -75,5 +76,5 @@ genUpdate = TeleUpdate.Update
 
 genUpdateData :: Gen TeleUpData.UpdateData
 genUpdateData = TeleUpData.UpdateData
-  <$> Gen.bool
+  <$> (BotSynonyms.Status <$> Gen.bool)
   <*> Gen.list (Range.constant 0 10) genUpdate

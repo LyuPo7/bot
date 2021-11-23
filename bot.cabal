@@ -89,6 +89,7 @@ library
       Bot.Exception
       Bot.Logger.Logger
       Bot.Mode.Mode
+      Bot.Objects.Api
       Bot.Objects.Button
       Bot.Objects.Document
       Bot.Objects.Message

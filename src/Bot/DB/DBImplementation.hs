@@ -10,19 +10,20 @@ import qualified Control.Exception as Exc
 import qualified Bot.DB.DB as BotDB
 import qualified Bot.Logger.Logger as Logger
 import qualified Bot.Settings as Settings
+import qualified Bot.Objects.Api as BotApi
 import qualified Bot.Exception as E
 
 withHandleIO :: Logger.Handle IO ->
                 Settings.Config -> (BotDB.Handle IO -> IO a) -> IO a
 withHandleIO logger config f = do
   case Settings.botApi config of
-    "vk" -> do
+    BotApi.Vk -> do
       let dbFile = "data/vk.db"
       dbConn <- connect dbFile
       let handle = BotDB.Handle logger dbConn config
       prepDB handle
       f handle
-    "telegram" -> do
+    BotApi.Tele -> do
       let dbFile = "data/tele.db"
       dbConn <- connect dbFile
       let handle = BotDB.Handle logger dbConn config

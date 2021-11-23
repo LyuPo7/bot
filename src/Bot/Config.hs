@@ -10,6 +10,7 @@ import GHC.Generics (Generic)
 import qualified Bot.Exception as E
 import qualified Bot.Settings as Settings
 import qualified Bot.Logger.Logger as Logger
+import qualified Bot.Objects.Api as BotApi
 
 data Config = Config {
   cSettings :: Settings.Config,
@@ -32,7 +33,7 @@ getConfig = do
 
 checkConfig :: Config -> Either E.BotError Config
 checkConfig config 
-  | Settings.botApi cSet `notElem` ["vk", "telegram"] = Left 
+  | Settings.botApi cSet == BotApi.InvalidApi = Left 
      $ E.ParseConfigError "Incorrect field 'bot_api' in config.json"
   | Settings.botInitialReplyNumber cSet < 0 = Left
      $ E.ParseConfigError "Incorrect field in config.json: \

@@ -6,6 +6,7 @@ import qualified Data.ByteString.Lazy.UTF8 as B8
 import qualified TestBot.Api.Tele.Handlers as TeleHandlers
 
 import qualified Bot.Api.Tele.Parser.Parser as Parser
+import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Api.Tele.Objects.UpdateData as TeleUpData
 
 import Test.Hspec (Spec, shouldBe, it, describe)
@@ -20,6 +21,6 @@ spec_parseUpdateData obj bstr bstrFail =
     it "Should fail parse updates" $ do
       let result = Parser.parseUpdateData TeleHandlers.parserH bstrFail
       result `shouldBe` Just TeleUpData.UpdateData {
-          TeleUpData.ok = True,
+          TeleUpData.ok = BotSynonyms.Status True,
           TeleUpData.result = []
         }

@@ -1,16 +1,17 @@
 module Bot.Api.Vk.Request.Requests where
 
 import Prelude hiding (readFile)
-import Data.List (union, (\\))
-import System.FilePath.Posix ((</>))
 import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Web.FormUrlEncoded as Url
 import qualified Data.Text as T
+import  qualified Network.HTTP.Client as HTTPClient
+import Data.List (union, (\\))
+import System.FilePath.Posix ((</>))
 import Data.Text (Text)
 import Text.Read (readMaybe)
 import Control.Monad.Catch (MonadThrow, throwM)
-import  qualified Network.HTTP.Client as HTTPClient
+import Data.Convertible.Base (convert)
 
 import qualified Bot.Settings as Settings
 import qualified Bot.Exception as E
@@ -107,7 +108,8 @@ setUploadedServer handle botDoc = do
       token = Settings.botToken config
       doc = BotDoc.vkDoc botDoc
       userId = VkDoc.owner_id doc
-      query = VkGetUpLink.getLink userId "doc" Settings.vkVersion token
+      query = VkGetUpLink.getLink userId
+        (BotSynonyms.FileType "doc") Settings.vkVersion token
       vkReqOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable query
       reqOptions = BotReqOptions.VkReqOptions $
                    VkReqOptions.RequestOptions vkReqOptions
@@ -119,7 +121,8 @@ setUploadedDoc :: Monad m => BotParser.Handle m -> Text ->
 setUploadedDoc handle file = do
   let config = BotParser.cParser handle
       token = Settings.botToken config
-      link = VkSaveDoc.saveNewDoc file token Settings.vkVersion
+      link = VkSaveDoc.saveNewDoc
+        (BotSynonyms.FilePathT file) token Settings.vkVersion
       vkReqOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable link
       reqOptions = BotReqOptions.VkReqOptions $
                    VkReqOptions.RequestOptions vkReqOptions
@@ -153,7 +156,7 @@ setEchoMessage _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setHelpMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> BotMessage.Message ->
-                  BotSynonyms.Description ->
+                  Text ->
                   m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions))
 setHelpMessage handle (BotMessage.VkMessage message) description = do
   let config = BotParser.cParser handle
@@ -255,8 +258,9 @@ changeDoc handle botDoc@(BotDoc.VkDoc doc) objUp = do
   case VkUpObjResp.response obj of
     [x] -> do
       Logger.logInfo logH "Doc changed"
+      let (BotSynonyms.ObjectId objId) = VkUpObj.id x
       return $ BotDoc.VkDoc doc {
-        VkDoc.id = VkUpObj.id x,
+        VkDoc.id = BotSynonyms.DocId objId,
         VkDoc.owner_id = VkUpObj.owner_id x,
         VkDoc.url = VkUpObj.url x
       }
@@ -313,7 +317,7 @@ attachmentToString attach = case attach of
       <> "_"
       <> BotUtil.convertValue photoId
       <> "_"
-      <> key
+      <> convert key
   VkAttach.AttachVideo video -> do
     let ownerId = VkVideo.owner_id video
         videoId = VkVideo.id video
@@ -323,7 +327,7 @@ attachmentToString attach = case attach of
       <> "_"
       <> BotUtil.convertValue videoId
       <> "_"
-      <> key
+      <> convert key
   VkAttach.AttachAudio audio -> do
     let ownerId = VkAudio.owner_id audio
         audioId = VkAudio.id audio

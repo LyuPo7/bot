@@ -1,5 +1,7 @@
 module TestBot.Request.Request where
 
+import Data.Convertible.Base (convert)
+
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 import Test.Hspec (Spec, shouldBe, it, describe)
@@ -12,6 +14,7 @@ import qualified TestBot.Api.Vk.GenData as VkGD
 
 import qualified Bot.Settings as Settings
 import qualified Bot.Request.Request as BotReq
+import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.Method as BotMethod
 import qualified Bot.Objects.RequestOptions as BotReqOptions
 import qualified Bot.Objects.Update as BotUpdate
@@ -83,7 +86,7 @@ spec_sendEchoMessage =
             VkDoc.owner_id = 129,
             VkDoc.title = "book.pdf",
             VkDoc.url = "https://server/link/222",
-            VkDoc.access_key = "x\n 0\n \NAK^IMYz.<E"
+            VkDoc.access_key = BotSynonyms.AccessKey "x\n 0\n \NAK^IMYz.<E"
           }
           docAttach = VkAttach.AttachDoc doc
           attachs = Just [docAttach]
@@ -121,7 +124,7 @@ spec_sendHelpMessage =
                     TeleReqOptions.SendMessage $
                     TeleSendMessage.SendMessage {
                       TeleSendMessage.chat_id = 222,
-                      TeleSendMessage.text = Settings.botDescription
+                      TeleSendMessage.text = convert $ Settings.botDescription
                                              TeleHandlers.runC,
                       TeleSendMessage.disable_notification = Nothing,
                       TeleSendMessage.reply_to_message_id = Nothing
@@ -134,7 +137,7 @@ spec_sendHelpMessage =
             VkDoc.owner_id = 129,
             VkDoc.title = "book.pdf",
             VkDoc.url = "https://server/link/222",
-            VkDoc.access_key = "x\n 0\n \NAK^IMYz.<E"
+            VkDoc.access_key = BotSynonyms.AccessKey "x\n 0\n \NAK^IMYz.<E"
           }
           docAttach = VkAttach.AttachDoc doc
           attachs = Just [docAttach]
@@ -176,7 +179,7 @@ spec_updateMessage =
             VkDoc.owner_id = 129,
             VkDoc.title = "book.pdf",
             VkDoc.url = "https://server/link/222",
-            VkDoc.access_key = "x\n 0\n \NAK^IMYz.<E"
+            VkDoc.access_key = BotSynonyms.AccessKey "x\n 0\n \NAK^IMYz.<E"
           }
           docAttach = VkAttach.AttachDoc doc
           attachs = Just [docAttach]
@@ -213,7 +216,7 @@ spec_updateDoc =
             VkDoc.owner_id = 129,
             VkDoc.title = "book.pdf",
             VkDoc.url = "https://server/link/222",
-            VkDoc.access_key = "x\n 0\n \NAK^IMYz.<E"
+            VkDoc.access_key = BotSynonyms.AccessKey "x\n 0\n \NAK^IMYz.<E"
           }
           botDoc = BotDoc.VkDoc doc
           result = BotReq.updateDoc VkHandlers.reqH botDoc
@@ -224,7 +227,7 @@ spec_updateDoc =
             VkDoc.owner_id = 129,
             VkDoc.title = "book.pdf",
             VkDoc.url = "https://server/link/222",
-            VkDoc.access_key = "x\n 0\n \NAK^IMYz.<E"
+            VkDoc.access_key = BotSynonyms.AccessKey "x\n 0\n \NAK^IMYz.<E"
           }
           botDoc = BotDoc.VkDoc doc
           result = BotReq.updateDoc TeleHandlers.reqH botDoc

@@ -9,7 +9,7 @@ import qualified Bot.Objects.Synonyms as BotSynonyms
 
 data GetLongPollServer = GetLongPollServer {
   group_id :: BotSynonyms.GroupId,
-  access_token :: BotSynonyms.AccessToken,
+  access_token :: BotSynonyms.Token,
   v :: BotSynonyms.Version
 } deriving (Generic, ToForm)
 

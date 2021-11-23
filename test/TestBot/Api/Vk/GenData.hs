@@ -4,6 +4,7 @@ import Hedgehog (Gen)
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
+import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Api.Vk.Objects.UploadObjectResponse as VkUpObjResp
 import qualified Bot.Api.Vk.Objects.UploadFileResponse as VkUpFileResp
 import qualified Bot.Api.Vk.Objects.UploadUrlResponse as VkUpUrlResp
@@ -38,31 +39,31 @@ genGeo = VkGeo.Geo
 
 genPhoto :: Gen VkPhoto.Photo
 genPhoto = VkPhoto.Photo
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
-  <*> Gen.text (Range.constant 10 15) Gen.ascii
+  <$> (BotSynonyms.PhotoId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.UserId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.AccessKey <$> Gen.text (Range.constant 10 15) Gen.ascii)
 
 genVideo :: Gen VkVideo.Video
 genVideo = VkVideo.Video
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
-  <*> Gen.text (Range.constant 10 15) Gen.ascii
+  <$> (BotSynonyms.VideoId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.UserId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.AccessKey <$> Gen.text (Range.constant 10 15) Gen.ascii)
 
 genAudio :: Gen VkAudio.Audio
 genAudio = VkAudio.Audio
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
+  <$> (BotSynonyms.AudioId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.UserId <$> (toInteger <$> genId))
 
 genDoc :: Gen VkDoc.Document
 genDoc = VkDoc.Document
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
+  <$> (BotSynonyms.DocId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.UserId <$> (toInteger <$> genId))
   <*> Gen.element ["book.pdf",
                    "log.txt",
                    "prog.py"]
   <*> Gen.element ["https://server/link/123",
                    "https://server/link/222"]
-  <*> Gen.text (Range.constant 10 15) Gen.ascii
+  <*> (BotSynonyms.AccessKey <$> Gen.text (Range.constant 10 15) Gen.ascii)
 
 genLink :: Gen VkLink.Link
 genLink = VkLink.Link
@@ -71,31 +72,31 @@ genLink = VkLink.Link
 
 genMarket :: Gen VkMarket.Market
 genMarket = VkMarket.Market
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
+  <$> (BotSynonyms.MarketId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.UserId <$> (toInteger <$> genId))
 
 genMarketAlbum :: Gen VkMarketAlbum.MarketAlbum
 genMarketAlbum = VkMarketAlbum.MarketAlbum
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
+  <$> (BotSynonyms.MarketAlbumId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.UserId <$> (toInteger <$> genId))
 
 genWall :: Gen VkWall.Wall
 genWall = VkWall.Wall
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
+  <$> (BotSynonyms.WallId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.UserId <$> (toInteger <$> genId))
 
 genWallReply :: Gen VkWallReply.WallReply
 genWallReply = VkWallReply.WallReply
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
+  <$> (BotSynonyms.WallReplyId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.UserId <$> (toInteger <$> genId))
 
 genSticker :: Gen VkSticker.Sticker
 genSticker = VkSticker.Sticker
-  <$> (toInteger <$> genId)
+  <$> (BotSynonyms.StickerId <$> (toInteger <$> genId))
 
 genGift :: Gen VkGift.Gift
 genGift = VkGift.Gift
-  <$> (toInteger <$> genId)
+  <$> (BotSynonyms.GiftId <$> (toInteger <$> genId))
 
 genAttach :: Gen VkAttach.Attachment
 genAttach = do
@@ -193,7 +194,7 @@ genPhotoAttach = VkAttach.AttachPhoto
 
 genMessage :: Gen VkMessage.Message
 genMessage = VkMessage.Message
-  <$> Gen.maybe (toInteger <$> genId)
+  <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> (toInteger <$> genId)
   <*> Gen.element ["Hi!", "Let's talk!", ""]
   <*> Gen.maybe genGeo
@@ -202,7 +203,7 @@ genMessage = VkMessage.Message
 
 genNum5Message :: Gen VkMessage.Message
 genNum5Message = VkMessage.Message
-  <$> Gen.maybe (toInteger <$> genId)
+  <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> (toInteger <$> genId)
   <*> Gen.constant "5"
   <*> Gen.maybe genGeo
@@ -211,7 +212,7 @@ genNum5Message = VkMessage.Message
 
 genBotHelpMessage :: Gen VkMessage.Message
 genBotHelpMessage = VkMessage.Message
-  <$> Gen.maybe (toInteger <$> genId)
+  <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> (toInteger <$> genId)
   <*> Gen.constant "/help"
   <*> Gen.maybe genGeo
@@ -220,7 +221,7 @@ genBotHelpMessage = VkMessage.Message
 
 genBotRepeatMessage :: Gen VkMessage.Message
 genBotRepeatMessage = VkMessage.Message
-  <$> Gen.maybe (toInteger <$> genId)
+  <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> (toInteger <$> genId)
   <*> Gen.constant "/repeat"
   <*> Gen.maybe genGeo
@@ -229,7 +230,7 @@ genBotRepeatMessage = VkMessage.Message
 
 genMessageWoBotCom :: Gen VkMessage.Message
 genMessageWoBotCom = VkMessage.Message
-  <$> Gen.maybe (toInteger <$> genId)
+  <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> (toInteger <$> genId)
   <*> Gen.element ["", "Hi!", "Let's talk!"]
   <*> Gen.maybe genGeo
@@ -279,8 +280,8 @@ genUploadFileResponse = VkUpFileResp.UploadFileResponse
 
 genUploadObject :: Gen VkUpObj.UploadObject
 genUploadObject = VkUpObj.UploadObject
-  <$> (toInteger <$> genId)
-  <*> (toInteger <$> genId)
+  <$> (BotSynonyms.ObjectId <$> (toInteger <$> genId))
+  <*> (BotSynonyms.UserId <$> (toInteger <$> genId))
   <*> Gen.element ["https://server/obj/23",
                    "https://server/obj/77"]
 

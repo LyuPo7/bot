@@ -3,11 +3,12 @@ module Bot.Request.Request where
 import qualified Data.ByteString.Lazy as B
 import qualified Data.Text as T
 import qualified Control.Monad.Catch as Catch
+import qualified Network.HTTP.Client as HTTPClient
 import Data.Text (Text)
 import Control.Monad.Catch (MonadThrow, throwM)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types.Status (statusCode)
-import qualified Network.HTTP.Client as HTTPClient
+import Data.Convertible.Base (convert)
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
@@ -45,7 +46,7 @@ data Handle m = Handle {
   setStartMessage :: BotMessage.Message -> Text ->
                      m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions)),
   setKeyboardMessage :: BotMessage.Message -> [BotButton.Button] ->
-                        BotSynonyms.Description ->
+                        Text ->
                         m (BotMethod.Method, BotReqOptions.RequestOptions),
   setCommands :: m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions)),
 
@@ -119,7 +120,7 @@ sendHelpMessage handle message = do
   let logH = hLogger handle
       config = cReq handle
       helpText = Settings.botDescription config
-  methodAndOptM <- setHelpMessage handle message helpText
+  methodAndOptM <- setHelpMessage handle message (convert helpText)
   case methodAndOptM of
     Nothing -> do
       Logger.logWarning logH "No exist '/help' command for this API"

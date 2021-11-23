@@ -12,6 +12,8 @@ import qualified Bot.Parser.Parser as BotParser
 import qualified Bot.Request.Request as BotReq
 import qualified Bot.Mode.Mode as BotMode
 import qualified Bot.Objects.Mode as Mode
+import qualified Bot.Objects.Synonyms as BotSynonyms
+import qualified Bot.Objects.Api as BotApi
 import qualified Bot.Api.Tele.Request.Requests as TeleReq
 import qualified Bot.Api.Tele.Mode.Mode as TeleMode
 
@@ -58,11 +60,11 @@ sysH = BotSystem.Handle {
 
 runC :: Settings.Config
 runC = Settings.Config {
-  Settings.botApi = "telegram",
-  Settings.botToken = "abcd0dcba",
+  Settings.botApi = BotApi.Tele,
+  Settings.botToken = BotSynonyms.Token "abcd0dcba",
   Settings.botInitialReplyNumber = 3,
   Settings.botQuestion = "How many replies do you prefer to receive?",
-  Settings.botDescription = "Hi! I'm bot=)",
+  Settings.botDescription = BotSynonyms.Description "Hi! I'm bot=)",
   Settings.botGroupId = Nothing
 }
 

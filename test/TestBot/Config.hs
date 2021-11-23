@@ -7,6 +7,8 @@ import qualified Hedgehog.Range as Range
 import qualified Bot.Config as Config
 import qualified Bot.Logger.Logger as Logger
 import qualified Bot.Settings as Settings
+import qualified Bot.Objects.Synonyms as BotSynonyms
+import qualified Bot.Objects.Api as BotApi
 
 prop_checkConfig :: Property
 prop_checkConfig = property $ do
@@ -27,12 +29,12 @@ genValidLogConfig = Logger.Config
 
 genValidSetConfig :: Gen Settings.Config
 genValidSetConfig = Settings.Config
-  <$> Gen.element ["vk", "telegram"]
-  <*> Gen.text (Range.constant 10 15) Gen.ascii
+  <$> Gen.element [BotApi.Vk, BotApi.Tele]
+  <*> (BotSynonyms.Token <$> Gen.text (Range.constant 10 15) Gen.ascii)
   <*> (toInteger <$> Gen.int (Range.constant 1 5))
   <*> Gen.element ["Reps?"]
-  <*> Gen.element ["Bot!"]
-  <*> Gen.maybe (toInteger <$> Gen.int (Range.constant 0 1000))
+  <*> (BotSynonyms.Description <$> Gen.element ["Bot!"])
+  <*> Gen.maybe (BotSynonyms.GroupId <$> (toInteger <$> Gen.int (Range.constant 0 1000)))
 
 genValidConfig :: Gen Config.Config
 genValidConfig = Config.Config

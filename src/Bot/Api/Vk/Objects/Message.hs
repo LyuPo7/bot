@@ -12,7 +12,7 @@ import qualified Bot.Objects.Synonyms as BotSynonyms
 
 data Message = Message {
   message_id :: Maybe BotSynonyms.MessageId,
-  user_id :: BotSynonyms.UserId,
+  user_id :: BotSynonyms.ChatId,
   body :: Text,
   geo :: Maybe VkGeo.Geo, 
   attachments :: Maybe [VkAttachment.Attachment],

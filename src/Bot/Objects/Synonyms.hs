@@ -1,37 +1,72 @@
+{-# LANGUAGE DerivingStrategies, GeneralizedNewtypeDeriving, MultiParamTypeClasses #-}
+
 module Bot.Objects.Synonyms where
+
+import Data.Aeson.Types (FromJSON, ToJSON)
+import Web.Internal.HttpApiData (ToHttpApiData)
+import Data.Convertible.Base (Convertible(..))
 
 import Data.Text (Text)
 
-type Api = Text
-type Status = Bool
-type UserId = Integer
+newtype Status = Status Bool
+  deriving newtype (Show, FromJSON, Read, Ord, Eq)
+newtype UserId = UserId Integer
+  deriving newtype (Show, FromJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype GroupId = GroupId Integer
+  deriving newtype (Show, FromJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype MessageId = MessageId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype WallId = WallId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype WallReplyId = WallReplyId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype PhotoId = PhotoId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype AudioId = AudioId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype VideoId = VideoId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype StickerId = StickerId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype MarketId = MarketId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype MarketAlbumId = MarketAlbumId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype GiftId = GiftId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype ObjectId = ObjectId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype DocId = DocId Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype Timeout = Timeout Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype RecordLimit = RecordLimit Integer
+  deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
+newtype Version = Version Text
+  deriving newtype (Show, FromJSON, ToJSON, Read, Ord, Eq, ToHttpApiData)
+newtype FileType = FileType Text
+  deriving newtype (Show, FromJSON, ToJSON, Read, Ord, Eq, ToHttpApiData)
+newtype FilePathT = FilePathT Text
+  deriving newtype (Show, FromJSON, ToJSON, Read, Ord, Eq, ToHttpApiData)
+newtype AccessKey = AccessKey Text
+  deriving newtype (Show, FromJSON, ToJSON, Read, Ord, Eq, ToHttpApiData)
+
+instance Convertible AccessKey Text where
+  safeConvert (AccessKey key) = Right key
+
+newtype Description = Description Text
+  deriving newtype (Show, FromJSON, ToJSON, Read, Ord, Eq, ToHttpApiData)
+
+instance Convertible Description Text where
+  safeConvert (Description description) = Right description
+
+newtype Token = Token Text
+  deriving newtype (Show, FromJSON, ToJSON, Read, Ord, Eq, ToHttpApiData)
+
+instance Convertible Token Text where
+  safeConvert (Token token) = Right token
+
 type ChatId = Integer
-type GroupId = Integer
 type UpdateId = Integer
-type MessageId = Integer
-type PeerId = Integer
-type WallId = Integer
-type WallReplyId = Integer
-type PhotoId = Integer
-type AudioId = Integer
-type VideoId = Integer
-type DocId = Integer
-type StickerId = Integer
-type MarketId = Integer
-type MarketAlbumId = Integer
-type GiftId = Integer
-type ObjectId = Integer
 type RepNum = Integer
-type Timeout = Integer
-type Offset = Integer
-type RecordLimit = Integer
-type Language = Text
-type Mode = Text
-type Version = Text
-type Token = Text
-type Description = Text
-type FileType = Text
-type FilePathT = Text
-type AccessKey = Text
-type AccessToken = Text
 type Url = Text

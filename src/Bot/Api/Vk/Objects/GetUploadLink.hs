@@ -9,9 +9,9 @@ import GHC.Generics (Generic)
 import qualified Bot.Objects.Synonyms as BotSynonyms
 
 data GetUploadLink = GetUploadLink {
-  link_type :: BotSynonyms.Url,
-  peer_id :: BotSynonyms.PeerId,
-  access_token :: BotSynonyms.AccessToken,
+  link_type :: BotSynonyms.FileType,
+  peer_id :: BotSynonyms.UserId,
+  access_token :: BotSynonyms.Token,
   v :: BotSynonyms.Version
 } deriving (Generic)
 
@@ -23,8 +23,11 @@ instance ToForm GetUploadLink where
       ("v", Url.toQueryParam (v upLink))
        ]
 
-getLink :: BotSynonyms.PeerId -> BotSynonyms.FileType -> BotSynonyms.Version ->
-           BotSynonyms.Token -> GetUploadLink
+getLink :: BotSynonyms.UserId ->
+           BotSynonyms.FileType ->
+           BotSynonyms.Version ->
+           BotSynonyms.Token ->
+           GetUploadLink
 getLink peerId fileType vkVersion token = GetUploadLink {
   peer_id = peerId,
   link_type = fileType,

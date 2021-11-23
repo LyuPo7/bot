@@ -40,7 +40,8 @@ startMode handle = do
   let logH = hLogger handle
       config = cRun handle
       apiName = Settings.botApi config
-  Logger.logInfo logH $ "Bot api: " <> apiName
+  Logger.logInfo logH $ "Bot api: "
+    <> BotUtil.convertValue apiName
   setupBot handle
   firstUpdate <- getFirstUpdate handle
   _ <- checkMode handle firstUpdate

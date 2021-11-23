@@ -10,6 +10,7 @@ import qualified Bot.DB.DBImplementation as BotDB
 import qualified Bot.DB.DBQImplementation as BotDBQ
 import qualified Bot.System.SystemImplementation as BotSystem
 import qualified Bot.Mode.Mode as BotMode
+import qualified Bot.Objects.Api as BotApi
 import qualified Bot.Api.Tele.Request.Requests as TeleReq
 import qualified Bot.Parser.ParserImplementation as BotParserImpl
 import qualified Bot.Api.Tele.Mode.Mode as TeleMode
@@ -25,7 +26,7 @@ main = Exc.handle errorHandler $ do
       logH = Logger.newHandleIO cLog
       api = Settings.botApi cSet
   case api of
-    "telegram" -> do
+    BotApi.Tele -> do
       Logger.withHandleIO cLog $ \hLogger ->
         BotSystem.withHandleIO hLogger cSet $ \hSys ->
         BotDB.withHandleIO hLogger cSet $ \hDbConn ->
@@ -34,7 +35,7 @@ main = Exc.handle errorHandler $ do
         TeleReq.withHandleIO hLogger hDb hParser cSet $ \hReq ->
         TeleMode.withHandleIO hLogger cSet hDb hReq hParser $ \hTele ->
         BotMode.startMode hTele
-    "vk" -> do
+    BotApi.Vk -> do
       Logger.withHandleIO cLog $ \hLogger ->
         BotSystem.withHandleIO hLogger cSet $ \hSys ->
         BotDB.withHandleIO hLogger cSet $ \hDbConn ->
