@@ -36,18 +36,10 @@ instance FromJSON Config where
       _ -> return $ Config BotApi.InvalidApi
         token repNum question description groupId
 
-newtype Host = Host { getHost :: Text }
-
--- | Bot commands
-startMessage, helpMessage, repeatMessage :: Text
-startMessage = "/start" -- initialize chat with new User;
-helpMessage = "/help"   -- request bot description;
-repeatMessage = "/repeat" -- request for change reply number;
-
 -- | Api host
-apiTele, apiVk :: Host
-apiTele = Host "https://api.telegram.org/bot"
-apiVk = Host "https://api.vk.com/method/"
+apiTele, apiVk :: BotSynonyms.Host
+apiTele = BotSynonyms.Host "https://api.telegram.org/bot"
+apiVk = BotSynonyms.Host "https://api.vk.com/method/"
 
 -- | Api version
 vkVersion :: BotSynonyms.Version

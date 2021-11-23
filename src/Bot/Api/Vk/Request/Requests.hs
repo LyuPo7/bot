@@ -245,7 +245,8 @@ downloadDoc handle botDoc serverUp = do
   let fileName = tempDir </> T.unpack docTitle
   BotSystem.downloadFile systemH link fileName
   urlResp <- Parser.parseUploadUrl handle serverUp
-  let docUrl = maybe (T.pack "") VkUpUrl.upload_url (VkUpUrlResp.response urlResp)
+  let docUrl = maybe (BotSynonyms.Url "")
+        VkUpUrl.upload_url (VkUpUrlResp.response urlResp)
   fileUp <- BotSystem.uploadFile systemH docUrl fileName
   fileResp <- Parser.parseUploadFile handle fileUp
   return $ VkUpFileResp.file fileResp

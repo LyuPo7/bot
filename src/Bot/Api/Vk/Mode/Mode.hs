@@ -5,6 +5,7 @@ import Control.Monad.Trans.Either (newEitherT, runEitherT)
 import Data.Text (Text)
 import Data.Maybe (fromMaybe)
 import Control.Monad.Catch (MonadThrow, throwM)
+import Data.Convertible.Base (convert)
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
@@ -56,7 +57,7 @@ getLastUpdate handle (BotUpdate.VkUpdate serverParams) = do
       tsCurrent = VkServer.ts serverParams
   processedUpdId <- BotDBQ.getLastSucUpdate dbH
   let newUpdId = fmap (+1) processedUpdId
-      updateId = fromMaybe tsCurrent newUpdId
+      updateId = fromMaybe (BotSynonyms.UpdateId tsCurrent) newUpdId
   let nextUpdate = BotUpdate.VkUpdate serverParams
   responseUp <- BotReq.getUpdate handle nextUpdate
   updateData <- VkParser.parseUpdateData parserH responseUp
@@ -128,13 +129,8 @@ getMessageType :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Messa
                   m BotMessageType.MessageType
 getMessageType _ (BotMessage.VkMessage userMessage) = do
   let messageText = VkMessage.body userMessage
-      action
-        | Settings.helpMessage == messageText = do
-            return BotMessageType.HelpMessage
-        | Settings.repeatMessage == messageText = do
-            return BotMessageType.RepeatMessage
-        | otherwise = do
-            return BotMessageType.TextMessage
-  action
+  case convert messageText of
+    BotMessageType.StartMessage -> return BotMessageType.UnsupportedMessage
+    message -> return message
 getMessageType _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage

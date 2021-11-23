@@ -85,7 +85,7 @@ spec_sendEchoMessage =
             VkDoc.id = 781, 
             VkDoc.owner_id = 129,
             VkDoc.title = "book.pdf",
-            VkDoc.url = "https://server/link/222",
+            VkDoc.url = BotSynonyms.Url "https://server/link/222",
             VkDoc.access_key = BotSynonyms.AccessKey "x\n 0\n \NAK^IMYz.<E"
           }
           docAttach = VkAttach.AttachDoc doc
@@ -136,7 +136,7 @@ spec_sendHelpMessage =
             VkDoc.id = 781, 
             VkDoc.owner_id = 129,
             VkDoc.title = "book.pdf",
-            VkDoc.url = "https://server/link/222",
+            VkDoc.url = BotSynonyms.Url "https://server/link/222",
             VkDoc.access_key = BotSynonyms.AccessKey "x\n 0\n \NAK^IMYz.<E"
           }
           docAttach = VkAttach.AttachDoc doc
@@ -178,7 +178,7 @@ spec_updateMessage =
             VkDoc.id = 781, 
             VkDoc.owner_id = 129,
             VkDoc.title = "book.pdf",
-            VkDoc.url = "https://server/link/222",
+            VkDoc.url = BotSynonyms.Url "https://server/link/222",
             VkDoc.access_key = BotSynonyms.AccessKey "x\n 0\n \NAK^IMYz.<E"
           }
           docAttach = VkAttach.AttachDoc doc
@@ -215,7 +215,7 @@ spec_updateDoc =
             VkDoc.id = 781, 
             VkDoc.owner_id = 129,
             VkDoc.title = "book.pdf",
-            VkDoc.url = "https://server/link/222",
+            VkDoc.url = BotSynonyms.Url "https://server/link/222",
             VkDoc.access_key = BotSynonyms.AccessKey "x\n 0\n \NAK^IMYz.<E"
           }
           botDoc = BotDoc.VkDoc doc
@@ -226,7 +226,7 @@ spec_updateDoc =
             VkDoc.id = 781, 
             VkDoc.owner_id = 129,
             VkDoc.title = "book.pdf",
-            VkDoc.url = "https://server/link/222",
+            VkDoc.url = BotSynonyms.Url "https://server/link/222",
             VkDoc.access_key = BotSynonyms.AccessKey "x\n 0\n \NAK^IMYz.<E"
           }
           botDoc = BotDoc.VkDoc doc

@@ -87,7 +87,7 @@ replyMode handle userMessage = do
   chatId <- getChatId handle userMessage
   messageType <- getMessageType handle userMessage
   case messageType of
-    BotMessageType.TextMessage -> do
+    BotMessageType.TextMessage _ -> do
       repNum <- BotDBQ.getRepliesNumber dbH chatId
       BotReq.sendNEchoMessage reqH userMessage repNum
       Logger.logInfo logH "It's ordinary message from User."
@@ -118,7 +118,7 @@ answerMode handle userMessage = do
   messageTextM <- getMessageText handle userMessage
   let messageText = T.unpack $ fromMaybe "" messageTextM
   BotDBQ.setMode dbH chatId BotMode.ReplyMode
-  case (readMaybe messageText :: Maybe Integer) of
+  case (readMaybe messageText :: Maybe BotSynonyms.RepNum) of
     Just repNum -> do
       Logger.logInfo logH $ "Info: Received user's answer in chat with id: "
         <> BotUtil.convertValue chatId

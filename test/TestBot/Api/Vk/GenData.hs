@@ -61,14 +61,14 @@ genDoc = VkDoc.Document
   <*> Gen.element ["book.pdf",
                    "log.txt",
                    "prog.py"]
-  <*> Gen.element ["https://server/link/123",
-                   "https://server/link/222"]
+  <*> (BotSynonyms.Url <$> Gen.element ["https://server/link/123",
+                                        "https://server/link/222"])
   <*> (BotSynonyms.AccessKey <$> Gen.text (Range.constant 10 15) Gen.ascii)
 
 genLink :: Gen VkLink.Link
 genLink = VkLink.Link
-  <$> Gen.element ["https://server/link/123",
-                   "https://server/link/222"]
+  <$> (BotSynonyms.Url <$> Gen.element ["https://server/link/123",
+                                        "https://server/link/222"])
 
 genMarket :: Gen VkMarket.Market
 genMarket = VkMarket.Market
@@ -195,7 +195,7 @@ genPhotoAttach = VkAttach.AttachPhoto
 genMessage :: Gen VkMessage.Message
 genMessage = VkMessage.Message
   <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
-  <*> (toInteger <$> genId)
+  <*> (BotSynonyms.ChatId <$> (toInteger <$> genId))
   <*> Gen.element ["Hi!", "Let's talk!", ""]
   <*> Gen.maybe genGeo
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
@@ -204,7 +204,7 @@ genMessage = VkMessage.Message
 genNum5Message :: Gen VkMessage.Message
 genNum5Message = VkMessage.Message
   <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
-  <*> (toInteger <$> genId)
+  <*> (BotSynonyms.ChatId <$> (toInteger <$> genId))
   <*> Gen.constant "5"
   <*> Gen.maybe genGeo
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
@@ -213,7 +213,7 @@ genNum5Message = VkMessage.Message
 genBotHelpMessage :: Gen VkMessage.Message
 genBotHelpMessage = VkMessage.Message
   <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
-  <*> (toInteger <$> genId)
+  <*> (BotSynonyms.ChatId <$> (toInteger <$> genId))
   <*> Gen.constant "/help"
   <*> Gen.maybe genGeo
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
@@ -222,7 +222,7 @@ genBotHelpMessage = VkMessage.Message
 genBotRepeatMessage :: Gen VkMessage.Message
 genBotRepeatMessage = VkMessage.Message
   <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
-  <*> (toInteger <$> genId)
+  <*> (BotSynonyms.ChatId <$> (toInteger <$> genId))
   <*> Gen.constant "/repeat"
   <*> Gen.maybe genGeo
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
@@ -231,7 +231,7 @@ genBotRepeatMessage = VkMessage.Message
 genMessageWoBotCom :: Gen VkMessage.Message
 genMessageWoBotCom = VkMessage.Message
   <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
-  <*> (toInteger <$> genId)
+  <*> (BotSynonyms.ChatId <$> (toInteger <$> genId))
   <*> Gen.element ["", "Hi!", "Let's talk!"]
   <*> Gen.maybe genGeo
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
@@ -267,8 +267,8 @@ genVkPollResponse = VkPollResp.PollResponse
 
 genUploadUrl :: Gen VkUpUrl.UploadUrl
 genUploadUrl = VkUpUrl.UploadUrl
-  <$> Gen.element ["https://server/link/123",
-                   "https://server/link/222"]
+  <$> (BotSynonyms.Url <$> Gen.element ["https://server/link/123",
+                                        "https://server/link/222"])
 
 genUploadUrlResponse :: Gen VkUpUrlResp.UploadUrlResponse
 genUploadUrlResponse = VkUpUrlResp.UploadUrlResponse
@@ -282,8 +282,8 @@ genUploadObject :: Gen VkUpObj.UploadObject
 genUploadObject = VkUpObj.UploadObject
   <$> (BotSynonyms.ObjectId <$> (toInteger <$> genId))
   <*> (BotSynonyms.UserId <$> (toInteger <$> genId))
-  <*> Gen.element ["https://server/obj/23",
-                   "https://server/obj/77"]
+  <*> (BotSynonyms.Url <$> Gen.element ["https://server/link/123",
+                                        "https://server/link/222"])
 
 genUploadObjectResponse :: Gen VkUpObjResp.UploadObjectResponse
 genUploadObjectResponse = VkUpObjResp.UploadObjectResponse

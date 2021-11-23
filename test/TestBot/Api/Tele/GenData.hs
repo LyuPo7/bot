@@ -15,8 +15,7 @@ genId :: Gen Int
 genId = Gen.int (Range.constant 0 1000)
 
 genChat :: Gen TeleChat.Chat
-genChat = TeleChat.Chat
-  <$> (toInteger <$> genId)
+genChat = TeleChat.Chat . BotSynonyms.ChatId <$> (toInteger <$> genId)
 
 genMessageEntity :: Gen TeleMessageEntity.MessageEntity
 genMessageEntity = TeleMessageEntity.MessageEntity 
@@ -71,7 +70,7 @@ genMessageWoBotCom = TeleMessage.Message
 
 genUpdate :: Gen TeleUpdate.Update
 genUpdate = TeleUpdate.Update
-  <$> (toInteger <$> genId)
+  <$> (BotSynonyms.UpdateId <$> (toInteger <$> genId))
   <*> Gen.maybe genMessage
 
 genUpdateData :: Gen TeleUpData.UpdateData

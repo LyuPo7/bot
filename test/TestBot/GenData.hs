@@ -7,6 +7,7 @@ import qualified Hedgehog.Range as Range
 import qualified TestBot.Api.Tele.GenData as TeleGD
 import qualified TestBot.Api.Vk.GenData as VkGD
 
+import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.Update as BotUpdate
 import qualified Bot.Objects.Message as BotMessage
 import qualified Bot.Objects.Document as BotDoc
@@ -17,7 +18,7 @@ genBotDoc = BotDoc.VkDoc
 
 genBotTeleUpdate :: Gen BotUpdate.Update
 genBotTeleUpdate = BotUpdate.TeleUpdate
-  <$> (toInteger <$> TeleGD.genId)
+  <$> (BotSynonyms.UpdateId <$> (toInteger <$> TeleGD.genId))
 
 genBotVkUpdate :: Gen BotUpdate.Update
 genBotVkUpdate = BotUpdate.VkUpdate

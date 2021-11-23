@@ -31,7 +31,7 @@ genValidSetConfig :: Gen Settings.Config
 genValidSetConfig = Settings.Config
   <$> Gen.element [BotApi.Vk, BotApi.Tele]
   <*> (BotSynonyms.Token <$> Gen.text (Range.constant 10 15) Gen.ascii)
-  <*> (toInteger <$> Gen.int (Range.constant 1 5))
+  <*> (BotSynonyms.RepNum <$> (toInteger <$> Gen.int (Range.constant 1 5)))
   <*> Gen.element ["Reps?"]
   <*> (BotSynonyms.Description <$> Gen.element ["Bot!"])
   <*> Gen.maybe (BotSynonyms.GroupId <$> (toInteger <$> Gen.int (Range.constant 0 1000)))

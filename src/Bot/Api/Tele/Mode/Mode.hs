@@ -3,6 +3,7 @@ module Bot.Api.Tele.Mode.Mode where
 import Data.Text (Text)
 import Data.Maybe (fromMaybe)
 import Control.Monad.Catch (MonadThrow, throwM)
+import Data.Convertible.Base (convert)
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
@@ -110,23 +111,16 @@ getMessageText _ botMessage = do
 getMessageType :: (MonadThrow m, Monad m) => BotReq.Handle m -> BotMessage.Message ->
                   m BotMessageType.MessageType
 getMessageType _ (BotMessage.TeleMessage userMessage) = do
-  let messageText = TeleMessage.text userMessage
-      entitiesM = filter 
-        ((== "bot_command") . TeleMessageEntity.entity_type) 
-        <$> TeleMessage.entities userMessage
-  case entitiesM of
-    Nothing -> return BotMessageType.TextMessage
-    Just _ -> do
-      let action
-            | Just Settings.helpMessage == messageText = do
-              return BotMessageType.HelpMessage
-            | Just Settings.repeatMessage == messageText = do
-              return BotMessageType.RepeatMessage
-            | Just Settings.startMessage == messageText = do
-              return BotMessageType.StartMessage
-            | otherwise = do
-              return BotMessageType.UnsupportedMessage
-      action
+  let messageTextM = TeleMessage.text userMessage
+  case messageTextM of
+    Nothing -> return $ BotMessageType.TextMessage ""
+    Just messageText -> do
+      let entitiesM = filter 
+           ((== "bot_command") . TeleMessageEntity.entity_type) 
+           <$> TeleMessage.entities userMessage
+      case entitiesM of
+        Nothing -> return $ BotMessageType.TextMessage messageText
+        Just _ -> return $ convert messageText
 getMessageType _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
   

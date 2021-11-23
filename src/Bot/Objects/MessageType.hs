@@ -1,7 +1,21 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 module Bot.Objects.MessageType where
 
-data MessageType = TextMessage
+import qualified Data.Text as T
+import Data.Text (Text)
+import Data.Convertible.Base (Convertible(..))
+
+data MessageType = TextMessage Text
                  | HelpMessage
                  | RepeatMessage
                  | StartMessage
                  | UnsupportedMessage
+
+instance Convertible Text MessageType where
+  safeConvert "/help" = Right HelpMessage
+  safeConvert "/start" = Right StartMessage
+  safeConvert "/repeat" = Right RepeatMessage
+  safeConvert text = if T.isPrefixOf "/" text
+    then Right UnsupportedMessage
+    else Right $ TextMessage text
+    

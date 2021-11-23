@@ -1,10 +1,10 @@
 module Bot.System.System where
 
 import qualified Data.ByteString.Lazy as B
-import Data.Text (Text)
 
 import qualified Bot.Logger.Logger as Logger
 import qualified Bot.Settings as Settings
+import qualified Bot.Objects.Synonyms as BotSynonyms
 
 data Handle m = Handle {
   hLogger :: Logger.Handle m,
@@ -12,6 +12,6 @@ data Handle m = Handle {
 
   readFile :: FilePath -> m String,
   getTemporaryDirectory :: m FilePath,
-  downloadFile :: Text -> FilePath -> m (),
-  uploadFile :: Text -> FilePath -> m B.ByteString
+  downloadFile :: BotSynonyms.Url -> FilePath -> m (),
+  uploadFile :: BotSynonyms.Url -> FilePath -> m B.ByteString
 }

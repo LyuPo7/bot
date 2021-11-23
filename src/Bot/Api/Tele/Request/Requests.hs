@@ -13,6 +13,7 @@ import qualified Bot.DB.DBQ as BotDBQ
 import qualified Bot.Settings as Settings
 import qualified Bot.Parser.Parser as BotParser
 import qualified Bot.Request.Request as BotReq
+import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.Method as BotMethod
 import qualified Bot.Objects.RequestOptions as BotReqOptions
 import qualified Bot.Objects.Button as BotButton
@@ -147,7 +148,7 @@ createRequest handle (BotMethod.TeleMethod apiMethod)
                      (BotReqOptions.TeleReqOptions options) = do
   let config = BotParser.cParser handle
       token = Settings.botToken config
-      hostApi = Settings.getHost Settings.apiTele
+      hostApi = BotSynonyms.getHost Settings.apiTele
       methodApi = TeleMethod.getMethod apiMethod
       api = T.concat [hostApi, convert token, methodApi]
       apiOptions = TeleReqOptions.encodeRequestOptions options
