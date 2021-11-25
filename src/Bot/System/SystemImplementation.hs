@@ -15,8 +15,10 @@ import qualified Bot.System.System as BotSystem
 import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Settings as Settings
 
-withHandleIO :: Logger.Handle IO -> Settings.Config ->
-               (BotSystem.Handle IO -> IO a) -> IO a
+withHandleIO :: Logger.Handle IO ->
+                Settings.Config ->
+               (BotSystem.Handle IO -> IO a) ->
+                IO a
 withHandleIO logger config f = do
   let handle = BotSystem.Handle {
     BotSystem.hLogger = logger,
@@ -29,7 +31,10 @@ withHandleIO logger config f = do
   }
   f handle
 
-downloadFile :: Logger.Handle IO -> BotSynonyms.Url -> FilePath -> IO ()
+downloadFile :: Logger.Handle IO ->
+                BotSynonyms.Url ->
+                FilePath ->
+                IO ()
 downloadFile logH link fileName = do
   manager <- newManager tlsManagerSettings
   request <- parseRequest $ T.unpack $ convert link
@@ -39,7 +44,10 @@ downloadFile logH link fileName = do
   SIO.hClose file
   Logger.logInfo logH "Doc was downloaded."
 
-uploadFile :: Logger.Handle IO -> BotSynonyms.Url -> FilePath -> IO B.ByteString
+uploadFile :: Logger.Handle IO ->
+              BotSynonyms.Url ->
+              FilePath ->
+              IO B.ByteString
 uploadFile logH link fileName = do
   manager <- newManager tlsManagerSettings
   req <- parseRequest $ T.unpack $ convert link

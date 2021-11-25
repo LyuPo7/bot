@@ -42,7 +42,6 @@ library
       Bot.Api.Tele.Objects.SetCommands
       Bot.Api.Tele.Objects.Update
       Bot.Api.Tele.Objects.UpdateData
-      Bot.Api.Tele.Parser.Parser
       Bot.Api.Tele.Request.Requests
       Bot.Api.Vk.Mode.Mode
       Bot.Api.Vk.Objects.Action
@@ -79,7 +78,6 @@ library
       Bot.Api.Vk.Objects.Video
       Bot.Api.Vk.Objects.Wall
       Bot.Api.Vk.Objects.WallReply
-      Bot.Api.Vk.Parser.Parser
       Bot.Api.Vk.Request.Requests
       Bot.Config
       Bot.DB.DB
@@ -94,14 +92,13 @@ library
       Bot.Objects.Document
       Bot.Objects.Message
       Bot.Objects.MessageType
-      Bot.Objects.Method
       Bot.Objects.Mode
-      Bot.Objects.RequestOptions
+      Bot.Objects.RequestPair
       Bot.Objects.Synonyms
       Bot.Objects.Update
       Bot.Parser.Parser
-      Bot.Parser.ParserImplementation
       Bot.Request.Request
+      Bot.Request.RequestImplementation
       Bot.Settings
       Bot.System.System
       Bot.System.SystemImplementation
@@ -188,10 +185,9 @@ test-suite bot-test
   main-is: Test.hs
   other-modules:
       TestBot.Config
+      TestBot.Parser.Parser
       TestBot.Request.Request
       TestBot.Mode.Mode
-      TestBot.Api.Tele.Parser.Parser
-      TestBot.Api.Vk.Parser.Parser
       TestBot.Api.Vk.GenData
       TestBot.Api.Vk.Handlers
       TestBot.Api.Tele.GenData

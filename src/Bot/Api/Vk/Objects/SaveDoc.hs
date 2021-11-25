@@ -13,8 +13,10 @@ data SaveDoc = SaveDoc {
   v :: BotSynonyms.Version
 } deriving (Generic, ToForm)
 
-saveNewDoc :: BotSynonyms.FilePathT -> BotSynonyms.Token ->
-              BotSynonyms.Version -> SaveDoc
+saveNewDoc :: BotSynonyms.FilePathT ->
+              BotSynonyms.Token ->
+              BotSynonyms.Version ->
+              SaveDoc
 saveNewDoc fileName token vkVersion = SaveDoc {
   file = fileName,
   access_token = token,

@@ -13,8 +13,10 @@ data GetLongPollServer = GetLongPollServer {
   v :: BotSynonyms.Version
 } deriving (Generic, ToForm)
 
-getPollServer :: BotSynonyms.GroupId -> BotSynonyms.Token ->
-                 BotSynonyms.Version -> GetLongPollServer
+getPollServer :: BotSynonyms.GroupId ->
+                 BotSynonyms.Token ->
+                 BotSynonyms.Version ->
+                 GetLongPollServer
 getPollServer groupId token vkVersion = GetLongPollServer { 
   group_id = groupId,
   access_token = token,

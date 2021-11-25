@@ -8,6 +8,7 @@ import qualified Control.Exception as Exc
 import qualified Bot.DB.DB as BotDB
 import qualified Bot.DB.DBQ as BotDBQ
 import qualified Bot.Logger.Logger as Logger
+import qualified Bot.System.System as BotSystem
 import qualified Bot.Settings as Settings
 import qualified Bot.Exception as E
 import qualified Bot.Objects.Synonyms as BotSynonyms
@@ -15,11 +16,17 @@ import qualified Bot.Objects.Mode as BotMode
 import qualified Bot.Util as BotUtil
 
 withHandleIO :: Logger.Handle IO ->
-                BotDB.Handle IO -> (BotDBQ.Handle IO -> IO a) -> IO a
-withHandleIO logger dbH f = do
+                BotDB.Handle IO ->
+                BotSystem.Handle IO ->
+                Settings.Config ->
+               (BotDBQ.Handle IO -> IO a) ->
+                IO a
+withHandleIO logger dbH sysH config f = do
   let handle = BotDBQ.Handle {
     BotDBQ.hLogger = logger,
     BotDBQ.hDb = dbH,
+    BotDBQ.hSystem = sysH,
+    BotDBQ.cDBQ = config,
 
     BotDBQ.getLastSucUpdate = getLastSucUpdate dbH,
     BotDBQ.putUpdate = putUpdate dbH,
@@ -30,7 +37,8 @@ withHandleIO logger dbH f = do
   }
   f handle
 
-getLastSucUpdate :: BotDB.Handle IO -> IO (Maybe BotSynonyms.UpdateId)
+getLastSucUpdate :: BotDB.Handle IO ->
+                    IO (Maybe BotSynonyms.UpdateId)
 getLastSucUpdate handle = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle
@@ -49,7 +57,9 @@ getLastSucUpdate handle = handleSql errorHandler $ do
   where errorHandler _ = do
           Exc.throwIO $ E.DbError "Error: Error in getLastSucUpdate!"
 
-putUpdate :: BotDB.Handle IO -> BotSynonyms.UpdateId -> IO ()
+putUpdate :: BotDB.Handle IO ->
+             BotSynonyms.UpdateId ->
+             IO ()
 putUpdate handle updateId = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle
@@ -73,7 +83,9 @@ putUpdate handle updateId = handleSql errorHandler $ do
           Exc.throwIO $ E.DbError $ "Error: Error in putUpdate!\n"
             <> show e
 
-getRepliesNumber :: BotDB.Handle IO -> BotSynonyms.ChatId -> IO BotSynonyms.RepNum
+getRepliesNumber :: BotDB.Handle IO ->
+                    BotSynonyms.ChatId ->
+                    IO BotSynonyms.RepNum
 getRepliesNumber handle chatId = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle
@@ -98,7 +110,10 @@ getRepliesNumber handle chatId = handleSql errorHandler $ do
           Exc.throwIO $ E.DbError $ "Error: Error in getRepliesNumber!\n"
             <> show e
 
-setRepliesNumber :: BotDB.Handle IO -> BotSynonyms.ChatId -> BotSynonyms.RepNum -> IO ()
+setRepliesNumber :: BotDB.Handle IO ->
+                    BotSynonyms.ChatId ->
+                    BotSynonyms.RepNum ->
+                    IO ()
 setRepliesNumber handle chatId repNum = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle
@@ -128,7 +143,9 @@ setRepliesNumber handle chatId repNum = handleSql errorHandler $ do
           Exc.throwIO $ E.DbError $ "Error: Error in setRepliesNumber!\n"
             <> show e
 
-getMode :: BotDB.Handle IO -> BotSynonyms.ChatId -> IO BotMode.Mode
+getMode :: BotDB.Handle IO ->
+           BotSynonyms.ChatId ->
+           IO BotMode.Mode
 getMode handle chatId = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle
@@ -151,7 +168,10 @@ getMode handle chatId = handleSql errorHandler $ do
           Exc.throwIO $ E.DbError $ "Error in getMode!\n"
             <> show e
 
-setMode :: BotDB.Handle IO -> BotSynonyms.ChatId -> BotMode.Mode -> IO ()
+setMode :: BotDB.Handle IO ->
+           BotSynonyms.ChatId ->
+           BotMode.Mode ->
+           IO ()
 setMode handle chatId mode = handleSql errorHandler $ do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle

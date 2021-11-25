@@ -4,8 +4,7 @@ import Test.Tasty.Hedgehog (testProperty)
 import qualified Data.ByteString.Lazy as B
 
 import qualified TestBot.Config as Config
-import qualified TestBot.Api.Tele.Parser.Parser as TeleParser
-import qualified TestBot.Api.Vk.Parser.Parser as VkParser
+import qualified TestBot.Parser.Parser as BotParser
 import qualified TestBot.Request.Request as BotReq
 import qualified TestBot.Mode.Mode as BotMode
 
@@ -22,9 +21,7 @@ props = [
   testProperty "Successful replyMode for /help, /start bot command"
                BotMode.prop_replyModeReplySuc,
   testProperty "Successful replyMode for /reply bot command"
-               BotMode.prop_replyModeAnswerSuc,
-  testProperty "Successful replyMode for message without bot command"
-               BotMode.prop_replyModeOrdinarySuc
+               BotMode.prop_replyModeAnswerSuc
   ]
 
 main :: IO ()
@@ -53,15 +50,20 @@ main = do
   objUpObjVk <- readObjUpObjVk
 
   specs <- concat <$> mapM testSpecs
-             [ TeleParser.spec_parseUpdateData objTele bstrTele bstrFailTele,
-               VkParser.spec_parseUpdateData objVk bstrVk bstrFailVk,
-               VkParser.spec_parsePollResponse objServerVk bstrServerVk,
-               VkParser.spec_parseUploadUrl objUpUrlVk bstrUpUrlVk bstrUpUrlFailVk,
-               VkParser.spec_parseUploadFile objUpFileVk bstrUpFileVk bstrUpFileFailVk,
-               VkParser.spec_parseUploadObject objUpObjVk bstrUpObjVk bstrUpObjFailVk,
+             [ BotParser.spec_parseData_TeleUpData_UpdateData
+                 objTele bstrTele bstrFailTele,
+               BotParser.spec_parseData_VkUpData_UpdateData
+                 objVk bstrVk bstrFailVk,
+               BotParser.spec_parseData_VkPollResp_PollResponse
+                 objServerVk bstrServerVk,
+               BotParser.spec_parseData_VkUpUrlResp_UploadUrlResponse
+                 objUpUrlVk bstrUpUrlVk bstrUpUrlFailVk,
+               BotParser.spec_parseData_VkUpFileResp_UploadFileResponse
+                 objUpFileVk bstrUpFileVk bstrUpFileFailVk,
+               BotParser.spec_parseData_VkUpObjResp_UploadObjectResponse
+                 objUpObjVk bstrUpObjVk bstrUpObjFailVk,
                BotReq.spec_getServer,
                BotReq.spec_getUploadedServer,
-               BotReq.spec_getUpdate,
                BotReq.spec_sendEchoMessage,
                BotReq.spec_sendHelpMessage,
                BotReq.spec_saveUploadedDoc,

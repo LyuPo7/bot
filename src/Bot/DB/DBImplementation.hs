@@ -5,16 +5,16 @@ module Bot.DB.DBImplementation where
 import Database.HDBC (getTables, run, commit)
 import Database.HDBC.Sqlite3 (Connection, connectSqlite3)
 import Control.Monad (when)
-import qualified Control.Exception as Exc
 
 import qualified Bot.DB.DB as BotDB
 import qualified Bot.Logger.Logger as Logger
 import qualified Bot.Settings as Settings
 import qualified Bot.Objects.Api as BotApi
-import qualified Bot.Exception as E
 
 withHandleIO :: Logger.Handle IO ->
-                Settings.Config -> (BotDB.Handle IO -> IO a) -> IO a
+                Settings.Config ->
+               (BotDB.Handle IO -> IO a) ->
+                IO a
 withHandleIO logger config f = do
   case Settings.botApi config of
     BotApi.Vk -> do
@@ -29,13 +29,9 @@ withHandleIO logger config f = do
       let handle = BotDB.Handle logger dbConn config
       prepDB handle
       f handle
-    _ -> do
-      Logger.logError logger "Incorrect field 'bot_api' \
-                             \in config.json"
-      Exc.throwIO $ E.ParseConfigError "Incorrect field 'bot_api' \
-                                       \in config.json"
 
-connect :: FilePath -> IO Connection
+connect :: FilePath ->
+           IO Connection
 connect dbFile = do connectSqlite3 dbFile
 
 {- | Prepare the database for data.
@@ -50,7 +46,8 @@ Create two tables and ask the database engine to verify some info:
     - update_id - unique identifier for this update;
     - processed - status the response;
 -}
-prepDB :: BotDB.Handle IO -> IO ()
+prepDB :: BotDB.Handle IO ->
+          IO ()
 prepDB handle = do
   let dbConn = BotDB.conn handle
       logH = BotDB.hLogger handle

@@ -27,10 +27,13 @@ instance A.FromJSON Config where
   parseJSON = A.withObject "General Config" $ \o ->
     Config <$> o A..:? "verbosity"
 
-withHandleIO :: Config -> (Handle IO -> IO a) -> IO a
+withHandleIO :: Config ->
+               (Handle IO -> IO a) ->
+                IO a
 withHandleIO config f = f $ newHandleIO config
 
-newHandleIO :: Config -> Handle IO
+newHandleIO :: Config ->
+               Handle IO
 newHandleIO config = do
   let globalLevel = fromMaybe Debug $ cVerbosity config
   Handle {
@@ -80,7 +83,9 @@ newtype LogMessage = LogMessage {
   level :: Level
 }
 
-logDebug, logInfo, logWarning, logError :: Handle m -> Text -> m ()
+logDebug, logInfo, logWarning, logError :: Handle m ->
+                                           Text ->
+                                           m ()
 logDebug = (`log` LogMessage {level = Debug})
 logInfo = (`log` LogMessage {level = Info})
 logWarning = (`log` LogMessage {level = Warning})
@@ -97,7 +102,8 @@ defaultTimeFormat = "%_Y-%m-%d %T.%3q"
 resetColor :: Text
 resetColor = normalCS
 
-renderColor :: Level -> Text
+renderColor :: Level ->
+               Text
 renderColor lev = case lev of
   Debug -> purpleCS
   Info -> blueCS

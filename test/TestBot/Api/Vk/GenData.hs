@@ -232,7 +232,7 @@ genMessageWoBotCom :: Gen VkMessage.Message
 genMessageWoBotCom = VkMessage.Message
   <$> Gen.maybe (BotSynonyms.MessageId <$> (toInteger <$> genId))
   <*> (BotSynonyms.ChatId <$> (toInteger <$> genId))
-  <*> Gen.element ["", "Hi!", "Let's talk!"]
+  <*> Gen.element ["ok", "Hi!", "Let's talk!"]
   <*> Gen.maybe genGeo
   <*> Gen.maybe (Gen.list (Range.constant 0 10) genAttach)
   <*> Gen.constant Nothing

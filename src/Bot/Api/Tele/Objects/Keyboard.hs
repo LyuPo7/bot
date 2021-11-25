@@ -13,7 +13,8 @@ data Keyboard = Keyboard {
   one_time_keyboard :: Maybe Bool
 } deriving (Show, Eq, Generic, ToJSON)
 
-createKeyboard :: [[TeleButton.Button]] -> Keyboard
+createKeyboard :: [[TeleButton.Button]] ->
+                    Keyboard
 createKeyboard buttons = Keyboard {
   keyboard = buttons,
   one_time_keyboard = Just True,

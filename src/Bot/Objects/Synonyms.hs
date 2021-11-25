@@ -1,4 +1,6 @@
-{-# LANGUAGE DerivingStrategies, GeneralizedNewtypeDeriving, MultiParamTypeClasses #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Bot.Objects.Synonyms where
 

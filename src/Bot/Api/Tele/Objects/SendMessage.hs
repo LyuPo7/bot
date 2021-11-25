@@ -15,7 +15,9 @@ data SendMessage = SendMessage {
   reply_to_message_id :: Maybe BotSynonyms.MessageId
 } deriving (Show, Eq, Generic, ToJSON)
 
-createTextMessage :: BotSynonyms.ChatId -> Text -> SendMessage
+createTextMessage :: BotSynonyms.ChatId ->
+                     Text ->
+                     SendMessage
 createTextMessage chatId messageText = SendMessage {
   chat_id = chatId,
   text = messageText,

@@ -86,10 +86,9 @@ tests:
     source-dirs:         test
     other-modules: [
       TestBot.Config,
+      TestBot.Parser.Parser,
       TestBot.Request.Request,
       TestBot.Mode.Mode,
-      TestBot.Api.Tele.Parser.Parser,
-      TestBot.Api.Vk.Parser.Parser,
       TestBot.Api.Vk.GenData,
       TestBot.Api.Vk.Handlers,
       TestBot.Api.Tele.GenData,

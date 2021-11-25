@@ -17,8 +17,10 @@ data KeyboardMessage = KeyboardMessage {
   reply_markup :: Maybe TeleKeyboard.Keyboard
 } deriving (Show, Eq, Generic, ToJSON)
 
-createKeyboardMessage :: BotSynonyms.ChatId -> Text ->
-                         TeleKeyboard.Keyboard -> KeyboardMessage
+createKeyboardMessage :: BotSynonyms.ChatId ->
+                         Text ->
+                         TeleKeyboard.Keyboard ->
+                         KeyboardMessage
 createKeyboardMessage chatId question markupIn = KeyboardMessage {
   chat_id = chatId,
   text = question,

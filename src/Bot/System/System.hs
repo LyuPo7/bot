@@ -10,8 +10,12 @@ data Handle m = Handle {
   hLogger :: Logger.Handle m,
   cSet :: Settings.Config,
 
-  readFile :: FilePath -> m String,
+  readFile :: FilePath ->
+              m String,
   getTemporaryDirectory :: m FilePath,
-  downloadFile :: BotSynonyms.Url -> FilePath -> m (),
-  uploadFile :: BotSynonyms.Url -> FilePath -> m B.ByteString
+  downloadFile :: BotSynonyms.Url ->
+                  FilePath -> m (),
+  uploadFile :: BotSynonyms.Url ->
+                FilePath ->
+                m B.ByteString
 }

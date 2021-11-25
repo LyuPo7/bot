@@ -5,7 +5,8 @@ import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Web.FormUrlEncoded as Url
 import qualified Data.Text as T
-import  qualified Network.HTTP.Client as HTTPClient
+import Control.Monad.Trans.Either (newEitherT, runEitherT)
+import Control.Monad.Trans (lift)
 import Data.List (union, (\\))
 import System.FilePath.Posix ((</>))
 import Data.Text (Text)
@@ -19,10 +20,8 @@ import qualified Bot.Logger.Logger as Logger
 import qualified Bot.DB.DBQ as BotDBQ
 import qualified Bot.System.System as BotSystem
 import qualified Bot.Parser.Parser as BotParser
-import qualified Bot.Request.Request as BotReq
 import qualified Bot.Objects.Synonyms as BotSynonyms
-import qualified Bot.Objects.Method as BotMethod
-import qualified Bot.Objects.RequestOptions as BotReqOptions
+import qualified Bot.Objects.RequestPair as BotReqPair
 import qualified Bot.Objects.Button as BotButton
 import qualified Bot.Objects.Update as BotUpdate
 import qualified Bot.Objects.Message as BotMessage
@@ -47,44 +46,14 @@ import qualified Bot.Api.Vk.Objects.UploadObjectResponse as VkUpObjResp
 import qualified Bot.Api.Vk.Objects.UploadFileResponse as VkUpFileResp
 import qualified Bot.Api.Vk.Objects.UploadUrlResponse as VkUpUrlResp
 import qualified Bot.Api.Vk.Objects.SaveDoc as VkSaveDoc
-import qualified Bot.Api.Vk.Parser.Parser as Parser
 import qualified Bot.Util as BotUtil
 
-withHandleIO :: Logger.Handle IO -> BotDBQ.Handle IO -> BotParser.Handle IO ->
-                Settings.Config -> (BotReq.Handle IO -> IO a) -> IO a
-withHandleIO logger dbH parserH config f = do
-  let handle = BotReq.Handle {
-    BotReq.hLogger = logger,
-    BotReq.hDb = dbH,
-    BotReq.hParser = parserH,
-    BotReq.cReq = config,
-
-    BotReq.createRequest = createRequest parserH,
-    BotReq.setUploadedServer = setUploadedServer parserH,
-    BotReq.setUploadedDoc = setUploadedDoc parserH,
-    BotReq.setGetServer = setGetServer parserH,
-    BotReq.setGetUpdate = setGetUpdate parserH,
-    BotReq.setEchoMessage = setEchoMessage parserH,
-    BotReq.setHelpMessage = setHelpMessage parserH,
-    BotReq.setStartMessage = \_ _ -> return Nothing,
-    BotReq.setKeyboardMessage = setKeyboardMessage parserH,
-    BotReq.setCommands = return Nothing,
-
-    BotReq.downloadDoc = downloadDoc parserH,
-    BotReq.extractDoc = extractDoc parserH,
-    BotReq.changeMessage = changeMessage parserH,
-    BotReq.changeDoc = changeDoc parserH,
-
-    BotReq.newManager = HTTPClient.newManager,
-    BotReq.httpLbs = HTTPClient.httpLbs
-  }
-  f handle
-
-setGetServer :: (MonadThrow m, Monad m) => BotParser.Handle m ->
-                 m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions))
+setGetServer :: (MonadThrow m, Monad m) =>
+                 BotDBQ.Handle m ->
+                 m (Maybe BotReqPair.ReqPair)
 setGetServer handle = do
-  let logH = BotParser.hLogger handle
-      config = BotParser.cParser handle
+  let logH = BotDBQ.hLogger handle
+      config = BotDBQ.cDBQ handle
   case Settings.botGroupId config of
     Nothing -> do
       let msg = "'bot_group_id' is required for Api Vk"
@@ -94,45 +63,48 @@ setGetServer handle = do
       let token = Settings.botToken config
           params = VkGetLongPollServer.getPollServer
             groupId token Settings.vkVersion
-          reqOptions = BotReqOptions.VkReqOptions $
-                       VkReqOptions.RequestOptions $
+          reqOptions = VkReqOptions.RequestOptions $
                        T.pack $ L8.unpack $ Url.urlEncodeAsFormStable params
-          apiMethod = BotMethod.VkMethod VkMethod.getLongPollServer
+          apiMethod = VkMethod.getLongPollServer
       Logger.logDebug logH "Server query string was created."
-      return $ Just (apiMethod, reqOptions)
+      return $ Just $ BotReqPair.VkReqPair (apiMethod, reqOptions)
 
-setUploadedServer :: Monad m => BotParser.Handle m -> BotDoc.Document ->
-                  m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions))
+setUploadedServer :: Monad m =>
+                     BotDBQ.Handle m ->
+                     BotDoc.Document ->
+                     m (Maybe BotReqPair.ReqPair)
 setUploadedServer handle botDoc = do
-  let config = BotParser.cParser handle
+  let config = BotDBQ.cDBQ handle
       token = Settings.botToken config
       doc = BotDoc.vkDoc botDoc
       userId = VkDoc.owner_id doc
       query = VkGetUpLink.getLink userId
         (BotSynonyms.FileType "doc") Settings.vkVersion token
       vkReqOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable query
-      reqOptions = BotReqOptions.VkReqOptions $
-                   VkReqOptions.RequestOptions vkReqOptions
-      apiMethod = BotMethod.VkMethod VkMethod.getMessagesUploadServer
-  return $ Just (apiMethod, reqOptions)
+      reqOptions = VkReqOptions.RequestOptions vkReqOptions
+      apiMethod = VkMethod.getMessagesUploadServer
+  return $ Just $ BotReqPair.VkReqPair (apiMethod, reqOptions)
 
-setUploadedDoc :: Monad m => BotParser.Handle m -> Text ->
-                  m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions))
+setUploadedDoc :: Monad m =>
+                  BotDBQ.Handle m ->
+                  Text ->
+                  m (Maybe BotReqPair.ReqPair)
 setUploadedDoc handle file = do
-  let config = BotParser.cParser handle
+  let config = BotDBQ.cDBQ handle
       token = Settings.botToken config
       link = VkSaveDoc.saveNewDoc
         (BotSynonyms.FilePathT file) token Settings.vkVersion
       vkReqOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable link
-      reqOptions = BotReqOptions.VkReqOptions $
-                   VkReqOptions.RequestOptions vkReqOptions
-      apiMethod = BotMethod.VkMethod VkMethod.saveDoc
-  return $ Just (apiMethod, reqOptions)
+      reqOptions = VkReqOptions.RequestOptions vkReqOptions
+      apiMethod = VkMethod.saveDoc
+  return $ Just $ BotReqPair.VkReqPair (apiMethod, reqOptions)
 
-setEchoMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> BotMessage.Message ->
-                  m (BotMethod.Method, BotReqOptions.RequestOptions)
+setEchoMessage :: (MonadThrow m, Monad m) =>
+                   BotDBQ.Handle m ->
+                   BotMessage.Message ->
+                   m BotReqPair.ReqPair
 setEchoMessage handle (BotMessage.VkMessage message) = do
-  let config = BotParser.cParser handle
+  let config = BotDBQ.cDBQ handle
       token = Settings.botToken config
       userId = VkMessage.user_id message
       messageText = VkMessage.body message
@@ -148,18 +120,19 @@ setEchoMessage handle (BotMessage.VkMessage message) = do
           VkSendMessage.long = coordLong
         }
       vkReqOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable newMessage
-      reqOptions = BotReqOptions.VkReqOptions $
-                   VkReqOptions.RequestOptions vkReqOptions
-      apiMethod = BotMethod.VkMethod VkMethod.sendMessage
-  return (apiMethod, reqOptions)
+      reqOptions = VkReqOptions.RequestOptions vkReqOptions
+      apiMethod = VkMethod.sendMessage
+  return $ BotReqPair.VkReqPair (apiMethod, reqOptions)
 setEchoMessage _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
-setHelpMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> BotMessage.Message ->
-                  Text ->
-                  m (Maybe (BotMethod.Method, BotReqOptions.RequestOptions))
+setHelpMessage :: (MonadThrow m, Monad m) =>
+                   BotDBQ.Handle m ->
+                   BotMessage.Message ->
+                   Text ->
+                   m (Maybe BotReqPair.ReqPair)
 setHelpMessage handle (BotMessage.VkMessage message) description = do
-  let config = BotParser.cParser handle
+  let config = BotDBQ.cDBQ handle
       token = Settings.botToken config
       userId = VkMessage.user_id message
       newMessage = (
@@ -167,21 +140,21 @@ setHelpMessage handle (BotMessage.VkMessage message) description = do
           VkSendMessage.message = description
         }
       vkReqOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable newMessage
-      reqOptions = BotReqOptions.VkReqOptions $
-                   VkReqOptions.RequestOptions vkReqOptions
-      apiMethod = BotMethod.VkMethod VkMethod.sendMessage
-  return $ Just (apiMethod, reqOptions)
+      reqOptions = VkReqOptions.RequestOptions vkReqOptions
+      apiMethod = VkMethod.sendMessage
+  return $ Just $ BotReqPair.VkReqPair (apiMethod, reqOptions)
 setHelpMessage _ botMessage _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
-setKeyboardMessage :: (MonadThrow m, Monad m) => BotParser.Handle m ->
-                      BotMessage.Message ->
-                     [BotButton.Button] ->
-                      Text ->
-                      m (BotMethod.Method, BotReqOptions.RequestOptions)
+setKeyboardMessage :: (MonadThrow m, Monad m) =>
+                       BotDBQ.Handle m ->
+                       BotMessage.Message ->
+                      [BotButton.Button] ->
+                       Text ->
+                       m BotReqPair.ReqPair
 setKeyboardMessage handle (BotMessage.VkMessage message) _ question = do
-  let systemH = BotParser.hSystem handle
-      config = BotParser.cParser handle
+  let systemH = BotDBQ.hSystem handle
+      config = BotDBQ.cDBQ handle
       token = Settings.botToken config
       userId = VkMessage.user_id message
   keyboard <- BotSystem.readFile systemH "data/Vk/repeatButtons.txt"
@@ -191,17 +164,16 @@ setKeyboardMessage handle (BotMessage.VkMessage message) _ question = do
         }
       vkReqOptions = T.pack $ L8.unpack $ Url.urlEncodeAsFormStable newMessage
       vkReqOptionsWKeyboard = vkReqOptions <> "&keyboard=" <> T.pack keyboard
-      reqOptions = BotReqOptions.VkReqOptions $
-                   VkReqOptions.RequestOptions vkReqOptionsWKeyboard
-      apiMethod = BotMethod.VkMethod VkMethod.sendMessage
-  return (apiMethod, reqOptions)
+      reqOptions = VkReqOptions.RequestOptions vkReqOptionsWKeyboard
+      apiMethod = VkMethod.sendMessage
+  return $ BotReqPair.VkReqPair (apiMethod, reqOptions)
 setKeyboardMessage _ botMessage _ _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setGetUpdate :: (MonadThrow m, Monad m) =>
-                BotParser.Handle m ->
+                BotDBQ.Handle m ->
                 BotUpdate.Update ->
-                m (BotMethod.Method, BotReqOptions.RequestOptions)
+                m BotReqPair.ReqPair
 setGetUpdate _  (BotUpdate.VkUpdate server) = do
   let serverLink = VkServer.server server
       serverKey = VkServer.key server
@@ -213,64 +185,75 @@ setGetUpdate _  (BotUpdate.VkUpdate server) = do
                   <> BotUtil.convertValue tsCurrent
                   <> "&wait="
                   <> BotUtil.convertValue Settings.timeout
-      reqOptions = BotReqOptions.VkReqOptions $
-                   VkReqOptions.RequestOptions vkReqOptions
-      apiMethod = BotMethod.VkMethod VkMethod.getUpdate
-  return (apiMethod, reqOptions)
+      reqOptions = VkReqOptions.RequestOptions vkReqOptions
+      apiMethod = VkMethod.getUpdate
+  return $ BotReqPair.VkReqPair (apiMethod, reqOptions)
 setGetUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
 createRequest :: (Monad m, MonadThrow m) =>
-                  BotParser.Handle m ->
-                  BotMethod.Method ->
-                  BotReqOptions.RequestOptions ->
+                  BotDBQ.Handle m ->
+                  BotReqPair.ReqPair ->
                   m (Text, B.ByteString)
-createRequest _ (BotMethod.VkMethod apiMethod)
-                   (BotReqOptions.VkReqOptions options) = do
+createRequest _ (BotReqPair.VkReqPair (apiMethod, options)) = do
   let methodApi = VkMethod.getMethod apiMethod
       optionsApi = VkReqOptions.reqOption options
       api = T.intercalate "?" (filter (not . T.null) [methodApi, optionsApi])
   return (api, "")
-createRequest _ _ _ = do
+createRequest _ _ = do
   throwM E.ApiMethodError
 
-downloadDoc :: Monad m => BotParser.Handle m ->
-               BotDoc.Document -> B.ByteString -> m (Maybe Text)
+downloadDoc :: (Monad m, MonadThrow m) =>
+                BotDBQ.Handle m ->
+                BotDoc.Document ->
+                B.ByteString ->
+                m (Maybe Text)
 downloadDoc handle botDoc serverUp = do
-  let systemH = BotParser.hSystem handle
+  let systemH = BotDBQ.hSystem handle
       link = VkDoc.url doc
       docTitle = VkDoc.title doc
       doc = BotDoc.vkDoc botDoc
   tempDir <- BotSystem.getTemporaryDirectory systemH
   let fileName = tempDir </> T.unpack docTitle
   BotSystem.downloadFile systemH link fileName
-  urlResp <- Parser.parseUploadUrl handle serverUp
-  let docUrl = maybe (BotSynonyms.Url "")
-        VkUpUrl.upload_url (VkUpUrlResp.response urlResp)
-  fileUp <- BotSystem.uploadFile systemH docUrl fileName
-  fileResp <- Parser.parseUploadFile handle fileUp
-  return $ VkUpFileResp.file fileResp
+  fileRespE <- runEitherT $ do
+    urlResp <- newEitherT $ BotParser.parseData handle serverUp
+    let docUrl = maybe (BotSynonyms.Url "")
+          VkUpUrl.upload_url (VkUpUrlResp.response urlResp)
+    fileUp <- lift $ BotSystem.uploadFile systemH docUrl fileName
+    newEitherT $ BotParser.parseData handle fileUp
+  case fileRespE of
+    Left msg -> throwM $ E.ParseRequestError $ T.unpack msg
+    Right fileResp -> return $ VkUpFileResp.file fileResp
 
-changeDoc :: Monad m => BotParser.Handle m ->
-             BotDoc.Document -> B.ByteString -> m BotDoc.Document
+changeDoc :: (Monad m, MonadThrow m) =>
+              BotDBQ.Handle m ->
+              BotDoc.Document ->
+              B.ByteString ->
+              m BotDoc.Document
 changeDoc handle botDoc@(BotDoc.VkDoc doc) objUp = do
-  let logH = BotParser.hLogger handle
-  obj <- Parser.parseUploadObject handle objUp
-  case VkUpObjResp.response obj of
-    [x] -> do
-      Logger.logInfo logH "Doc changed"
-      let (BotSynonyms.ObjectId objId) = VkUpObj.id x
-      return $ BotDoc.VkDoc doc {
-        VkDoc.id = BotSynonyms.DocId objId,
-        VkDoc.owner_id = VkUpObj.owner_id x,
-        VkDoc.url = VkUpObj.url x
-      }
-    _ -> do
-      Logger.logWarning logH "No uploaded objects"
-      return botDoc
+  let logH = BotDBQ.hLogger handle
+  objE <- BotParser.parseData handle objUp
+  case objE of
+    Left msg -> throwM $ E.ParseRequestError $ T.unpack msg
+    Right obj -> do
+      case VkUpObjResp.response obj of
+        [x] -> do
+          Logger.logInfo logH "Doc changed"
+          let (BotSynonyms.ObjectId objId) = VkUpObj.id x
+          return $ BotDoc.VkDoc doc {
+            VkDoc.id = BotSynonyms.DocId objId,
+            VkDoc.owner_id = VkUpObj.owner_id x,
+            VkDoc.url = VkUpObj.url x
+          }
+        _ -> do
+          Logger.logWarning logH "No uploaded objects"
+          return botDoc
 
-extractDoc :: (MonadThrow m, Monad m) => BotParser.Handle m ->
-              BotMessage.Message -> m (Maybe [BotDoc.Document])
+extractDoc :: (MonadThrow m, Monad m) =>
+               BotDBQ.Handle m ->
+               BotMessage.Message ->
+               m (Maybe [BotDoc.Document])
 extractDoc _ (BotMessage.VkMessage message) = do
   case VkMessage.attachments message of
     Nothing -> return Nothing
@@ -280,8 +263,11 @@ extractDoc _ (BotMessage.VkMessage message) = do
 extractDoc _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
-changeMessage :: (MonadThrow m, Monad m) => BotParser.Handle m -> 
-                 BotMessage.Message -> [BotDoc.Document] -> m BotMessage.Message
+changeMessage :: (MonadThrow m, Monad m) =>
+                  BotDBQ.Handle m -> 
+                  BotMessage.Message ->
+                 [BotDoc.Document] ->
+                  m BotMessage.Message
 changeMessage _ botMessage@(BotMessage.VkMessage message) botDocs = do
   case map BotDoc.vkDoc botDocs of
     [] -> return botMessage
@@ -297,7 +283,8 @@ changeMessage _ botMessage@(BotMessage.VkMessage message) botDocs = do
 changeMessage _ botMessage _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
-attachmentsToQuery :: Maybe [VkAttach.Attachment] -> Maybe Text
+attachmentsToQuery :: Maybe [VkAttach.Attachment] ->
+                      Maybe Text
 attachmentsToQuery Nothing = Nothing
 attachmentsToQuery (Just xs) = do
   let attsStrsL = filter (/= Nothing) (map attachmentToString xs)
@@ -307,7 +294,8 @@ attachmentsToQuery (Just xs) = do
       attsStrs <- sequenceA attsStrsML
       Just $ T.intercalate "," attsStrs
 
-attachmentToString :: VkAttach.Attachment -> Maybe Text
+attachmentToString :: VkAttach.Attachment ->
+                      Maybe Text
 attachmentToString attach = case attach of 
   VkAttach.AttachPhoto photo -> do
     let ownerId = VkPhoto.owner_id photo
@@ -345,7 +333,8 @@ attachmentToString attach = case attach of
       <> BotUtil.convertValue docId
   _ -> Nothing
 
-returnStickerId :: Maybe [VkAttach.Attachment] -> Maybe BotSynonyms.StickerId
+returnStickerId :: Maybe [VkAttach.Attachment] ->
+                   Maybe BotSynonyms.StickerId
 returnStickerId attachsM = do
   attachs <- attachsM
   let awSticker = [ x | x@VkAttach.AttachSticker {} <- attachs ]
@@ -353,7 +342,8 @@ returnStickerId attachsM = do
     [VkAttach.AttachSticker sticker] -> Just $ VkSticker.id sticker
     _ -> Nothing -- Sticker maybe only one in Message
 
-geoToLatLong :: Maybe VkGeo.Geo -> [Maybe Double]
+geoToLatLong :: Maybe VkGeo.Geo ->
+               [Maybe Double]
 geoToLatLong Nothing = [Nothing, Nothing]
 geoToLatLong (Just geo) = map 
   (\x -> readMaybe  x :: Maybe Double) 

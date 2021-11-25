@@ -6,7 +6,6 @@ import qualified Data.Aeson.Types as A
 import Data.Text (Text)
 import GHC.Generics (Generic)
 import Data.Aeson.Types (FromJSON)
-import Data.Aeson (parseJSON)
 
 import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.Api as BotApi
@@ -33,22 +32,17 @@ instance FromJSON Config where
         token repNum question description groupId
       "telegram" -> return $ Config BotApi.Tele
         token repNum question description groupId
-      _ -> return $ Config BotApi.InvalidApi
-        token repNum question description groupId
+      invalidApi -> A.parserThrowError [] $ show invalidApi
 
--- | Api host
 apiTele, apiVk :: BotSynonyms.Host
 apiTele = BotSynonyms.Host "https://api.telegram.org/bot"
 apiVk = BotSynonyms.Host "https://api.vk.com/method/"
 
--- | Api version
 vkVersion :: BotSynonyms.Version
 vkVersion = BotSynonyms.Version "5.81"
 
--- | Config file
 configFile :: FilePath
 configFile = "data/config.json"
 
--- | Timeout
 timeout :: BotSynonyms.Timeout
 timeout = 25

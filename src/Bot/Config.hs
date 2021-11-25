@@ -10,7 +10,6 @@ import GHC.Generics (Generic)
 import qualified Bot.Exception as E
 import qualified Bot.Settings as Settings
 import qualified Bot.Logger.Logger as Logger
-import qualified Bot.Objects.Api as BotApi
 
 data Config = Config {
   cSettings :: Settings.Config,
@@ -31,10 +30,9 @@ getConfig = do
     Right cnfg -> return cnfg
     Left err -> Exc.throwIO err
 
-checkConfig :: Config -> Either E.BotError Config
+checkConfig :: Config ->
+               Either E.BotError Config
 checkConfig config 
-  | Settings.botApi cSet == BotApi.InvalidApi = Left 
-     $ E.ParseConfigError "Incorrect field 'bot_api' in config.json"
   | Settings.botInitialReplyNumber cSet < 0 = Left
      $ E.ParseConfigError "Incorrect field in config.json: \
                           \'bot_initial_reply_number' < 0"
@@ -56,9 +54,10 @@ checkConfig config
 readConfig :: IO B.ByteString
 readConfig = B.readFile Settings.configFile
       
-parseConfig :: B.ByteString -> Either E.BotError Config
+parseConfig :: B.ByteString ->
+               Either E.BotError Config
 parseConfig config = do
-  let d = A.eitherDecode config :: Either String Config
+  let d = A.eitherDecode config
   case d of
     Left err -> Left $ E.ParseConfigError err
     Right ps -> Right ps

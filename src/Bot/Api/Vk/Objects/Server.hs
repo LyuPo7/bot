@@ -7,14 +7,12 @@ import GHC.Generics (Generic)
 import Data.Aeson.Types (FromJSON(..), defaultOptions,
                          fieldLabelModifier, genericParseJSON)
 
--- | Server
 data Server = Server {
   key :: Text, -- Key for requests.
   server :: Text, -- Requests server.
   ts :: Integer  -- Server time stamp.
 } deriving (Show, Read, Eq, Generic, FromJSON)
 
--- | ServerText with ts String
 data ServerText = ServerText {
   text_key :: Text, -- Key for requests.
   text_server :: Text, -- Requests server.

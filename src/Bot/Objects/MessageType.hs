@@ -1,4 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
+
 module Bot.Objects.MessageType where
 
 import qualified Data.Text as T
@@ -10,6 +11,7 @@ data MessageType = TextMessage Text
                  | RepeatMessage
                  | StartMessage
                  | UnsupportedMessage
+                 deriving (Show, Eq)
 
 instance Convertible Text MessageType where
   safeConvert "/help" = Right HelpMessage

@@ -1,4 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
+
 module Bot.Objects.Mode where
 
 import Database.HDBC (SqlValue(..))

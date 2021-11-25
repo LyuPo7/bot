@@ -11,7 +11,9 @@ data Button = Button {
   callback_data :: Maybe Text
 } deriving (Show, Eq, Generic, ToJSON)
 
-createButton :: Text -> Text -> Button
+createButton :: Text ->
+                Text ->
+                Button
 createButton buttonText callback = Button {
   text = buttonText,
   callback_data = Just callback

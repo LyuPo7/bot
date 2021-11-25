@@ -17,13 +17,6 @@ import qualified Bot.Objects.Api as BotApi
 import qualified Bot.Api.Tele.Request.Requests as TeleReq
 import qualified Bot.Api.Tele.Mode.Mode as TeleMode
 
-parserH :: BotParser.Handle Maybe
-parserH = BotParser.Handle {
-  BotParser.hLogger = BotHandlers.logH,
-  BotParser.hSystem = sysH,
-  BotParser.cParser = runC
-}
-
 conn :: Connection
 conn = undefined
 
@@ -38,6 +31,8 @@ dbqH :: BotDBQ.Handle Maybe
 dbqH = BotDBQ.Handle {
   BotDBQ.hLogger = BotHandlers.logH,
   BotDBQ.hDb = dbH,
+  BotDBQ.hSystem = sysH,
+  BotDBQ.cDBQ = runC,
 
   BotDBQ.getLastSucUpdate = return (Just 100),
   BotDBQ.putUpdate = \_ -> return (),
@@ -72,43 +67,8 @@ reqH :: BotReq.Handle Maybe
 reqH = BotReq.Handle {
   BotReq.hLogger = BotHandlers.logH,
   BotReq.hDb = dbqH,
-  BotReq.hParser = parserH,
   BotReq.cReq = runC,
 
-  BotReq.createRequest = \_ _ -> return ("https://api.vk.com", ""),
-  BotReq.setUploadedServer = const Nothing,
-  BotReq.setUploadedDoc = const Nothing,
-  BotReq.setGetServer = Nothing,
-  BotReq.setGetUpdate = TeleReq.setGetUpdate parserH,
-  BotReq.setEchoMessage = TeleReq.setEchoMessage parserH,
-  BotReq.setHelpMessage = TeleReq.setTextMessage parserH,
-  BotReq.setStartMessage = TeleReq.setTextMessage parserH,
-  BotReq.setKeyboardMessage = TeleReq.setKeyboardMessage parserH,
-  BotReq.setCommands = TeleReq.setCommands parserH,
-
-  BotReq.downloadDoc = \_ _ -> Nothing,
-  BotReq.extractDoc = const Nothing,
-  BotReq.changeMessage = \message _-> return message,
-  BotReq.changeDoc = \doc _ -> return doc,
-
   BotReq.newManager = \_ -> return undefined,
-  BotReq.httpLbs = \ _ _ -> return (BotHandlers.resp  "ok")
-}
-
-modeH :: BotMode.Handle Maybe
-modeH = BotMode.Handle {
-  BotMode.hLogger = BotHandlers.logH,
-  BotMode.cRun = runC,
-  BotMode.hDb = dbqH,
-  BotMode.hReq = reqH,
-  BotMode.hParser = parserH,
-  
-  BotMode.setupBot = TeleMode.setupBot reqH,
-  BotMode.getFirstUpdate = TeleMode.getFirstUpdate reqH,
-  BotMode.getLastUpdate = TeleMode.getLastUpdate reqH,
-  BotMode.getNextUpdate = TeleMode.getNextUpdate reqH,
-  BotMode.getPrevUpdate = TeleMode.getPrevUpdate reqH,
-  BotMode.getChatId = TeleMode.getChatId reqH,
-  BotMode.getMessageText = TeleMode.getMessageText reqH,
-  BotMode.getMessageType = TeleMode.getMessageType reqH
+  BotReq.httpLbs = \ _ _ -> return (BotHandlers.resp "ok")
 }

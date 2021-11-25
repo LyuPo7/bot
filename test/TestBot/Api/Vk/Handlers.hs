@@ -17,13 +17,6 @@ import qualified Bot.Objects.Api as BotApi
 import qualified Bot.Api.Vk.Request.Requests as VkReq
 import qualified Bot.Api.Vk.Mode.Mode as VkMode
 
-parserH :: BotParser.Handle Maybe
-parserH = BotParser.Handle {
-  BotParser.hLogger = BotHandlers.logH,
-  BotParser.hSystem = sysH,
-  BotParser.cParser = runC
-}
-
 conn :: Connection
 conn = undefined
 
@@ -38,6 +31,8 @@ dbqH :: BotDBQ.Handle Maybe
 dbqH = BotDBQ.Handle {
   BotDBQ.hLogger = BotHandlers.logH,
   BotDBQ.hDb = dbH,
+  BotDBQ.hSystem = sysH,
+  BotDBQ.cDBQ = runC,
 
   BotDBQ.getLastSucUpdate = return (Just 100),
   BotDBQ.putUpdate = \_ -> return (),
@@ -72,43 +67,8 @@ reqH :: BotReq.Handle Maybe
 reqH = BotReq.Handle {
   BotReq.hLogger = BotHandlers.logH,
   BotReq.hDb = dbqH,
-  BotReq.hParser = parserH,
   BotReq.cReq = runC,
 
-  BotReq.createRequest = \_ _ -> return ("https://api.vk.com", "ok"),
-  BotReq.setUploadedServer = VkReq.setUploadedServer parserH,
-  BotReq.setUploadedDoc = VkReq.setUploadedDoc parserH,
-  BotReq.setGetServer = VkReq.setGetServer parserH,
-  BotReq.setGetUpdate = VkReq.setGetUpdate parserH,
-  BotReq.setEchoMessage = VkReq.setEchoMessage parserH,
-  BotReq.setHelpMessage = VkReq.setHelpMessage parserH,
-  BotReq.setStartMessage = \_ _ -> Nothing,
-  BotReq.setKeyboardMessage = VkReq.setKeyboardMessage parserH,
-  BotReq.setCommands = Nothing,
-
-  BotReq.downloadDoc = VkReq.downloadDoc parserH,
-  BotReq.extractDoc = VkReq.extractDoc parserH,
-  BotReq.changeMessage = VkReq.changeMessage parserH,
-  BotReq.changeDoc = VkReq.changeDoc parserH,
-
   BotReq.newManager = \_ -> return undefined,
-  BotReq.httpLbs = \ _ _ -> return (BotHandlers.resp  "ok")
-}
-
-modeH :: BotMode.Handle Maybe
-modeH = BotMode.Handle {
-  BotMode.hLogger = BotHandlers.logH,
-  BotMode.cRun = runC,
-  BotMode.hDb = dbqH,
-  BotMode.hReq = reqH,
-  BotMode.hParser = parserH,
-  
-  BotMode.setupBot = return (),
-  BotMode.getFirstUpdate = VkMode.getFirstUpdate reqH,
-  BotMode.getLastUpdate = VkMode.getLastUpdate reqH,
-  BotMode.getNextUpdate = VkMode.getNextUpdate reqH,
-  BotMode.getPrevUpdate = VkMode.getPrevUpdate reqH,
-  BotMode.getChatId = VkMode.getChatId reqH,
-  BotMode.getMessageText = VkMode.getMessageText reqH,
-  BotMode.getMessageType = VkMode.getMessageType reqH
+  BotReq.httpLbs = \ _ _ -> return (BotHandlers.resp "ok")
 }

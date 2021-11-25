@@ -14,7 +14,8 @@ data CopyMessage = CopyMessage {
 } deriving (Show, Eq, Generic, ToJSON)
 
 createEchoMessage :: BotSynonyms.ChatId ->
-                     BotSynonyms.MessageId -> CopyMessage
+                     BotSynonyms.MessageId ->
+                     CopyMessage
 createEchoMessage chatId messageId = CopyMessage { 
   chat_id = chatId,
   from_chat_id = chatId,

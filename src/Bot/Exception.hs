@@ -14,6 +14,7 @@ data BotError = ParseRequestError String
                | StartMessageError
                | ApiObjectError String
                | ApiMethodError
+               | InvalidApiError String
                | DbError String
                | Default String
                deriving (Exception, Eq)
@@ -32,5 +33,8 @@ instance Show BotError where
   show StartMessageError = "This API hasn't '/start' message"
   show (ApiObjectError err) = "Incorrect Object for this Api: " ++ err
   show ApiMethodError = "Incorrect Method for this Api!"
+  show (InvalidApiError invalidApi) = "This Api: "
+                                    ++ invalidApi
+                                    ++ " isn't supported!"
   show (Default _) = "Default error"
   show (DbError err) = "Db error: " ++ err
