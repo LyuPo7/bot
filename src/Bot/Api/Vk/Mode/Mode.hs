@@ -1,15 +1,14 @@
 module Bot.Api.Vk.Mode.Mode where
 
+import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.Text as T
 import Control.Monad.Trans.Either (newEitherT, runEitherT)
 import Data.Text (Text)
-import Data.Maybe (fromMaybe)
 import Control.Monad.Catch (MonadThrow, throwM)
 import Data.Convertible.Base (convert)
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
-import qualified Bot.DB.DBQ as BotDBQ
 import qualified Bot.Parser.Parser as BotParser
 import qualified Bot.Request.Request as BotReq
 import qualified Bot.Objects.Synonyms as BotSynonyms
@@ -23,37 +22,35 @@ import qualified Bot.Api.Vk.Objects.Update as VkUpdate
 import qualified Bot.Api.Vk.Objects.PollResponse as VkPollResp
 import qualified Bot.Util as BotUtil
 
-getLastUpdate :: (MonadThrow m, Monad m) =>
+extractUpdate :: (Monad m, MonadThrow m) =>
                   BotReq.Handle m ->
-                  BotUpdate.Update ->
-                  m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
-getLastUpdate handle (BotUpdate.VkUpdate serverParams) = do
-  let logH = BotReq.hLogger handle
-      dbH = BotReq.hDb handle
-      tsCurrent = VkServer.ts serverParams
-  processedUpdId <- BotDBQ.getLastSucUpdate dbH
-  let newUpdId = fmap (+1) processedUpdId
-      updateId = fromMaybe (BotSynonyms.UpdateId tsCurrent) newUpdId
-  let nextUpdate = BotUpdate.VkUpdate serverParams
-  responseUp <- BotReq.getUpdate handle nextUpdate
-  updateDataE <- BotParser.parseData dbH responseUp
+                  L8.ByteString ->
+                  m [BotUpdate.Update]
+extractUpdate handle response = do
+  let dbH = BotReq.hDb handle
+  updateDataE <- BotParser.parseData dbH response
   case updateDataE of
     Left msg -> throwM $ E.ParseRequestError $ T.unpack msg
     Right updateData -> do
-      let update = VkUpData.updates updateData
-      case update of
-        [] -> return Nothing
-        (x:_) -> do
-          let updateType = VkUpdate.update_type x
-              userMessage = VkUpdate.object x
-          case updateType of
-            "message_new" -> do
-              let botMessage = BotMessage.VkMessage userMessage
-              return $ Just (updateId, botMessage)
-            _ -> do
-              Logger.logError logH "Unsupported type of update."
-              return Nothing
-getLastUpdate _ botUpdate = do
+      let updates = VkUpData.updates updateData
+      return $ fmap BotUpdate.VkFullUpdate updates
+
+extractMessage :: (Monad m, MonadThrow m) =>
+                  BotReq.Handle m ->
+                  BotUpdate.Update ->
+                  m (Maybe BotMessage.Message)
+extractMessage handle (BotUpdate.VkFullUpdate update) = do
+  let logH = BotReq.hLogger handle
+      updateType = VkUpdate.update_type update
+      userMessage = VkUpdate.object update
+  case updateType of
+    "message_new" -> do
+      let botMessage = BotMessage.VkMessage userMessage
+      return $ Just botMessage
+    _ -> do
+      Logger.logError logH "Unsupported type of update."
+      return Nothing
+extractMessage _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
 getFirstUpdate :: (MonadThrow m, Monad m) =>
@@ -126,3 +123,23 @@ getMessageType _ (BotMessage.VkMessage userMessage) = do
     message -> return message
 getMessageType _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
+
+getDefaultUpdateId :: (MonadThrow m, Monad m) =>
+                       BotReq.Handle m ->
+                       BotUpdate.Update ->
+                       m BotSynonyms.UpdateId
+getDefaultUpdateId _ (BotUpdate.VkUpdate serverParams) = do
+  return $ convert $ VkServer.ts serverParams
+getDefaultUpdateId _ botUpdate = do
+  throwM $ E.ApiObjectError $ show botUpdate
+
+changeUpdateId :: (MonadThrow m, Monad m) =>
+                   BotReq.Handle m ->
+                   BotUpdate.Update ->
+                   BotSynonyms.UpdateId ->
+                   m BotUpdate.Update
+changeUpdateId _ (BotUpdate.VkUpdate update) newUpdateId = do
+  let newUpdate = update {VkServer.ts = convert newUpdateId}
+  return $ BotUpdate.VkUpdate newUpdate
+changeUpdateId _ botUpdate _ = do
+  throwM $ E.ApiObjectError $ show botUpdate

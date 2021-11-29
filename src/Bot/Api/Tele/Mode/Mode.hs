@@ -1,14 +1,13 @@
 module Bot.Api.Tele.Mode.Mode where
 
+import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.Text as T
 import Data.Text (Text)
-import Data.Maybe (fromMaybe)
 import Control.Monad.Catch (MonadThrow, throwM)
 import Data.Convertible.Base (convert)
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
-import qualified Bot.DB.DBQ as BotDBQ
 import qualified Bot.Request.Request as BotReq
 import qualified Bot.Parser.Parser as BotParser
 import qualified Bot.Objects.Synonyms as BotSynonyms
@@ -27,38 +26,35 @@ setupBot :: (Monad m, MonadThrow m) =>
 setupBot handle = do
   BotReq.sendCommands handle
 
-getLastUpdate :: (Monad m, MonadThrow m) =>
+extractUpdate :: (Monad m, MonadThrow m) =>
                   BotReq.Handle m ->
-                  BotUpdate.Update ->
-                  m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
-getLastUpdate handle _ = do
-  let logH = BotReq.hLogger handle
-      dbH = BotReq.hDb handle
-  processedUpdId <- BotDBQ.getLastSucUpdate dbH
-  let newUpdId = fmap (+ 1) processedUpdId
-      nextUpdateId = fromMaybe 0 newUpdId
-      nextUpdate = BotUpdate.TeleUpdate nextUpdateId
-  responseUp <- BotReq.getUpdate handle nextUpdate
-  updateDataE <- BotParser.parseData dbH responseUp
+                  L8.ByteString ->
+                  m [BotUpdate.Update]
+extractUpdate handle response = do
+  let dbH = BotReq.hDb handle
+  updateDataE <- BotParser.parseData dbH response
   case updateDataE of
     Left msg -> throwM $ E.ParseRequestError $ T.unpack msg
     Right updateData -> do
       let update = TeleUpData.result updateData
-      case update of
-        [] -> return Nothing
-        [x] -> do
-          let updateId = TeleUpdate.id x
-              checkMessage = TeleUpdate.message x
-          case checkMessage of
-            Nothing -> do 
-              Logger.logWarning logH "Where are no new messages!"
-              return Nothing
-            Just userMessage -> do
-              let botMessage = BotMessage.TeleMessage userMessage
-              return $ Just (updateId, botMessage)
-        _ -> do
-          Logger.logError logH "Expected one update, but have many."
-          return Nothing
+      return $ fmap BotUpdate.TeleFullUpdate update
+
+extractMessage :: (Monad m, MonadThrow m) =>
+                  BotReq.Handle m ->
+                  BotUpdate.Update ->
+                  m (Maybe BotMessage.Message)
+extractMessage handle (BotUpdate.TeleFullUpdate update) = do
+  let logH = BotReq.hLogger handle
+      checkMessage = TeleUpdate.message update
+  case checkMessage of
+    Nothing -> do 
+      Logger.logWarning logH "Where are no new messages!"
+      return Nothing
+    Just userMessage -> do
+      let botMessage = BotMessage.TeleMessage userMessage
+      return $ Just botMessage
+extractMessage _ botUpdate = do
+  throwM $ E.ApiObjectError $ show botUpdate
 
 getFirstUpdate :: Monad m =>
                   BotReq.Handle m ->
@@ -118,4 +114,13 @@ getMessageType _ (BotMessage.TeleMessage userMessage) = do
         Just _ -> return $ convert messageText
 getMessageType _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
-  
+
+changeUpdateId :: (MonadThrow m, Monad m) =>
+                   BotReq.Handle m ->
+                   BotUpdate.Update ->
+                   BotSynonyms.UpdateId ->
+                   m BotUpdate.Update
+changeUpdateId _ (BotUpdate.TeleUpdate _) updateId = do
+  return $ BotUpdate.TeleUpdate updateId
+changeUpdateId _ botUpdate _ = do
+  throwM $ E.ApiObjectError $ show botUpdate

@@ -2,6 +2,7 @@
 
 module Bot.Mode.Mode where
 
+import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.Text as T
 import Data.Text (Text)
 import Data.Maybe (fromMaybe)
@@ -29,10 +30,6 @@ class (MonadThrow m, Monad m) => Worker m api where
   getFirstUpdate :: api ->
                     BotReq.Handle m ->
                     m BotUpdate.Update
-  getLastUpdate :: api ->
-                   BotReq.Handle m ->
-                   BotUpdate.Update ->
-                   m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
   getNextUpdate :: api ->
                    BotReq.Handle m ->
                    BotUpdate.Update ->
@@ -53,6 +50,23 @@ class (MonadThrow m, Monad m) => Worker m api where
                     BotReq.Handle m ->
                     BotMessage.Message ->
                     m BotMessageType.MessageType
+  getDefaultUpdateId :: api ->
+                        BotReq.Handle m ->
+                        BotUpdate.Update ->
+                        m BotSynonyms.UpdateId
+  changeUpdateId :: api ->
+                    BotReq.Handle m ->
+                    BotUpdate.Update ->
+                    BotSynonyms.UpdateId ->
+                    m BotUpdate.Update
+  extractUpdate :: api ->
+                   BotReq.Handle m ->
+                   L8.ByteString ->
+                   m [BotUpdate.Update]
+  extractMessage :: api ->
+                    BotReq.Handle m ->
+                    BotUpdate.Update ->
+                    m (Maybe BotMessage.Message)
 
 instance (MonadThrow m, Monad m) => Worker m BotApi.Api where
   setupBot BotApi.Tele h = TeleMode.setupBot h
@@ -60,9 +74,6 @@ instance (MonadThrow m, Monad m) => Worker m BotApi.Api where
 
   getFirstUpdate BotApi.Tele h = TeleMode.getFirstUpdate h
   getFirstUpdate BotApi.Vk h = VkMode.getFirstUpdate h
-
-  getLastUpdate BotApi.Tele h update = TeleMode.getLastUpdate h update
-  getLastUpdate BotApi.Vk h update = VkMode.getLastUpdate h update
 
   getNextUpdate BotApi.Tele h update = TeleMode.getNextUpdate h update
   getNextUpdate BotApi.Vk h update = VkMode.getNextUpdate h update
@@ -78,6 +89,20 @@ instance (MonadThrow m, Monad m) => Worker m BotApi.Api where
 
   getMessageType BotApi.Tele h message = TeleMode.getMessageType h message
   getMessageType BotApi.Vk h message = VkMode.getMessageType h message
+
+  getDefaultUpdateId BotApi.Tele _ _ = return 0
+  getDefaultUpdateId BotApi.Vk h update = VkMode.getDefaultUpdateId h update
+
+  changeUpdateId BotApi.Tele h update updateId =
+    TeleMode.changeUpdateId h update updateId
+  changeUpdateId BotApi.Vk h update updateId =
+    VkMode.changeUpdateId h update updateId
+  
+  extractUpdate BotApi.Tele h response = TeleMode.extractUpdate h response
+  extractUpdate BotApi.Vk h response = VkMode.extractUpdate h response
+
+  extractMessage BotApi.Tele h update = TeleMode.extractMessage h update
+  extractMessage BotApi.Vk h update = VkMode.extractMessage h update
 
 startMode :: (MonadThrow m, Monad m) =>
               BotReq.Handle m ->
@@ -102,7 +127,7 @@ checkMode handle prevUpdate = do
       dbH = BotReq.hDb handle
       config = BotReq.cReq handle
       api = Settings.botApi config
-  nextUpdate <- getLastUpdate api handle prevUpdate
+  nextUpdate <- getLastUpdate handle prevUpdate
   case nextUpdate of
     Nothing -> do
       Logger.logWarning logH "Where are no more updates for now!"
@@ -185,4 +210,31 @@ answerMode handle userMessage = do
       return $ Just repNum
     Nothing -> do
       Logger.logError logH "Couldn't parse User's answer!"
+      return Nothing
+
+getLastUpdate :: (Monad m, MonadThrow m) =>
+                  BotReq.Handle m ->
+                  BotUpdate.Update ->
+                  m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
+getLastUpdate handle update = do
+  let logH = BotReq.hLogger handle
+      dbH = BotReq.hDb handle
+      config = BotReq.cReq handle
+      api = Settings.botApi config
+  defaultUpdateId <- getDefaultUpdateId api handle update
+  lastDbUpdateId <- BotDBQ.getLastSucUpdate dbH
+  let nextDbUpdateId = fmap (+1) lastDbUpdateId
+      nextUpdateId = fromMaybe defaultUpdateId nextDbUpdateId
+  nextUpdate <- changeUpdateId api handle update nextUpdateId
+  response <- BotReq.getUpdate handle nextUpdate
+  newUpdate <- extractUpdate api handle response
+  case newUpdate of
+    [] -> return Nothing
+    [x] -> do
+      messageM <- extractMessage api handle x
+      case messageM of
+        Nothing -> return Nothing
+        Just message -> return $ Just (nextUpdateId, message)
+    _ -> do
+      Logger.logError logH "Expected one update, but have many."
       return Nothing

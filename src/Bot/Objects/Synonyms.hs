@@ -85,6 +85,12 @@ instance Convertible ChatId SqlValue where
 newtype UpdateId = UpdateId Integer
   deriving newtype (Show, FromJSON, ToJSON, Num, Read, Ord, Eq, ToHttpApiData)
 
+instance Convertible UpdateId Integer where
+  safeConvert (UpdateId num) = Right num
+
+instance Convertible Integer UpdateId where
+  safeConvert num = Right $ UpdateId num
+
 instance Convertible UpdateId SqlValue where
   safeConvert (UpdateId updateId) = Right $ SqlInteger updateId
 
