@@ -19,7 +19,6 @@ import qualified Bot.Api.Tele.Objects.RequestOptions as TeleReqOptions
 import qualified Bot.Api.Tele.Objects.Message as TeleMessage
 import qualified Bot.Api.Tele.Objects.Chat as TeleChat
 import qualified Bot.Api.Tele.Objects.Keyboard as TeleKeyboard
-import qualified Bot.Api.Tele.Objects.Button as TeleButton
 import qualified Bot.Api.Tele.Objects.GetUpdates as TeleGetUpdates
 import qualified Bot.Api.Tele.Objects.SendMessage as TeleSendMessage
 import qualified Bot.Api.Tele.Objects.KeyboardMessage as TeleKeyboardMessage
@@ -74,23 +73,15 @@ setKeyboardMessage :: (MonadThrow m, Monad m) =>
                        m BotReqPair.ReqPair
 setKeyboardMessage _ (BotMessage.TeleMessage message) buttons question = do
   let chatId = TeleChat.id $ TeleMessage.chat message
-      [b1, b2, b3, b4, b5] = buttons
-      b1Tele = TeleButton.createButton
-        (BotButton.text b1) (BotButton.description b1)
-      b2Tele = TeleButton.createButton
-        (BotButton.text b2) (BotButton.description b2)
-      b3Tele = TeleButton.createButton
-        (BotButton.text b3) (BotButton.description b3)
-      b4Tele = TeleButton.createButton
-        (BotButton.text b4) (BotButton.description b4)
-      b5Tele = TeleButton.createButton
-        (BotButton.text b5) (BotButton.description b5)
-      keyboard = TeleKeyboard.createKeyboard
-        [[b1Tele, b2Tele, b3Tele, b4Tele, b5Tele]]
-      apiMethod = TeleMethod.sendMessage
-      reqOptions = TeleReqOptions.SendKeyboard $ 
-         TeleKeyboardMessage.createKeyboardMessage chatId question keyboard
-  return $ BotReqPair.TeleReqPair (apiMethod, reqOptions)
+  if length buttons == 5
+    then do
+      let teleButtons = fmap BotButton.createTeleButton buttons
+          keyboard = TeleKeyboard.createKeyboard [teleButtons]
+          apiMethod = TeleMethod.sendMessage
+          reqOptions = TeleReqOptions.SendKeyboard $ 
+            TeleKeyboardMessage.createKeyboardMessage chatId question keyboard
+      return $ BotReqPair.TeleReqPair (apiMethod, reqOptions)
+    else throwM $ E.ButtonNumberError $ length buttons
 setKeyboardMessage _ botMessage _ _ = do
   throwM $ E.ApiObjectError $ show botMessage
 

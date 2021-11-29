@@ -15,6 +15,7 @@ data BotError = ParseRequestError String
                | ApiObjectError String
                | ApiMethodError
                | InvalidApiError String
+               | ButtonNumberError Int
                | DbError String
                | Default String
                deriving (Exception, Eq)
@@ -36,5 +37,8 @@ instance Show BotError where
   show (InvalidApiError invalidApi) = "This Api: "
                                     ++ invalidApi
                                     ++ " isn't supported!"
+  show (ButtonNumberError num) = "Incorrect quantity of keyboard buttons: "
+                               ++ show num
+                               ++ ". Must be 5!"
   show (Default _) = "Default error"
   show (DbError err) = "Db error: " ++ err

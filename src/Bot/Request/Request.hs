@@ -148,7 +148,6 @@ instance (MonadThrow m, Monad m) => Request m BotApi.Api where
   changeDoc BotApi.Vk h doc bstr = VkReq.changeDoc h doc bstr
   changeDoc BotApi.Tele _ doc _ = return doc
   
-
 getServer :: (MonadThrow m, Monad m) =>
               Handle m ->
               m B.ByteString
