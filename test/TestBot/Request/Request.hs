@@ -3,29 +3,22 @@ module TestBot.Request.Request where
 import Data.Convertible.Base (convert)
 
 import qualified Hedgehog.Gen as Gen
-import qualified Hedgehog.Range as Range
 import Test.Hspec (Spec, shouldBe, it, describe)
 
 import qualified TestBot.GenData as BotGD
 import qualified TestBot.Api.Tele.Handlers as TeleHandlers
 import qualified TestBot.Api.Vk.Handlers as VkHandlers
 import qualified TestBot.Api.Tele.GenData as TeleGD
-import qualified TestBot.Api.Vk.GenData as VkGD
 
 import qualified Bot.Settings as Settings
 import qualified Bot.Request.Request as BotReq
 import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.RequestPair as BotReqPair
-import qualified Bot.Objects.Update as BotUpdate
 import qualified Bot.Objects.Message as BotMessage
 import qualified Bot.Objects.Document as BotDoc
 import qualified Bot.Api.Vk.Objects.Message as VkMessage
 import qualified Bot.Api.Vk.Objects.Attachment as VkAttach
 import qualified Bot.Api.Vk.Objects.Document as VkDoc
-import qualified Bot.Api.Vk.Objects.Server as VkServer
-import qualified Bot.Api.Vk.Objects.Photo as VkPhoto
-import qualified Bot.Api.Vk.Objects.Video as VkVideo
-import qualified Bot.Api.Vk.Objects.Audio as VkAudio
 import qualified Bot.Api.Vk.Objects.Method as VkMethod
 import qualified Bot.Api.Vk.Objects.RequestOptions as VkReqOptions
 import qualified Bot.Api.Tele.Objects.Message as TeleMessage
@@ -33,11 +26,7 @@ import qualified Bot.Api.Tele.Objects.Chat as TeleChat
 import qualified Bot.Api.Tele.Objects.MessageEntity as TeleMessageEntity
 import qualified Bot.Api.Tele.Objects.Method as TeleMethod
 import qualified Bot.Api.Tele.Objects.RequestOptions as TeleReqOptions
-import qualified Bot.Api.Tele.Objects.GetUpdates as TeleGetUpdates
 import qualified Bot.Api.Tele.Objects.SendMessage as TeleSendMessage
-import qualified Bot.Api.Tele.Objects.KeyboardMessage as TeleKeyboardMessage
-import qualified Bot.Api.Tele.Objects.CopyMessage as TeleCopyMessage
-import qualified Bot.Api.Tele.Objects.SetCommands as TeleSetCommands
 
 spec_getServer :: Spec
 spec_getServer =

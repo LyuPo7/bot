@@ -198,7 +198,7 @@ test-suite bot-test
       test
   default-extensions:
       OverloadedStrings
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HDBC >=2.4
     , HDBC-sqlite3 >=2.3.3.0

@@ -1,9 +1,7 @@
 module TestBot.Handlers where
 
-import Data.Text (Text)
 import qualified Data.ByteString.Lazy as B
 import qualified Network.HTTP.Types as HTTPTypes
-import qualified Network.HTTP.Client as HTTPClient
 import qualified Network.HTTP.Client.Internal as HTTPInternal
 
 import qualified Bot.Logger.Logger as Logger

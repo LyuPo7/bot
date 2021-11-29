@@ -97,6 +97,8 @@ tests:
       TestBot.GenData
       ]
     ghc-options:
+    - -Wall 
+    - -Werror 
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N

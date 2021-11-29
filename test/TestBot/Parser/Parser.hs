@@ -10,7 +10,6 @@ import qualified TestBot.Api.Vk.Handlers as VkHandlers
 import qualified TestBot.Api.Tele.Handlers as TeleHandlers
 
 import qualified Bot.Parser.Parser as BotParser
-import qualified Bot.DB.DBQ as BotDBQ
 import qualified Bot.Api.Tele.Objects.UpdateData as TeleUpData
 import qualified Bot.Api.Vk.Objects.UploadObjectResponse as VkUpObjResp
 import qualified Bot.Api.Vk.Objects.UploadFileResponse as VkUpFileResp
