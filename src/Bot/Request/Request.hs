@@ -269,12 +269,7 @@ sendKeyboard handle message = do
       dbH = hDb handle
       config = cReq handle
       api = Settings.botApi config
-      b1 = BotButton.Button "1" "Pressed 1"
-      b2 = BotButton.Button "2" "Pressed 2"
-      b3 = BotButton.Button "3" "Pressed 3"
-      b4 = BotButton.Button "4" "Pressed 4"
-      b5 = BotButton.Button "5" "Pressed 5"
-      buttons = [b1, b2, b3, b4, b5]
+      buttons = fmap BotButton.defaultButton [1..5]
       question = Settings.botQuestion config
   reqPair <- setKeyboardMessage
     api dbH message buttons question
