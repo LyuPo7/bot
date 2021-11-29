@@ -109,6 +109,9 @@ library
       src
   default-extensions:
       OverloadedStrings
+      MultiParamTypeClasses
+      FlexibleInstances
+      LambdaCase
   ghc-options: -Wall -Werror
   build-depends:
       HDBC >=2.4
@@ -148,6 +151,9 @@ executable bot-exe
       app
   default-extensions:
       OverloadedStrings
+      MultiParamTypeClasses
+      FlexibleInstances
+      LambdaCase
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HDBC >=2.4
@@ -198,6 +204,9 @@ test-suite bot-test
       test
   default-extensions:
       OverloadedStrings
+      MultiParamTypeClasses
+      FlexibleInstances
+      LambdaCase
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HDBC >=2.4

@@ -1,5 +1,3 @@
-{-# LANGUAGE MultiParamTypeClasses, AllowAmbiguousTypes, FlexibleInstances #-}
-
 module Bot.Mode.Mode where
 
 import qualified Data.ByteString.Lazy.Char8 as L8

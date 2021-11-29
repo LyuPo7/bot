@@ -1,5 +1,3 @@
-{-# LANGUAGE MultiParamTypeClasses #-}
-
 module Bot.Objects.MessageType where
 
 import qualified Data.Text as T

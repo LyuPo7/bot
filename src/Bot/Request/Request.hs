@@ -1,5 +1,3 @@
-{-# LANGUAGE MultiParamTypeClasses, AllowAmbiguousTypes, FlexibleInstances #-}
-
 module Bot.Request.Request where
 
 import qualified Data.ByteString.Lazy as B

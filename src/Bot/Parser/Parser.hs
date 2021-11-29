@@ -1,5 +1,3 @@
-{-# LANGUAGE ConstrainedClassMethods #-}
-
 module Bot.Parser.Parser where
 
 import qualified Data.ByteString.Lazy.Char8 as L8

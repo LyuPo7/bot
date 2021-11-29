@@ -48,7 +48,11 @@ dependencies:
 - transformers-either
 - convertible
 
-default-extensions: OverloadedStrings
+default-extensions:
+- OverloadedStrings
+- MultiParamTypeClasses
+- FlexibleInstances
+- LambdaCase
 
 library:
   source-dirs: src

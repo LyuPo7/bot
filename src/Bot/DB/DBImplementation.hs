@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
-
 module Bot.DB.DBImplementation where
 
 import Database.HDBC (getTables, run, commit)

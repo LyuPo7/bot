@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
-
 module Bot.DB.DBQImplementation where
 
 import Database.HDBC (handleSql, run, commit, quickQuery', fromSql, toSql)
