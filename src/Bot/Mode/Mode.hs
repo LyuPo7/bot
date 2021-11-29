@@ -21,7 +21,7 @@ import qualified Bot.Api.Tele.Mode.Mode as TeleMode
 import qualified Bot.Api.Vk.Mode.Mode as VkMode
 import qualified Bot.Util as BotUtil
 
-class (MonadThrow m, Monad m) => Worker m api where
+class (MonadThrow m, Monad m) => BotApi m api where
   setupBot :: api ->
               BotReq.Handle m ->
               m ()
@@ -66,7 +66,7 @@ class (MonadThrow m, Monad m) => Worker m api where
                     BotUpdate.Update ->
                     m (Maybe BotMessage.Message)
 
-instance (MonadThrow m, Monad m) => Worker m BotApi.Api where
+instance (MonadThrow m, Monad m) => BotApi m BotApi.Api where
   setupBot BotApi.Tele h = TeleMode.setupBot h
   setupBot BotApi.Vk _ = return ()
 
