@@ -9,7 +9,6 @@ import Control.Monad.Catch (MonadThrow)
 
 import qualified Bot.Logger.Logger as Logger
 import qualified Bot.Settings as Settings
-import qualified Bot.DB.DBQ as BotDBQ
 import qualified Bot.Request.Request as BotReq
 import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.Api as BotApi
@@ -122,7 +121,6 @@ checkMode :: (MonadThrow m, Monad m) =>
               m (Maybe BotSynonyms.UpdateId)
 checkMode handle prevUpdate = do
   let logH = BotReq.hLogger handle
-      dbH = BotReq.hDb handle
       config = BotReq.cReq handle
       api = Settings.botApi config
   nextUpdate <- getLastUpdate handle prevUpdate
@@ -137,7 +135,7 @@ checkMode handle prevUpdate = do
       Logger.logInfo logH $ "Checking update with id: "
         <> BotUtil.convertValue updateId
       chatId <- getChatId api handle userMessage
-      mode <- BotDBQ.getMode dbH chatId
+      mode <- BotReq.getMode handle chatId
       case mode of
         BotMode.ReplyMode -> do
           _ <- replyMode handle userMessage
@@ -148,7 +146,7 @@ checkMode handle prevUpdate = do
         BotMode.UnknownMode -> do
           Logger.logError logH $ "Unknown Bot mode: "
             <> BotUtil.convertValue mode
-      BotDBQ.putUpdate dbH updateId
+      BotReq.putUpdate handle updateId
       newUpdate <- getNextUpdate api handle prevUpdate
       _ <- checkMode handle newUpdate
       return $ Just updateId
@@ -159,14 +157,13 @@ replyMode :: (MonadThrow m, Monad m) =>
               m BotMode.Mode
 replyMode handle userMessage = do
   let logH = BotReq.hLogger handle
-      dbH = BotReq.hDb handle
       config = BotReq.cReq handle
       api = Settings.botApi config
   chatId <- getChatId api handle userMessage
   messageType <- getMessageType api handle userMessage
   case messageType of
     BotMessageType.TextMessage _ -> do
-      repNum <- BotDBQ.getRepliesNumber dbH chatId
+      repNum <- BotReq.getRepliesNumber handle chatId
       BotReq.sendNEchoMessage handle userMessage repNum
       Logger.logInfo logH "It's ordinary message from User."
       return BotMode.ReplyMode
@@ -177,7 +174,7 @@ replyMode handle userMessage = do
     BotMessageType.RepeatMessage -> do
       _ <- BotReq.sendKeyboard handle userMessage
       Logger.logInfo logH "Info: User's /repeat message"
-      BotDBQ.setMode dbH chatId BotMode.AnswerMode
+      BotReq.setMode handle chatId BotMode.AnswerMode
       return BotMode.AnswerMode
     BotMessageType.StartMessage -> do
       Logger.logInfo logH "User's /start message"
@@ -193,18 +190,17 @@ answerMode :: (MonadThrow m, Monad m) =>
                m (Maybe BotSynonyms.RepNum)
 answerMode handle userMessage = do
   let logH = BotReq.hLogger handle
-      dbH = BotReq.hDb handle
       config = BotReq.cReq handle
       api = Settings.botApi config
   chatId <- getChatId api handle userMessage
   messageTextM <- getMessageText api handle userMessage
   let messageText = T.unpack $ fromMaybe "" messageTextM
-  BotDBQ.setMode dbH chatId BotMode.ReplyMode
+  BotReq.setMode handle chatId BotMode.ReplyMode
   case (readMaybe messageText :: Maybe BotSynonyms.RepNum) of
     Just repNum -> do
       Logger.logInfo logH $ "Info: Received user's answer in chat with id: "
         <> BotUtil.convertValue chatId
-      BotDBQ.setRepliesNumber dbH chatId repNum
+      BotReq.setRepliesNumber handle chatId repNum
       return $ Just repNum
     Nothing -> do
       Logger.logError logH "Couldn't parse User's answer!"
@@ -216,11 +212,10 @@ getLastUpdate :: (Monad m, MonadThrow m) =>
                   m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
 getLastUpdate handle update = do
   let logH = BotReq.hLogger handle
-      dbH = BotReq.hDb handle
       config = BotReq.cReq handle
       api = Settings.botApi config
   defaultUpdateId <- getDefaultUpdateId api handle update
-  lastDbUpdateId <- BotDBQ.getLastSucUpdate dbH
+  lastDbUpdateId <- BotReq.getLastSucUpdate handle
   let nextDbUpdateId = fmap (+1) lastDbUpdateId
       nextUpdateId = fromMaybe defaultUpdateId nextDbUpdateId
   nextUpdate <- changeUpdateId api handle update nextUpdateId

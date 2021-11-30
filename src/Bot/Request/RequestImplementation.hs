@@ -3,12 +3,13 @@ module Bot.Request.RequestImplementation where
 import  qualified Network.HTTP.Client as HTTPClient
 
 import qualified Bot.Logger.Logger as Logger
-import qualified Bot.DB.DBQ as BotDBQ
+import qualified Bot.DB.DB as BotDB
+import qualified Bot.DB.DBImplementation as BotDBImpl
 import qualified Bot.Request.Request as BotReq
 import qualified Bot.Settings as Settings
 
 withHandleIO :: Logger.Handle IO ->
-                BotDBQ.Handle IO ->
+                BotDB.Handle IO ->
                 Settings.Config ->
                (BotReq.Handle IO -> IO a) ->
                 IO a
@@ -19,6 +20,13 @@ withHandleIO logger dbH config f = do
     BotReq.cReq = config,
 
     BotReq.newManager = HTTPClient.newManager,
-    BotReq.httpLbs = HTTPClient.httpLbs
+    BotReq.httpLbs = HTTPClient.httpLbs,
+
+    BotReq.getLastSucUpdate = BotDBImpl.getLastSucUpdate dbH,
+    BotReq.putUpdate = BotDBImpl.putUpdate dbH,
+    BotReq.getRepliesNumber = BotDBImpl.getRepliesNumber dbH,
+    BotReq.setRepliesNumber = BotDBImpl.setRepliesNumber dbH,
+    BotReq.getMode = BotDBImpl.getMode dbH,
+    BotReq.setMode = BotDBImpl.setMode dbH
   }
   f handle

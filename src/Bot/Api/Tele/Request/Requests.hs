@@ -7,7 +7,7 @@ import Control.Monad.Catch (MonadThrow, throwM)
 import Data.Convertible.Base (convert)
 
 import qualified Bot.Exception as E
-import qualified Bot.DB.DBQ as BotDBQ
+import qualified Bot.DB.DB as BotDB
 import qualified Bot.Settings as Settings
 import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.RequestPair as BotReqPair
@@ -26,7 +26,7 @@ import qualified Bot.Api.Tele.Objects.CopyMessage as TeleCopyMessage
 import qualified Bot.Api.Tele.Objects.SetCommands as TeleSetCommands
 
 setGetUpdate :: (MonadThrow m, Monad m) =>
-                 BotDBQ.Handle m ->
+                 BotDB.Handle m ->
                  BotUpdate.Update ->
                  m BotReqPair.ReqPair
 setGetUpdate _ (BotUpdate.TeleUpdate updateId) = do
@@ -38,7 +38,7 @@ setGetUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
 setEchoMessage :: (MonadThrow m, Monad m) =>
-                   BotDBQ.Handle m ->
+                   BotDB.Handle m ->
                    BotMessage.Message ->
                    m BotReqPair.ReqPair
 setEchoMessage _ (BotMessage.TeleMessage message) = do
@@ -52,7 +52,7 @@ setEchoMessage _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setTextMessage :: (MonadThrow m, Monad m) =>
-                  BotDBQ.Handle m ->
+                  BotDB.Handle m ->
                   BotMessage.Message ->
                   Text ->
                   m (Maybe BotReqPair.ReqPair)
@@ -66,7 +66,7 @@ setTextMessage _ botMessage _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setKeyboardMessage :: (MonadThrow m, Monad m) =>
-                       BotDBQ.Handle m ->
+                       BotDB.Handle m ->
                        BotMessage.Message ->
                       [BotButton.Button] ->
                        Text ->
@@ -86,7 +86,7 @@ setKeyboardMessage _ botMessage _ _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setCommands :: Monad m =>
-               BotDBQ.Handle m ->
+               BotDB.Handle m ->
                m (Maybe BotReqPair.ReqPair)
 setCommands _ = do
   let reqOptions = TeleReqOptions.SetCommands TeleSetCommands.createCommands
@@ -94,11 +94,11 @@ setCommands _ = do
   return $ Just $ BotReqPair.TeleReqPair (apiMethod, reqOptions)
 
 createRequest :: (Monad m, MonadThrow m) =>
-                  BotDBQ.Handle m ->
+                  BotDB.Handle m ->
                   BotReqPair.ReqPair ->
                   m (Text, B.ByteString)
 createRequest handle (BotReqPair.TeleReqPair (apiMethod, options)) = do
-  let config = BotDBQ.cDBQ handle
+  let config = BotDB.cDb handle
       token = Settings.botToken config
       hostApi = BotSynonyms.getHost Settings.apiTele
       methodApi = TeleMethod.getMethod apiMethod

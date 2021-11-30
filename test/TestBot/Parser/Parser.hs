@@ -24,11 +24,11 @@ spec_parseData_TeleUpData_UpdateData :: B.ByteString ->
 spec_parseData_TeleUpData_UpdateData obj bstr bstrFail = 
   describe "Testing update parse for telegram bot" $ do
     it "Should successfully parseData with TeleUpData.UpdateData" $ do
-      let result = BotParser.parseData TeleHandlers.dbqH bstr
+      let result = BotParser.parseData TeleHandlers.dbH bstr
           check = read (B8.toString obj) :: TeleUpData.UpdateData
       result `shouldBe` Just (Right check)
     it "Should fail parse updates" $ do
-      let result = BotParser.parseData TeleHandlers.dbqH bstrFail
+      let result = BotParser.parseData TeleHandlers.dbH bstrFail
             :: Maybe (Either Text TeleUpData.UpdateData)
           err = "Error in $.result[1].message: \
                 \parsing Bot.Api.Tele.Objects.Message.Message(Message) \
@@ -42,11 +42,11 @@ spec_parseData_VkUpData_UpdateData :: B.ByteString ->
 spec_parseData_VkUpData_UpdateData obj bstr bstrFail =
   describe "Testing parseData with VkUpData.UpdateData" $ do
     it "Should successfully parse VkUpData.UpdateData" $ do
-      let result = BotParser.parseData VkHandlers.dbqH bstr
+      let result = BotParser.parseData VkHandlers.dbH bstr
           check = read (B8.toString obj) :: VkUpData.UpdateData
       result `shouldBe` Just (Right check)
     it "Should fail parse VkUpData.UpdateData" $ do
-      let result = BotParser.parseData VkHandlers.dbqH bstrFail
+      let result = BotParser.parseData VkHandlers.dbH bstrFail
             :: Maybe (Either Text VkUpData.UpdateData)
           err = "Error in $.updates[2].object['user_id']: \
                 \parsing Integer failed, expected Number, \
@@ -59,7 +59,7 @@ spec_parseData_VkPollResp_PollResponse :: B.ByteString ->
 spec_parseData_VkPollResp_PollResponse obj bstr =
     describe "Testing parseData with VkPollResp.PollResponse" $ do
     it "Should successfully parse VkPollResp.PollResponse" $ do
-      let result = BotParser.parseData VkHandlers.dbqH bstr
+      let result = BotParser.parseData VkHandlers.dbH bstr
             :: Maybe (Either Text VkPollResp.PollResponse)
           check = read (B8.toString obj)
       result `shouldBe` Just (Right check)
@@ -71,11 +71,11 @@ spec_parseData_VkUpUrlResp_UploadUrlResponse :: B.ByteString ->
 spec_parseData_VkUpUrlResp_UploadUrlResponse obj bstr bstrFail =
   describe "Testing parseData with VkUpUrlResp.UploadUrlResponse" $ do
     it "Should successfully parse VkUpUrlResp.UploadUrlResponse" $ do
-      let result = BotParser.parseData VkHandlers.dbqH bstr
+      let result = BotParser.parseData VkHandlers.dbH bstr
           check = read (B8.toString obj) :: VkUpUrlResp.UploadUrlResponse
       result `shouldBe` Just (Right check)
     it "Should fail parse VkUpUrlResp.UploadUrlResponse" $ do
-      let result = BotParser.parseData VkHandlers.dbqH bstrFail
+      let result = BotParser.parseData VkHandlers.dbH bstrFail
             :: Maybe (Either Text VkUpUrlResp.UploadUrlResponse)
           err = "Error in $.response['upload_url']: \
                 \parsing Text failed, expected String, \
@@ -89,11 +89,11 @@ spec_parseData_VkUpFileResp_UploadFileResponse :: B.ByteString ->
 spec_parseData_VkUpFileResp_UploadFileResponse obj bstr bstrFail =
   describe "Testing parseData with VkUpFileResp.UploadFileResponse" $ do
     it "Should successfully parse VkUpFileResp.UploadFileResponse" $ do
-      let result = BotParser.parseData VkHandlers.dbqH bstr
+      let result = BotParser.parseData VkHandlers.dbH bstr
           check = read (B8.toString obj) :: VkUpFileResp.UploadFileResponse
       result `shouldBe` Just (Right check)
     it "Should fail parse VkUpFileResp.UploadFileResponse" $ do
-      let result = BotParser.parseData VkHandlers.dbqH bstrFail
+      let result = BotParser.parseData VkHandlers.dbH bstrFail
             :: Maybe (Either Text VkUpFileResp.UploadFileResponse)
           err = "Error in $.file: parsing Text failed, \
                 \expected String, but encountered Number"
@@ -106,11 +106,11 @@ spec_parseData_VkUpObjResp_UploadObjectResponse :: B.ByteString ->
 spec_parseData_VkUpObjResp_UploadObjectResponse obj bstr bstrFail =
   describe "Testing parseData with VkUpObjResp.UploadObjectResponse" $ do
     it "Should successfully parse VkUpObjResp.UploadObjectResponse" $ do
-      let result = BotParser.parseData VkHandlers.dbqH bstr
+      let result = BotParser.parseData VkHandlers.dbH bstr
           check = read (B8.toString obj) :: VkUpObjResp.UploadObjectResponse
       result `shouldBe` Just (Right check)
     it "Should fail parse VkUpObjResp.UploadObjectResponse" $ do
-      let result = BotParser.parseData VkHandlers.dbqH bstrFail
+      let result = BotParser.parseData VkHandlers.dbH bstrFail
             :: Maybe (Either Text VkUpObjResp.UploadObjectResponse)
           err = "Error in $: parsing \
                 \Bot.Api.Vk.Objects.UploadObjectResponse.\

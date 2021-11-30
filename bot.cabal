@@ -82,8 +82,6 @@ library
       Bot.Config
       Bot.DB.DB
       Bot.DB.DBImplementation
-      Bot.DB.DBQ
-      Bot.DB.DBQImplementation
       Bot.Exception
       Bot.Logger.Logger
       Bot.Mode.Mode

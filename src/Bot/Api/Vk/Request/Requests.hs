@@ -17,7 +17,7 @@ import Data.Convertible.Base (convert)
 import qualified Bot.Settings as Settings
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
-import qualified Bot.DB.DBQ as BotDBQ
+import qualified Bot.DB.DB as BotDB
 import qualified Bot.System.System as BotSystem
 import qualified Bot.Parser.Parser as BotParser
 import qualified Bot.Objects.Synonyms as BotSynonyms
@@ -49,11 +49,11 @@ import qualified Bot.Api.Vk.Objects.SaveDoc as VkSaveDoc
 import qualified Bot.Util as BotUtil
 
 setGetServer :: (MonadThrow m, Monad m) =>
-                 BotDBQ.Handle m ->
+                 BotDB.Handle m ->
                  m (Maybe BotReqPair.ReqPair)
 setGetServer handle = do
-  let logH = BotDBQ.hLogger handle
-      config = BotDBQ.cDBQ handle
+  let logH = BotDB.hLogger handle
+      config = BotDB.cDb handle
   case Settings.botGroupId config of
     Nothing -> do
       let msg = "'bot_group_id' is required for Api Vk"
@@ -70,11 +70,11 @@ setGetServer handle = do
       return $ Just $ BotReqPair.VkReqPair (apiMethod, reqOptions)
 
 setUploadedServer :: Monad m =>
-                     BotDBQ.Handle m ->
+                     BotDB.Handle m ->
                      BotDoc.Document ->
                      m (Maybe BotReqPair.ReqPair)
 setUploadedServer handle botDoc = do
-  let config = BotDBQ.cDBQ handle
+  let config = BotDB.cDb handle
       token = Settings.botToken config
       doc = BotDoc.vkDoc botDoc
       userId = VkDoc.owner_id doc
@@ -86,11 +86,11 @@ setUploadedServer handle botDoc = do
   return $ Just $ BotReqPair.VkReqPair (apiMethod, reqOptions)
 
 setUploadedDoc :: Monad m =>
-                  BotDBQ.Handle m ->
+                  BotDB.Handle m ->
                   Text ->
                   m (Maybe BotReqPair.ReqPair)
 setUploadedDoc handle file = do
-  let config = BotDBQ.cDBQ handle
+  let config = BotDB.cDb handle
       token = Settings.botToken config
       link = VkSaveDoc.saveNewDoc
         (BotSynonyms.FilePathT file) token Settings.vkVersion
@@ -100,11 +100,11 @@ setUploadedDoc handle file = do
   return $ Just $ BotReqPair.VkReqPair (apiMethod, reqOptions)
 
 setEchoMessage :: (MonadThrow m, Monad m) =>
-                   BotDBQ.Handle m ->
+                   BotDB.Handle m ->
                    BotMessage.Message ->
                    m BotReqPair.ReqPair
 setEchoMessage handle (BotMessage.VkMessage message) = do
-  let config = BotDBQ.cDBQ handle
+  let config = BotDB.cDb handle
       token = Settings.botToken config
       userId = VkMessage.user_id message
       messageText = VkMessage.body message
@@ -127,12 +127,12 @@ setEchoMessage _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setHelpMessage :: (MonadThrow m, Monad m) =>
-                   BotDBQ.Handle m ->
+                   BotDB.Handle m ->
                    BotMessage.Message ->
                    Text ->
                    m (Maybe BotReqPair.ReqPair)
 setHelpMessage handle (BotMessage.VkMessage message) description = do
-  let config = BotDBQ.cDBQ handle
+  let config = BotDB.cDb handle
       token = Settings.botToken config
       userId = VkMessage.user_id message
       newMessage = (
@@ -147,14 +147,14 @@ setHelpMessage _ botMessage _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setKeyboardMessage :: (MonadThrow m, Monad m) =>
-                       BotDBQ.Handle m ->
+                       BotDB.Handle m ->
                        BotMessage.Message ->
                       [BotButton.Button] ->
                        Text ->
                        m BotReqPair.ReqPair
 setKeyboardMessage handle (BotMessage.VkMessage message) _ question = do
-  let systemH = BotDBQ.hSystem handle
-      config = BotDBQ.cDBQ handle
+  let systemH = BotDB.hSystem handle
+      config = BotDB.cDb handle
       token = Settings.botToken config
       userId = VkMessage.user_id message
   keyboard <- BotSystem.readFile systemH "data/Vk/repeatButtons.txt"
@@ -171,7 +171,7 @@ setKeyboardMessage _ botMessage _ _ = do
   throwM $ E.ApiObjectError $ show botMessage
 
 setGetUpdate :: (MonadThrow m, Monad m) =>
-                BotDBQ.Handle m ->
+                BotDB.Handle m ->
                 BotUpdate.Update ->
                 m BotReqPair.ReqPair
 setGetUpdate _  (BotUpdate.VkUpdate server) = do
@@ -192,7 +192,7 @@ setGetUpdate _ botUpdate = do
   throwM $ E.ApiObjectError $ show botUpdate
 
 createRequest :: (Monad m, MonadThrow m) =>
-                  BotDBQ.Handle m ->
+                  BotDB.Handle m ->
                   BotReqPair.ReqPair ->
                   m (Text, B.ByteString)
 createRequest _ (BotReqPair.VkReqPair (apiMethod, options)) = do
@@ -204,12 +204,12 @@ createRequest _ _ = do
   throwM E.ApiMethodError
 
 downloadDoc :: (Monad m, MonadThrow m) =>
-                BotDBQ.Handle m ->
+                BotDB.Handle m ->
                 BotDoc.Document ->
                 B.ByteString ->
                 m (Maybe Text)
 downloadDoc handle botDoc serverUp = do
-  let systemH = BotDBQ.hSystem handle
+  let systemH = BotDB.hSystem handle
       link = VkDoc.url doc
       docTitle = VkDoc.title doc
       doc = BotDoc.vkDoc botDoc
@@ -227,12 +227,12 @@ downloadDoc handle botDoc serverUp = do
     Right fileResp -> return $ VkUpFileResp.file fileResp
 
 changeDoc :: (Monad m, MonadThrow m) =>
-              BotDBQ.Handle m ->
+              BotDB.Handle m ->
               BotDoc.Document ->
               B.ByteString ->
               m BotDoc.Document
 changeDoc handle botDoc@(BotDoc.VkDoc doc) objUp = do
-  let logH = BotDBQ.hLogger handle
+  let logH = BotDB.hLogger handle
   objE <- BotParser.parseData handle objUp
   case objE of
     Left msg -> throwM $ E.ParseRequestError $ T.unpack msg
@@ -251,7 +251,7 @@ changeDoc handle botDoc@(BotDoc.VkDoc doc) objUp = do
           return botDoc
 
 extractDoc :: (MonadThrow m, Monad m) =>
-               BotDBQ.Handle m ->
+               BotDB.Handle m ->
                BotMessage.Message ->
                m (Maybe [BotDoc.Document])
 extractDoc _ (BotMessage.VkMessage message) = do
@@ -264,7 +264,7 @@ extractDoc _ botMessage = do
   throwM $ E.ApiObjectError $ show botMessage
 
 changeMessage :: (MonadThrow m, Monad m) =>
-                  BotDBQ.Handle m -> 
+                  BotDB.Handle m -> 
                   BotMessage.Message ->
                  [BotDoc.Document] ->
                   m BotMessage.Message

@@ -11,9 +11,10 @@ import Data.Convertible.Base (convert)
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
-import qualified Bot.DB.DBQ as BotDBQ
+import qualified Bot.DB.DB as BotDB
 import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.Api as BotApi
+import qualified Bot.Objects.Mode as BotMode
 import qualified Bot.Objects.RequestPair as BotReqPair
 import qualified Bot.Objects.Update as BotUpdate
 import qualified Bot.Objects.Message as BotMessage
@@ -26,75 +27,89 @@ import qualified Bot.Api.Tele.Request.Requests as TeleReq
 
 data Handle m = Handle {
   hLogger :: Logger.Handle m,
-  hDb :: BotDBQ.Handle m,
+  hDb :: BotDB.Handle m,
   cReq :: Settings.Config,
 
   newManager :: HTTPClient.ManagerSettings ->
                 m HTTPClient.Manager,
   httpLbs :: HTTPClient.Request ->
              HTTPClient.Manager ->
-             m (HTTPClient.Response B.ByteString)
+             m (HTTPClient.Response B.ByteString),
+  
+  getLastSucUpdate :: m (Maybe BotSynonyms.UpdateId),
+  putUpdate :: BotSynonyms.UpdateId ->
+               m (),
+  getRepliesNumber :: BotSynonyms.ChatId ->
+                      m BotSynonyms.RepNum,
+  setRepliesNumber :: BotSynonyms.ChatId ->
+                      BotSynonyms.RepNum ->
+                      m (),
+  getMode :: BotSynonyms.ChatId ->
+             m BotMode.Mode,
+  setMode :: BotSynonyms.ChatId ->
+             BotMode.Mode ->
+             m ()
 }
 
 class (MonadThrow m, Monad m) => Request m api where
   createRequest :: api ->
-                   BotDBQ.Handle m ->
+                   BotDB.Handle m ->
                    BotReqPair.ReqPair ->
                    m (Text, B.ByteString)
   setGetUpdate :: api ->
-                  BotDBQ.Handle m ->
+                  BotDB.Handle m ->
                   BotUpdate.Update ->
                   m BotReqPair.ReqPair
   setEchoMessage :: api ->
-                    BotDBQ.Handle m ->
+                    BotDB.Handle m ->
                     BotMessage.Message ->
                     m BotReqPair.ReqPair
   setHelpMessage :: api ->
-                    BotDBQ.Handle m ->
+                    BotDB.Handle m ->
                     BotMessage.Message ->
                     Text ->
                     m (Maybe BotReqPair.ReqPair)
   setStartMessage :: api ->
-                     BotDBQ.Handle m ->
+                     BotDB.Handle m ->
                      BotMessage.Message ->
                      Text ->
                      m (Maybe BotReqPair.ReqPair)
   setKeyboardMessage :: api ->
-                        BotDBQ.Handle m ->
+                        BotDB.Handle m ->
                         BotMessage.Message ->
                        [BotButton.Button] ->
                         Text ->
                         m BotReqPair.ReqPair
   setCommands :: api ->
-                 BotDBQ.Handle m ->
+                 BotDB.Handle m ->
                  m (Maybe BotReqPair.ReqPair)
   changeMessage :: api ->
-                   BotDBQ.Handle m ->
+                   BotDB.Handle m ->
                    BotMessage.Message ->
                   [BotDoc.Document] ->
                    m BotMessage.Message
   extractDoc :: api ->
-                BotDBQ.Handle m ->
+                BotDB.Handle m ->
                 BotMessage.Message ->
                 m (Maybe [BotDoc.Document])
   setUploadedServer :: api ->
-                       BotDBQ.Handle m ->
+                       BotDB.Handle m ->
                        BotDoc.Document ->
                        m (Maybe BotReqPair.ReqPair)
   setUploadedDoc :: api ->
-                    BotDBQ.Handle m ->
+                    BotDB.Handle m ->
                     Text ->
                     m (Maybe BotReqPair.ReqPair)
   setGetServer :: api ->
-                  BotDBQ.Handle m ->
+                  BotDB.Handle m ->
                   m (Maybe BotReqPair.ReqPair)
   downloadDoc :: api ->
-                 BotDBQ.Handle m ->
+                 BotDB.Handle m ->
                  BotDoc.Document ->
                  B.ByteString ->
                  m (Maybe Text)
   changeDoc :: api ->
-               BotDBQ.Handle m ->
+               BotDB.Handle m ->
                BotDoc.Document ->
                B.ByteString ->
                m BotDoc.Document

@@ -7,7 +7,7 @@ import Data.Aeson.Types (FromJSON)
 import Data.Aeson (eitherDecode)
 
 import qualified Bot.Logger.Logger as Logger
-import qualified Bot.DB.DBQ as BotDBQ
+import qualified Bot.DB.DB as BotDB
 import qualified Bot.Api.Tele.Objects.UpdateData as TeleUpData
 import qualified Bot.Api.Vk.Objects.UpdateData as VkUpData
 import qualified Bot.Api.Vk.Objects.PollResponse as VkPollResp
@@ -17,11 +17,11 @@ import qualified Bot.Api.Vk.Objects.UploadUrlResponse as VkUpUrlResp
 
 class (FromJSON a) => Parser a where
   parseData :: Monad m =>
-               BotDBQ.Handle m ->
+               BotDB.Handle m ->
                L8.ByteString ->
                m (Either Text a)
   parseData handle response = do
-    let logH = BotDBQ.hLogger handle
+    let logH = BotDB.hLogger handle
         d = eitherDecode response
     case d of
       Left err -> do
