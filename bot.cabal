@@ -25,7 +25,6 @@ source-repository head
 
 library
   exposed-modules:
-      Bot.Api.Tele.Mode.Mode
       Bot.Api.Tele.Objects.Button
       Bot.Api.Tele.Objects.Chat
       Bot.Api.Tele.Objects.Command
@@ -43,7 +42,6 @@ library
       Bot.Api.Tele.Objects.Update
       Bot.Api.Tele.Objects.UpdateData
       Bot.Api.Tele.Request.Requests
-      Bot.Api.Vk.Mode.Mode
       Bot.Api.Vk.Objects.Action
       Bot.Api.Vk.Objects.Attachment
       Bot.Api.Vk.Objects.Audio
@@ -89,12 +87,14 @@ library
       Bot.Objects.Api
       Bot.Objects.Button
       Bot.Objects.Document
+      Bot.Objects.FullUpdate
       Bot.Objects.Message
       Bot.Objects.MessageType
       Bot.Objects.Mode
       Bot.Objects.RequestPair
       Bot.Objects.Synonyms
       Bot.Objects.Update
+      Bot.Objects.UpdateData
       Bot.Parser.Parser
       Bot.Request.Request
       Bot.Request.RequestImplementation

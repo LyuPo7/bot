@@ -1,15 +1,18 @@
 module Bot.Mode.Mode where
 
+import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.Text as T
 import Data.Maybe (fromMaybe)
 import Text.Read (readMaybe)
-import Control.Monad.Catch (MonadThrow)
+import Control.Monad.Catch (MonadThrow, throwM)
 
+import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
 import qualified Bot.Settings as Settings
 import qualified Bot.Request.Request as BotReq
 import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.Update as BotUpdate
+import qualified Bot.Objects.FullUpdate as BotFullUpdate
 import qualified Bot.Objects.Message as BotMessage
 import qualified Bot.Objects.MessageType as BotMessageType
 import qualified Bot.Objects.Mode as BotMode
@@ -36,20 +39,18 @@ checkMode :: (MonadThrow m, Monad m) =>
               m (Maybe BotSynonyms.UpdateId)
 checkMode handle prevUpdate = do
   let logH = BotReq.hLogger handle
-      config = BotReq.cReq handle
-      api = Settings.botApi config
   nextUpdate <- getLastUpdate handle prevUpdate
   case nextUpdate of
     Nothing -> do
       Logger.logWarning logH "Where are no more updates for now!"
       Logger.logInfo logH "Waiting updates!"
-      newUpdate <- BotApiMode.getPrevUpdate api handle prevUpdate
+      newUpdate <- BotApiMode.getPrevUpdate handle prevUpdate
       _ <- checkMode handle newUpdate
       return Nothing
     Just (updateId, userMessage) -> do
       Logger.logInfo logH $ "Checking update with id: "
         <> BotUtil.convertValue updateId
-      chatId <- BotApiMode.getChatId api handle userMessage
+      chatId <- BotApiMode.getChatId handle userMessage
       mode <- BotReq.getMode handle chatId
       case mode of
         BotMode.ReplyMode -> do
@@ -62,7 +63,7 @@ checkMode handle prevUpdate = do
           Logger.logError logH $ "Unknown Bot mode: "
             <> BotUtil.convertValue mode
       BotReq.putUpdate handle updateId
-      newUpdate <- BotApiMode.getNextUpdate api handle prevUpdate
+      newUpdate <- BotApiMode.getNextUpdate handle prevUpdate
       _ <- checkMode handle newUpdate
       return $ Just updateId
 
@@ -72,10 +73,8 @@ replyMode :: (MonadThrow m, Monad m) =>
               m BotMode.Mode
 replyMode handle userMessage = do
   let logH = BotReq.hLogger handle
-      config = BotReq.cReq handle
-      api = Settings.botApi config
-  chatId <- BotApiMode.getChatId api handle userMessage
-  messageType <- BotApiMode.getMessageType api handle userMessage
+  chatId <- BotApiMode.getChatId handle userMessage
+  messageType <- BotApiMode.getMessageType handle userMessage
   case messageType of
     BotMessageType.TextMessage _ -> do
       repNum <- BotReq.getRepliesNumber handle chatId
@@ -105,10 +104,8 @@ answerMode :: (MonadThrow m, Monad m) =>
                m (Maybe BotSynonyms.RepNum)
 answerMode handle userMessage = do
   let logH = BotReq.hLogger handle
-      config = BotReq.cReq handle
-      api = Settings.botApi config
-  chatId <- BotApiMode.getChatId api handle userMessage
-  messageTextM <- BotApiMode.getMessageText api handle userMessage
+  chatId <- BotApiMode.getChatId handle userMessage
+  messageTextM <- BotApiMode.getMessageText handle userMessage
   let messageText = T.unpack $ fromMaybe "" messageTextM
   BotReq.setMode handle chatId BotMode.ReplyMode
   case (readMaybe messageText :: Maybe BotSynonyms.RepNum) of
@@ -127,22 +124,32 @@ getLastUpdate :: (Monad m, MonadThrow m) =>
                   m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
 getLastUpdate handle update = do
   let logH = BotReq.hLogger handle
-      config = BotReq.cReq handle
-      api = Settings.botApi config
-  defaultUpdateId <- BotApiMode.getDefaultUpdateId api handle update
+  defaultUpdateId <- BotApiMode.getDefaultUpdateId handle update
   lastDbUpdateId <- BotReq.getLastSucUpdate handle
   let nextDbUpdateId = fmap (+1) lastDbUpdateId
       nextUpdateId = fromMaybe defaultUpdateId nextDbUpdateId
-  nextUpdate <- BotApiMode.changeUpdateId api handle update nextUpdateId
+  nextUpdate <- BotApiMode.changeUpdateId handle update nextUpdateId
   response <- BotReq.getUpdate handle nextUpdate
-  newUpdate <- BotApiMode.extractUpdate api handle response
+  newUpdate <- extractUpdateData handle response
   case newUpdate of
     [] -> return Nothing
     [x] -> do
-      messageM <- BotApiMode.extractMessage api handle x
+      messageM <- BotApiMode.extractMessage handle x
       case messageM of
         Nothing -> return Nothing
         Just message -> return $ Just (nextUpdateId, message)
     _ -> do
       Logger.logError logH "Expected one update, but have many."
       return Nothing
+
+extractUpdateData :: (Monad m, MonadThrow m) =>
+                      BotReq.Handle m ->
+                      L8.ByteString ->
+                      m [BotFullUpdate.FullUpdate]
+extractUpdateData handle response = do
+  let config = BotReq.cReq handle
+      api = Settings.botApi config
+  updateDataE <- BotApiMode.getUpdateData api handle response
+  case updateDataE of
+    Left msg -> throwM $ E.ParseRequestError $ T.unpack msg
+    Right updateData -> BotApiMode.extractUpdate handle updateData
