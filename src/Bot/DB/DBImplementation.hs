@@ -30,19 +30,13 @@ withHandleIO ::
   (BotDB.Handle IO -> IO a) ->
   IO a
 withHandleIO logger sysH config f = do
-  case Settings.botApi config of
-    BotApi.Vk -> do
-      let dbFile = "data/vk.db"
-      dbConn <- connect dbFile
-      let handle = BotDB.Handle logger dbConn sysH config
-      prepDB handle
-      f handle
-    BotApi.Tele -> do
-      let dbFile = "data/tele.db"
-      dbConn <- connect dbFile
-      let handle = BotDB.Handle logger dbConn sysH config
-      prepDB handle
-      f handle
+  let dbFile = case Settings.botApi config of
+        BotApi.Vk -> "data/vk.db"
+        BotApi.Tele -> "data/tele.db"
+  dbConn <- connect dbFile
+  let handle = BotDB.Handle logger dbConn sysH config
+  prepDB handle
+  f handle
 
 connect ::
   FilePath ->
