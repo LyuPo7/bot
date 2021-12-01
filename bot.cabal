@@ -84,6 +84,7 @@ library
       Bot.DB.DBImplementation
       Bot.Exception
       Bot.Logger.Logger
+      Bot.Mode.Api
       Bot.Mode.Mode
       Bot.Objects.Api
       Bot.Objects.Button
