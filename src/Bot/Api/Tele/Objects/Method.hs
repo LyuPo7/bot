@@ -2,9 +2,10 @@ module Bot.Api.Tele.Objects.Method where
 
 import Data.Text (Text)
 
-newtype Method = Method {
-  getMethod :: Text
-} deriving (Show, Eq)
+newtype Method = Method
+  { getMethod :: Text
+  }
+  deriving (Show, Eq)
 
 getUpdates :: Method
 getUpdates = Method "/getUpdates"

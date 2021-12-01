@@ -1,118 +1,137 @@
 module Bot.Request.Request where
 
+import Control.Monad.Catch (MonadThrow, throwM)
 import qualified Data.ByteString.Lazy as B
+import Data.Convertible.Base (convert)
+import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Network.HTTP.Client as HTTPClient
-import Data.Text (Text)
-import Control.Monad.Catch (MonadThrow, throwM)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.HTTP.Types.Status (statusCode)
-import Data.Convertible.Base (convert)
 
+import qualified Bot.Api.Tele.Request.Requests as TeleReq
+import qualified Bot.Api.Vk.Request.Requests as VkReq
+import qualified Bot.DB.DB as BotDB
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
-import qualified Bot.DB.DB as BotDB
-import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.Api as BotApi
-import qualified Bot.Objects.Mode as BotMode
-import qualified Bot.Objects.RequestPair as BotReqPair
-import qualified Bot.Objects.Update as BotUpdate
-import qualified Bot.Objects.Message as BotMessage
 import qualified Bot.Objects.Button as BotButton
 import qualified Bot.Objects.Document as BotDoc
+import qualified Bot.Objects.Message as BotMessage
+import qualified Bot.Objects.Mode as BotMode
+import qualified Bot.Objects.RequestPair as BotReqPair
+import qualified Bot.Objects.Synonyms as BotSynonyms
+import qualified Bot.Objects.Update as BotUpdate
 import qualified Bot.Settings as Settings
 import qualified Bot.Util as BotUtil
-import qualified Bot.Api.Vk.Request.Requests as VkReq
-import qualified Bot.Api.Tele.Request.Requests as TeleReq
 
-data Handle m = Handle {
-  hLogger :: Logger.Handle m,
-  hDb :: BotDB.Handle m,
-  cReq :: Settings.Config,
-
-  newManager :: HTTPClient.ManagerSettings ->
-                m HTTPClient.Manager,
-  httpLbs :: HTTPClient.Request ->
-             HTTPClient.Manager ->
-             m (HTTPClient.Response B.ByteString),
-  
-  getLastSucUpdate :: m (Maybe BotSynonyms.UpdateId),
-  putUpdate :: BotSynonyms.UpdateId ->
-               m (),
-  getRepliesNumber :: BotSynonyms.ChatId ->
-                      m BotSynonyms.RepNum,
-  setRepliesNumber :: BotSynonyms.ChatId ->
-                      BotSynonyms.RepNum ->
-                      m (),
-  getMode :: BotSynonyms.ChatId ->
-             m BotMode.Mode,
-  setMode :: BotSynonyms.ChatId ->
-             BotMode.Mode ->
-             m ()
-}
+data Handle m = Handle
+  { hLogger :: Logger.Handle m,
+    hDb :: BotDB.Handle m,
+    cReq :: Settings.Config,
+    newManager ::
+      HTTPClient.ManagerSettings ->
+      m HTTPClient.Manager,
+    httpLbs ::
+      HTTPClient.Request ->
+      HTTPClient.Manager ->
+      m (HTTPClient.Response B.ByteString),
+    getLastSucUpdate :: m (Maybe BotSynonyms.UpdateId),
+    putUpdate ::
+      BotSynonyms.UpdateId ->
+      m (),
+    getRepliesNumber ::
+      BotSynonyms.ChatId ->
+      m BotSynonyms.RepNum,
+    setRepliesNumber ::
+      BotSynonyms.ChatId ->
+      BotSynonyms.RepNum ->
+      m (),
+    getMode ::
+      BotSynonyms.ChatId ->
+      m BotMode.Mode,
+    setMode ::
+      BotSynonyms.ChatId ->
+      BotMode.Mode ->
+      m ()
+  }
 
 class (MonadThrow m, Monad m) => Request m api where
-  createRequest :: api ->
-                   BotDB.Handle m ->
-                   BotReqPair.ReqPair ->
-                   m (Text, B.ByteString)
-  setGetUpdate :: api ->
-                  BotDB.Handle m ->
-                  BotUpdate.Update ->
-                  m BotReqPair.ReqPair
-  setEchoMessage :: api ->
-                    BotDB.Handle m ->
-                    BotMessage.Message ->
-                    m BotReqPair.ReqPair
-  setHelpMessage :: api ->
-                    BotDB.Handle m ->
-                    BotMessage.Message ->
-                    Text ->
-                    m (Maybe BotReqPair.ReqPair)
-  setStartMessage :: api ->
-                     BotDB.Handle m ->
-                     BotMessage.Message ->
-                     Text ->
-                     m (Maybe BotReqPair.ReqPair)
-  setKeyboardMessage :: api ->
-                        BotDB.Handle m ->
-                        BotMessage.Message ->
-                       [BotButton.Button] ->
-                        Text ->
-                        m BotReqPair.ReqPair
-  setCommands :: api ->
-                 BotDB.Handle m ->
-                 m (Maybe BotReqPair.ReqPair)
-  changeMessage :: api ->
-                   BotDB.Handle m ->
-                   BotMessage.Message ->
-                  [BotDoc.Document] ->
-                   m BotMessage.Message
-  extractDoc :: api ->
-                BotDB.Handle m ->
-                BotMessage.Message ->
-                m (Maybe [BotDoc.Document])
-  setUploadedServer :: api ->
-                       BotDB.Handle m ->
-                       BotDoc.Document ->
-                       m (Maybe BotReqPair.ReqPair)
-  setUploadedDoc :: api ->
-                    BotDB.Handle m ->
-                    Text ->
-                    m (Maybe BotReqPair.ReqPair)
-  setGetServer :: api ->
-                  BotDB.Handle m ->
-                  m (Maybe BotReqPair.ReqPair)
-  downloadDoc :: api ->
-                 BotDB.Handle m ->
-                 BotDoc.Document ->
-                 B.ByteString ->
-                 m (Maybe Text)
-  changeDoc :: api ->
-               BotDB.Handle m ->
-               BotDoc.Document ->
-               B.ByteString ->
-               m BotDoc.Document
+  createRequest ::
+    api ->
+    BotDB.Handle m ->
+    BotReqPair.ReqPair ->
+    m (Text, B.ByteString)
+  setGetUpdate ::
+    api ->
+    BotDB.Handle m ->
+    BotUpdate.Update ->
+    m BotReqPair.ReqPair
+  setEchoMessage ::
+    api ->
+    BotDB.Handle m ->
+    BotMessage.Message ->
+    m BotReqPair.ReqPair
+  setHelpMessage ::
+    api ->
+    BotDB.Handle m ->
+    BotMessage.Message ->
+    Text ->
+    m (Maybe BotReqPair.ReqPair)
+  setStartMessage ::
+    api ->
+    BotDB.Handle m ->
+    BotMessage.Message ->
+    Text ->
+    m (Maybe BotReqPair.ReqPair)
+  setKeyboardMessage ::
+    api ->
+    BotDB.Handle m ->
+    BotMessage.Message ->
+    [BotButton.Button] ->
+    Text ->
+    m BotReqPair.ReqPair
+  setCommands ::
+    api ->
+    BotDB.Handle m ->
+    m (Maybe BotReqPair.ReqPair)
+  changeMessage ::
+    api ->
+    BotDB.Handle m ->
+    BotMessage.Message ->
+    [BotDoc.Document] ->
+    m BotMessage.Message
+  extractDoc ::
+    api ->
+    BotDB.Handle m ->
+    BotMessage.Message ->
+    m (Maybe [BotDoc.Document])
+  setUploadedServer ::
+    api ->
+    BotDB.Handle m ->
+    BotDoc.Document ->
+    m (Maybe BotReqPair.ReqPair)
+  setUploadedDoc ::
+    api ->
+    BotDB.Handle m ->
+    Text ->
+    m (Maybe BotReqPair.ReqPair)
+  setGetServer ::
+    api ->
+    BotDB.Handle m ->
+    m (Maybe BotReqPair.ReqPair)
+  downloadDoc ::
+    api ->
+    BotDB.Handle m ->
+    BotDoc.Document ->
+    B.ByteString ->
+    m (Maybe Text)
+  changeDoc ::
+    api ->
+    BotDB.Handle m ->
+    BotDoc.Document ->
+    B.ByteString ->
+    m BotDoc.Document
 
 instance (MonadThrow m, Monad m) => Request m BotApi.Api where
   createRequest BotApi.Tele h pair = TeleReq.createRequest h pair
@@ -160,10 +179,11 @@ instance (MonadThrow m, Monad m) => Request m BotApi.Api where
 
   changeDoc BotApi.Vk h doc bstr = VkReq.changeDoc h doc bstr
   changeDoc BotApi.Tele _ doc _ = return doc
-  
-getServer :: (MonadThrow m, Monad m) =>
-              Handle m ->
-              m B.ByteString
+
+getServer ::
+  (MonadThrow m, Monad m) =>
+  Handle m ->
+  m B.ByteString
 getServer handle = do
   let logH = hLogger handle
       dbH = hDb handle
@@ -178,10 +198,11 @@ getServer handle = do
       Logger.logInfo logH "Get server parameters for requests."
       makeRequest handle reqPair
 
-getUploadedServer :: (MonadThrow m, Monad m) =>
-                      Handle m ->
-                      BotDoc.Document ->
-                      m B.ByteString
+getUploadedServer ::
+  (MonadThrow m, Monad m) =>
+  Handle m ->
+  BotDoc.Document ->
+  m B.ByteString
 getUploadedServer handle doc = do
   let logH = hLogger handle
       dbH = hDb handle
@@ -196,10 +217,11 @@ getUploadedServer handle doc = do
       Logger.logInfo logH "Get Uploaded server parameters for upload file."
       makeRequest handle reqPair
 
-getUpdate :: (Monad m, MonadThrow m) =>
-              Handle m ->
-              BotUpdate.Update ->
-              m B.ByteString
+getUpdate ::
+  (Monad m, MonadThrow m) =>
+  Handle m ->
+  BotUpdate.Update ->
+  m B.ByteString
 getUpdate handle update = do
   let dbH = hDb handle
       config = cReq handle
@@ -207,10 +229,11 @@ getUpdate handle update = do
   reqPair <- setGetUpdate api dbH update
   makeRequest handle reqPair
 
-sendEchoMessage :: (MonadThrow m, Monad m) =>
-                    Handle m ->
-                    BotMessage.Message ->
-                    m BotMessage.Message
+sendEchoMessage ::
+  (MonadThrow m, Monad m) =>
+  Handle m ->
+  BotMessage.Message ->
+  m BotMessage.Message
 sendEchoMessage handle message = do
   let logH = hLogger handle
       dbH = hDb handle
@@ -222,11 +245,12 @@ sendEchoMessage handle message = do
   Logger.logInfo logH "Echo-Message was forwarded."
   return newMessage
 
-sendNEchoMessage :: (MonadThrow m, Monad m) =>
-                     Handle m ->
-                     BotMessage.Message ->
-                     BotSynonyms.RepNum ->
-                     m ()
+sendNEchoMessage ::
+  (MonadThrow m, Monad m) =>
+  Handle m ->
+  BotMessage.Message ->
+  BotSynonyms.RepNum ->
+  m ()
 sendNEchoMessage handle _ 0 = do
   let logH = hLogger handle
   Logger.logInfo logH "Echo-Messages were sent."
@@ -234,10 +258,11 @@ sendNEchoMessage handle message n = do
   _ <- sendEchoMessage handle message
   sendNEchoMessage handle message (n - 1)
 
-sendHelpMessage :: (MonadThrow m, Monad m) =>
-                    Handle m ->
-                    BotMessage.Message ->
-                    m BotReqPair.ReqPair
+sendHelpMessage ::
+  (MonadThrow m, Monad m) =>
+  Handle m ->
+  BotMessage.Message ->
+  m BotReqPair.ReqPair
 sendHelpMessage handle message = do
   let logH = hLogger handle
       dbH = hDb handle
@@ -254,10 +279,11 @@ sendHelpMessage handle message = do
       Logger.logInfo logH "Help-Message was sent."
       return reqPair
 
-sendStartMessage :: (MonadThrow m, Monad m) =>
-                     Handle m ->
-                     BotMessage.Message ->
-                     m ()
+sendStartMessage ::
+  (MonadThrow m, Monad m) =>
+  Handle m ->
+  BotMessage.Message ->
+  m ()
 sendStartMessage handle message = do
   let logH = hLogger handle
       dbH = hDb handle
@@ -273,25 +299,32 @@ sendStartMessage handle message = do
       _ <- makeRequest handle reqPair
       Logger.logInfo logH "Start-Message was sent."
 
-sendKeyboard :: (Monad m, MonadThrow m) =>
-                 Handle m ->
-                 BotMessage.Message ->
-                 m B.ByteString
+sendKeyboard ::
+  (Monad m, MonadThrow m) =>
+  Handle m ->
+  BotMessage.Message ->
+  m B.ByteString
 sendKeyboard handle message = do
   let logH = hLogger handle
       dbH = hDb handle
       config = cReq handle
       api = Settings.botApi config
-      buttons = fmap BotButton.defaultButton [1..5]
+      buttons = fmap BotButton.defaultButton [1 .. 5]
       question = Settings.botQuestion config
-  reqPair <- setKeyboardMessage
-    api dbH message buttons question
+  reqPair <-
+    setKeyboardMessage
+      api
+      dbH
+      message
+      buttons
+      question
   Logger.logInfo logH "Keyboard was sent."
   makeRequest handle reqPair
 
-sendCommands :: (Monad m, MonadThrow m) =>
-                 Handle m ->
-                 m ()
+sendCommands ::
+  (Monad m, MonadThrow m) =>
+  Handle m ->
+  m ()
 sendCommands handle = do
   let logH = hLogger handle
       dbH = hDb handle
@@ -304,10 +337,11 @@ sendCommands handle = do
       _ <- makeRequest handle reqPair
       Logger.logInfo logH "Bot commands were created."
 
-saveUploadedDoc :: (MonadThrow m, Monad m) =>
-                    Handle m ->
-                    Text ->
-                    m B.ByteString
+saveUploadedDoc ::
+  (MonadThrow m, Monad m) =>
+  Handle m ->
+  Text ->
+  m B.ByteString
 saveUploadedDoc handle file = do
   let logH = hLogger handle
       dbH = hDb handle
@@ -322,10 +356,11 @@ saveUploadedDoc handle file = do
       Logger.logInfo logH "Doc was saved."
       makeRequest handle reqPair
 
-updateMessage :: (MonadThrow m, Monad m) =>
-                  Handle m ->
-                  BotMessage.Message ->
-                  m BotMessage.Message
+updateMessage ::
+  (MonadThrow m, Monad m) =>
+  Handle m ->
+  BotMessage.Message ->
+  m BotMessage.Message
 updateMessage handle message = do
   let dbH = hDb handle
       config = cReq handle
@@ -337,10 +372,11 @@ updateMessage handle message = do
       newDocs <- mapM (updateDoc handle) docs
       changeMessage api dbH message newDocs
 
-updateDoc :: (MonadThrow m, Monad m) =>
-              Handle m ->
-              BotDoc.Document ->
-              m BotDoc.Document
+updateDoc ::
+  (MonadThrow m, Monad m) =>
+  Handle m ->
+  BotDoc.Document ->
+  m BotDoc.Document
 updateDoc handle doc = do
   let logH = hLogger handle
       dbH = hDb handle
@@ -357,10 +393,11 @@ updateDoc handle doc = do
       objUp <- saveUploadedDoc handle file
       changeDoc api dbH doc objUp
 
-makeRequest :: (Monad m, MonadThrow m) =>
-                Handle m ->
-                BotReqPair.ReqPair ->
-                m B.ByteString
+makeRequest ::
+  (Monad m, MonadThrow m) =>
+  Handle m ->
+  BotReqPair.ReqPair ->
+  m B.ByteString
 makeRequest handle reqPair = do
   let logH = hLogger handle
       dbH = hDb handle
@@ -369,13 +406,16 @@ makeRequest handle reqPair = do
   (apiHost, apiOptions) <- createRequest api dbH reqPair
   manager <- newManager handle tlsManagerSettings
   initialRequest <- HTTPClient.parseRequest $ T.unpack apiHost
-  let request = initialRequest {
-    HTTPClient.method = "POST",
-    HTTPClient.requestBody = HTTPClient.RequestBodyLBS apiOptions,
-    HTTPClient.requestHeaders = [ ( "Content-Type",
-                         "application/json; charset=utf-8")
-                      ]
-  }
+  let request =
+        initialRequest
+          { HTTPClient.method = "POST",
+            HTTPClient.requestBody = HTTPClient.RequestBodyLBS apiOptions,
+            HTTPClient.requestHeaders =
+              [ ( "Content-Type",
+                  "application/json; charset=utf-8"
+                )
+              ]
+          }
   response <- httpLbs handle request manager
   let codeResp = statusCode $ HTTPClient.responseStatus response
   if codeResp == 200
@@ -383,6 +423,7 @@ makeRequest handle reqPair = do
       Logger.logInfo logH "Successful request to api."
       return $ HTTPClient.responseBody response
     else do
-      Logger.logWarning logH $ "Unsuccessful request to api with code: "
-        <> BotUtil.convertValue codeResp
+      Logger.logWarning logH $
+        "Unsuccessful request to api with code: "
+          <> BotUtil.convertValue codeResp
       throwM $ E.ConnectionError codeResp

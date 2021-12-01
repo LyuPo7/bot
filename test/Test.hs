@@ -1,27 +1,32 @@
-import Test.Tasty (TestTree, testGroup, defaultMain)
-import Test.Tasty.Hspec (testSpecs)
-import Test.Tasty.Hedgehog (testProperty)
 import qualified Data.ByteString.Lazy as B
+import Test.Tasty (TestTree, defaultMain, testGroup)
+import Test.Tasty.Hedgehog (testProperty)
+import Test.Tasty.Hspec (testSpecs)
 
 import qualified TestBot.Config as Config
+import qualified TestBot.Mode.Mode as BotMode
 import qualified TestBot.Parser.Parser as BotParser
 import qualified TestBot.Request.Request as BotReq
-import qualified TestBot.Mode.Mode as BotMode
 
 props :: [TestTree]
-props = [
-  testProperty "Successful checkConfig for each valid Config"
-    Config.prop_checkConfig,
-  testProperty "Unsuccessful answerMode parse for each text Message \
-               \while waiting answer number"
-               BotMode.prop_answerModeFail,
-  testProperty "Successful answerMode parse for each Message \
-               \with number 5 in body while waiting answer number" 
-               BotMode.prop_answerModeSuc,
-  testProperty "Successful replyMode for /help, /start bot command"
-               BotMode.prop_replyModeReplySuc,
-  testProperty "Successful replyMode for /reply bot command"
-               BotMode.prop_replyModeAnswerSuc
+props =
+  [ testProperty
+      "Successful checkConfig for each valid Config"
+      Config.prop_checkConfig,
+    testProperty
+      "Unsuccessful answerMode parse for each text Message \
+      \while waiting answer number"
+      BotMode.prop_answerModeFail,
+    testProperty
+      "Successful answerMode parse for each Message \
+      \with number 5 in body while waiting answer number"
+      BotMode.prop_answerModeSuc,
+    testProperty
+      "Successful replyMode for /help, /start bot command"
+      BotMode.prop_replyModeReplySuc,
+    testProperty
+      "Successful replyMode for /reply bot command"
+      BotMode.prop_replyModeAnswerSuc
   ]
 
 main :: IO ()
@@ -36,7 +41,7 @@ main = do
 
   bstrServerVk <- readServerVk
   objServerVk <- readServerObjVk
-  
+
   bstrUpUrlFailVk <- readUpUrlFailVk
   bstrUpUrlVk <- readUpUrlVk
   objUpUrlVk <- readObjUpUrlVk
@@ -49,31 +54,48 @@ main = do
   bstrUpObjVk <- readUpObjVk
   objUpObjVk <- readObjUpObjVk
 
-  specs <- concat <$> mapM testSpecs
-             [ BotParser.spec_parseData_TeleUpData_UpdateData
-                 objTele bstrTele bstrFailTele,
-               BotParser.spec_parseData_VkUpData_UpdateData
-                 objVk bstrVk bstrFailVk,
-               BotParser.spec_parseData_VkPollResp_PollResponse
-                 objServerVk bstrServerVk,
-               BotParser.spec_parseData_VkUpUrlResp_UploadUrlResponse
-                 objUpUrlVk bstrUpUrlVk bstrUpUrlFailVk,
-               BotParser.spec_parseData_VkUpFileResp_UploadFileResponse
-                 objUpFileVk bstrUpFileVk bstrUpFileFailVk,
-               BotParser.spec_parseData_VkUpObjResp_UploadObjectResponse
-                 objUpObjVk bstrUpObjVk bstrUpObjFailVk,
-               BotReq.spec_getServer,
-               BotReq.spec_getUploadedServer,
-               BotReq.spec_sendEchoMessage,
-               BotReq.spec_sendHelpMessage,
-               BotReq.spec_saveUploadedDoc,
-               BotReq.spec_updateMessage,
-               BotReq.spec_updateDoc
-             ]
-  defaultMain (testGroup "All Tests" [
-                  testGroup "Specs" specs,
-                  testGroup "Properties" props
-                ])
+  specs <-
+    concat
+      <$> mapM
+        testSpecs
+        [ BotParser.spec_parseData_TeleUpData_UpdateData
+            objTele
+            bstrTele
+            bstrFailTele,
+          BotParser.spec_parseData_VkUpData_UpdateData
+            objVk
+            bstrVk
+            bstrFailVk,
+          BotParser.spec_parseData_VkPollResp_PollResponse
+            objServerVk
+            bstrServerVk,
+          BotParser.spec_parseData_VkUpUrlResp_UploadUrlResponse
+            objUpUrlVk
+            bstrUpUrlVk
+            bstrUpUrlFailVk,
+          BotParser.spec_parseData_VkUpFileResp_UploadFileResponse
+            objUpFileVk
+            bstrUpFileVk
+            bstrUpFileFailVk,
+          BotParser.spec_parseData_VkUpObjResp_UploadObjectResponse
+            objUpObjVk
+            bstrUpObjVk
+            bstrUpObjFailVk,
+          BotReq.spec_getServer,
+          BotReq.spec_getUploadedServer,
+          BotReq.spec_sendEchoMessage,
+          BotReq.spec_sendHelpMessage,
+          BotReq.spec_saveUploadedDoc,
+          BotReq.spec_updateMessage,
+          BotReq.spec_updateDoc
+        ]
+  defaultMain
+    ( testGroup
+        "All Tests"
+        [ testGroup "Specs" specs,
+          testGroup "Properties" props
+        ]
+    )
 
 -- | Tele UpdateData file
 updatesFileTele, updatesFileFailTele, updateObjFileTele :: FilePath

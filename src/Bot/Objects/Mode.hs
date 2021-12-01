@@ -1,12 +1,13 @@
 module Bot.Objects.Mode where
 
-import Database.HDBC (SqlValue(..))
-import Data.Convertible.Base (Convertible(..))
+import Data.Convertible.Base (Convertible (..))
+import Database.HDBC (SqlValue (..))
 
-data Mode = ReplyMode
-          | AnswerMode
-          | UnknownMode
-          deriving (Show, Eq)
+data Mode
+  = ReplyMode
+  | AnswerMode
+  | UnknownMode
+  deriving (Show, Eq)
 
 instance Convertible Mode SqlValue where
   safeConvert ReplyMode = Right $ SqlByteString "reply"

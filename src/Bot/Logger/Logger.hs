@@ -2,61 +2,68 @@
 
 module Bot.Logger.Logger where
 
-import Prelude hiding (log)
-import qualified Data.Text as T
+import Control.Monad (mzero, when)
 import qualified Data.Aeson as A
-import GHC.Generics (Generic)
-import Data.Text (Text)
-import Data.Maybe (fromMaybe)
 import Data.Aeson.Types (FromJSON)
+import Data.Maybe (fromMaybe)
+import Data.Text (Text)
+import qualified Data.Text as T
+import GHC.Generics (Generic)
 import TextShow (TextShow, showb, showt)
-import Control.Monad (when, mzero)
+import Prelude hiding (log)
 
 import Data.Time (defaultTimeLocale, formatTime, getZonedTime)
 
-data Handle m = Handle {
-  log :: LogMessage -> Text -> m (),
-  hConfig :: Config
-}
+data Handle m = Handle
+  { log :: LogMessage -> Text -> m (),
+    hConfig :: Config
+  }
 
-newtype Config = Config {
-  cVerbosity :: Maybe Level
-} deriving (Show, Generic, Eq)
+newtype Config = Config
+  { cVerbosity :: Maybe Level
+  }
+  deriving (Show, Generic, Eq)
 
 instance A.FromJSON Config where
   parseJSON = A.withObject "General Config" $ \o ->
     Config <$> o A..:? "verbosity"
 
-withHandleIO :: Config ->
-               (Handle IO -> IO a) ->
-                IO a
+withHandleIO ::
+  Config ->
+  (Handle IO -> IO a) ->
+  IO a
 withHandleIO config f = f $ newHandleIO config
 
-newHandleIO :: Config ->
-               Handle IO
+newHandleIO ::
+  Config ->
+  Handle IO
 newHandleIO config = do
   let globalLevel = fromMaybe Debug $ cVerbosity config
-  Handle {
-    hConfig = config,
-    log = \logMes str -> 
-      when (level logMes >= globalLevel) $ do
-        let levelMes = level logMes
-        currentTime <- getTime
-        putStrLn $ T.unpack (
-          (renderColor levelMes 
-            <> showt levelMes 
-            <> resetColor) 
-            <> " | " 
-            <> currentTime 
-            <> " | " 
-            <> str)
-  }
+  Handle
+    { hConfig = config,
+      log = \logMes str ->
+        when (level logMes >= globalLevel) $ do
+          let levelMes = level logMes
+          currentTime <- getTime
+          putStrLn $
+            T.unpack
+              ( ( renderColor levelMes
+                    <> showt levelMes
+                    <> resetColor
+                )
+                  <> " | "
+                  <> currentTime
+                  <> " | "
+                  <> str
+              )
+    }
 
-data Level = Debug
-           | Info
-           | Warning
-           | Error
-           deriving (Eq, Ord, Enum, Bounded, Read, Generic)
+data Level
+  = Debug
+  | Info
+  | Warning
+  | Error
+  deriving (Eq, Ord, Enum, Bounded, Read, Generic)
 
 instance Show Level where
   show Debug = "[DEBUG]"
@@ -71,7 +78,7 @@ instance TextShow Level where
   showb Error = "[ERROR]"
 
 instance FromJSON Level where
-  parseJSON = A.withText "Level Logger" $ 
+  parseJSON = A.withText "Level Logger" $
     \case
       "debug" -> pure Debug
       "info" -> pure Info
@@ -79,21 +86,25 @@ instance FromJSON Level where
       "error" -> pure Error
       _ -> mzero
 
-newtype LogMessage = LogMessage { 
-  level :: Level
-}
+newtype LogMessage = LogMessage
+  { level :: Level
+  }
 
-logDebug, logInfo, logWarning, logError :: Handle m ->
-                                           Text ->
-                                           m ()
+logDebug,
+  logInfo,
+  logWarning,
+  logError ::
+    Handle m ->
+    Text ->
+    m ()
 logDebug = (`log` LogMessage {level = Debug})
 logInfo = (`log` LogMessage {level = Info})
 logWarning = (`log` LogMessage {level = Warning})
 logError = (`log` LogMessage {level = Error})
 
 getTime :: IO Text
-getTime = do 
-  T.pack . formatTime defaultTimeLocale (T.unpack defaultTimeFormat) 
+getTime = do
+  T.pack . formatTime defaultTimeLocale (T.unpack defaultTimeFormat)
     <$> getZonedTime
 
 defaultTimeFormat :: Text
@@ -102,8 +113,9 @@ defaultTimeFormat = "%_Y-%m-%d %T.%3q"
 resetColor :: Text
 resetColor = normalCS
 
-renderColor :: Level ->
-               Text
+renderColor ::
+  Level ->
+  Text
 renderColor lev = case lev of
   Debug -> purpleCS
   Info -> blueCS

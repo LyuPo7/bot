@@ -1,10 +1,10 @@
 module TestBot.Mode.Mode where
 
-import Hedgehog (Property, property, (===), forAll)
+import Hedgehog (Property, forAll, property, (===))
 
-import qualified TestBot.GenData as BotGD
-import qualified TestBot.Api.Vk.Handlers as VkHandlers
 import qualified TestBot.Api.Tele.Handlers as TeleHandlers
+import qualified TestBot.Api.Vk.Handlers as VkHandlers
+import qualified TestBot.GenData as BotGD
 
 import qualified Bot.Mode.Mode as BotMode
 import qualified Bot.Objects.Mode as Mode

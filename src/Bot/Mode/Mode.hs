@@ -1,42 +1,45 @@
 module Bot.Mode.Mode where
 
-import qualified Data.ByteString.Lazy.Char8 as L8
-import qualified Data.Text as T
-import Data.Maybe (fromMaybe)
-import Text.Read (readMaybe)
 import Control.Monad.Catch (MonadThrow, throwM)
+import qualified Data.ByteString.Lazy.Char8 as L8
+import Data.Maybe (fromMaybe)
+import qualified Data.Text as T
+import Text.Read (readMaybe)
 
 import qualified Bot.Exception as E
 import qualified Bot.Logger.Logger as Logger
-import qualified Bot.Settings as Settings
-import qualified Bot.Request.Request as BotReq
-import qualified Bot.Objects.Synonyms as BotSynonyms
-import qualified Bot.Objects.Update as BotUpdate
+import qualified Bot.Mode.Api as BotApiMode
 import qualified Bot.Objects.FullUpdate as BotFullUpdate
 import qualified Bot.Objects.Message as BotMessage
 import qualified Bot.Objects.MessageType as BotMessageType
 import qualified Bot.Objects.Mode as BotMode
-import qualified Bot.Mode.Api as BotApiMode
+import qualified Bot.Objects.Synonyms as BotSynonyms
+import qualified Bot.Objects.Update as BotUpdate
+import qualified Bot.Request.Request as BotReq
+import qualified Bot.Settings as Settings
 import qualified Bot.Util as BotUtil
 
-startMode :: (MonadThrow m, Monad m) =>
-              BotReq.Handle m ->
-              m ()
+startMode ::
+  (MonadThrow m, Monad m) =>
+  BotReq.Handle m ->
+  m ()
 startMode handle = do
   let logH = BotReq.hLogger handle
       config = BotReq.cReq handle
       api = Settings.botApi config
-  Logger.logInfo logH $ "Bot api: "
-    <> BotUtil.convertValue api
+  Logger.logInfo logH $
+    "Bot api: "
+      <> BotUtil.convertValue api
   BotApiMode.setupBot api handle
   firstUpdate <- BotApiMode.getFirstUpdate api handle
   _ <- checkMode handle firstUpdate
   return ()
 
-checkMode :: (MonadThrow m, Monad m) =>
-              BotReq.Handle m ->
-              BotUpdate.Update ->
-              m (Maybe BotSynonyms.UpdateId)
+checkMode ::
+  (MonadThrow m, Monad m) =>
+  BotReq.Handle m ->
+  BotUpdate.Update ->
+  m (Maybe BotSynonyms.UpdateId)
 checkMode handle prevUpdate = do
   let logH = BotReq.hLogger handle
   nextUpdate <- getLastUpdate handle prevUpdate
@@ -48,8 +51,9 @@ checkMode handle prevUpdate = do
       _ <- checkMode handle newUpdate
       return Nothing
     Just (updateId, userMessage) -> do
-      Logger.logInfo logH $ "Checking update with id: "
-        <> BotUtil.convertValue updateId
+      Logger.logInfo logH $
+        "Checking update with id: "
+          <> BotUtil.convertValue updateId
       chatId <- BotApiMode.getChatId handle userMessage
       mode <- BotReq.getMode handle chatId
       case mode of
@@ -60,17 +64,19 @@ checkMode handle prevUpdate = do
           _ <- answerMode handle userMessage
           Logger.logDebug logH "Bot in answer mode."
         BotMode.UnknownMode -> do
-          Logger.logError logH $ "Unknown Bot mode: "
-            <> BotUtil.convertValue mode
+          Logger.logError logH $
+            "Unknown Bot mode: "
+              <> BotUtil.convertValue mode
       BotReq.putUpdate handle updateId
       newUpdate <- BotApiMode.getNextUpdate handle prevUpdate
       _ <- checkMode handle newUpdate
       return $ Just updateId
 
-replyMode :: (MonadThrow m, Monad m) =>
-              BotReq.Handle m ->
-              BotMessage.Message ->
-              m BotMode.Mode
+replyMode ::
+  (MonadThrow m, Monad m) =>
+  BotReq.Handle m ->
+  BotMessage.Message ->
+  m BotMode.Mode
 replyMode handle userMessage = do
   let logH = BotReq.hLogger handle
   chatId <- BotApiMode.getChatId handle userMessage
@@ -98,10 +104,11 @@ replyMode handle userMessage = do
       Logger.logError logH "Received unsupported bot-command!"
       return BotMode.ReplyMode
 
-answerMode :: (MonadThrow m, Monad m) =>
-               BotReq.Handle m ->
-               BotMessage.Message ->
-               m (Maybe BotSynonyms.RepNum)
+answerMode ::
+  (MonadThrow m, Monad m) =>
+  BotReq.Handle m ->
+  BotMessage.Message ->
+  m (Maybe BotSynonyms.RepNum)
 answerMode handle userMessage = do
   let logH = BotReq.hLogger handle
   chatId <- BotApiMode.getChatId handle userMessage
@@ -110,23 +117,25 @@ answerMode handle userMessage = do
   BotReq.setMode handle chatId BotMode.ReplyMode
   case (readMaybe messageText :: Maybe BotSynonyms.RepNum) of
     Just repNum -> do
-      Logger.logInfo logH $ "Info: Received user's answer in chat with id: "
-        <> BotUtil.convertValue chatId
+      Logger.logInfo logH $
+        "Info: Received user's answer in chat with id: "
+          <> BotUtil.convertValue chatId
       BotReq.setRepliesNumber handle chatId repNum
       return $ Just repNum
     Nothing -> do
       Logger.logError logH "Couldn't parse User's answer!"
       return Nothing
 
-getLastUpdate :: (Monad m, MonadThrow m) =>
-                  BotReq.Handle m ->
-                  BotUpdate.Update ->
-                  m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
+getLastUpdate ::
+  (Monad m, MonadThrow m) =>
+  BotReq.Handle m ->
+  BotUpdate.Update ->
+  m (Maybe (BotSynonyms.UpdateId, BotMessage.Message))
 getLastUpdate handle update = do
   let logH = BotReq.hLogger handle
   defaultUpdateId <- BotApiMode.getDefaultUpdateId handle update
   lastDbUpdateId <- BotReq.getLastSucUpdate handle
-  let nextDbUpdateId = fmap (+1) lastDbUpdateId
+  let nextDbUpdateId = fmap (+ 1) lastDbUpdateId
       nextUpdateId = fromMaybe defaultUpdateId nextDbUpdateId
   nextUpdate <- BotApiMode.changeUpdateId handle update nextUpdateId
   response <- BotReq.getUpdate handle nextUpdate
@@ -142,10 +151,11 @@ getLastUpdate handle update = do
       Logger.logError logH "Expected one update, but have many."
       return Nothing
 
-extractUpdateData :: (Monad m, MonadThrow m) =>
-                      BotReq.Handle m ->
-                      L8.ByteString ->
-                      m [BotFullUpdate.FullUpdate]
+extractUpdateData ::
+  (Monad m, MonadThrow m) =>
+  BotReq.Handle m ->
+  L8.ByteString ->
+  m [BotFullUpdate.FullUpdate]
 extractUpdateData handle response = do
   let config = BotReq.cReq handle
       api = Settings.botApi config
