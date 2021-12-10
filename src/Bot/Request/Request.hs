@@ -62,6 +62,10 @@ class (MonadThrow m, Monad m) => Request m api where
     BotDB.Handle m ->
     BotReqPair.ReqPair ->
     m (Text, B.ByteString)
+  setGetFirstUpdate ::
+    api ->
+    BotDB.Handle m ->
+    m (Maybe BotReqPair.ReqPair)
   setGetUpdate ::
     api ->
     BotDB.Handle m ->
@@ -146,6 +150,9 @@ instance (MonadThrow m, Monad m) => Request m BotApi.Api where
   setGetServer BotApi.Tele _ = return Nothing
   setGetServer BotApi.Vk h = VkReq.setGetServer h
 
+  setGetFirstUpdate BotApi.Tele h = TeleReq.setGetFirstUpdate h
+  setGetFirstUpdate BotApi.Vk _ = return Nothing
+
   setGetUpdate BotApi.Tele h update = TeleReq.setGetUpdate h update
   setGetUpdate BotApi.Vk h update = VkReq.setGetUpdate h update
 
@@ -216,6 +223,22 @@ getUploadedServer handle doc = do
     Just reqPair -> do
       Logger.logInfo logH "Get Uploaded server parameters for upload file."
       makeRequest handle reqPair
+
+getFirstUpdate ::
+  (Monad m, MonadThrow m) =>
+  Handle m ->
+  m B.ByteString
+getFirstUpdate handle = do
+  let dbH = hDb handle
+      logH = hLogger handle
+      config = cReq handle
+      api = Settings.botApi config
+  reqPairM <- setGetFirstUpdate api dbH
+  case reqPairM of
+    Nothing -> do
+      Logger.logWarning logH "No need first update for this API"
+      throwM E.FirstUpdateError
+    Just reqPair -> makeRequest handle reqPair
 
 getUpdate ::
   (Monad m, MonadThrow m) =>

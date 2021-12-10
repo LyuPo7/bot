@@ -25,6 +25,17 @@ import qualified Bot.Objects.Synonyms as BotSynonyms
 import qualified Bot.Objects.Update as BotUpdate
 import qualified Bot.Settings as Settings
 
+setGetFirstUpdate ::
+  (MonadThrow m, Monad m) =>
+  BotDB.Handle m ->
+  m (Maybe BotReqPair.ReqPair)
+setGetFirstUpdate _ = do
+  let reqOptions =
+        TeleReqOptions.GetUpdates $
+          TeleGetUpdates.createGetUpdates Nothing
+      apiMethod = TeleMethod.getUpdates
+  return $ Just $ BotReqPair.TeleReqPair (apiMethod, reqOptions)
+
 setGetUpdate ::
   (MonadThrow m, Monad m) =>
   BotDB.Handle m ->
@@ -33,7 +44,7 @@ setGetUpdate ::
 setGetUpdate _ (BotUpdate.TeleUpdate updateId) = do
   let reqOptions =
         TeleReqOptions.GetUpdates $
-          TeleGetUpdates.createGetUpdates updateId
+          TeleGetUpdates.createGetUpdates $ Just updateId
       apiMethod = TeleMethod.getUpdates
   return $ BotReqPair.TeleReqPair (apiMethod, reqOptions)
 setGetUpdate _ botUpdate = do

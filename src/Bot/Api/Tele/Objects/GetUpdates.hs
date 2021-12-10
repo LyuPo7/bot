@@ -19,11 +19,11 @@ data GetUpdates = GetUpdates
   deriving (Show, Eq, Generic, ToJSON)
 
 createGetUpdates ::
-  BotSynonyms.UpdateId ->
+  Maybe BotSynonyms.UpdateId ->
   GetUpdates
-createGetUpdates updateId =
+createGetUpdates updateIdM =
   GetUpdates
-    { offset = Just updateId,
+    { offset = updateIdM,
       limit = Nothing,
       timeout = Just Settings.timeout,
       allowed_updates = Just ["message"]

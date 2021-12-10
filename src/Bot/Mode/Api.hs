@@ -43,7 +43,18 @@ getFirstUpdate ::
   BotApi.Api ->
   BotReq.Handle m ->
   m BotUpdate.Update
-getFirstUpdate BotApi.Tele _ = return $ BotUpdate.TeleUpdate 0
+getFirstUpdate BotApi.Tele handle = do
+  let dbH = BotReq.hDb handle
+  response <- BotReq.getFirstUpdate handle
+  updateDataM <- BotParser.parseData dbH response
+  case updateDataM of
+    Left msg2 -> throwM $ E.ParseRequestError $ T.unpack msg2
+    Right updateData -> do
+      case TeleUpData.result updateData of
+        (update : _) -> do
+          let updateId = TeleUpdate.id update
+          return $ BotUpdate.TeleUpdate updateId
+        _ -> throwM E.FirstUpdateError
 getFirstUpdate BotApi.Vk handle = do
   let dbH = BotReq.hDb handle
   serverUp <- BotReq.getServer handle
@@ -135,7 +146,8 @@ getDefaultUpdateId ::
   m BotSynonyms.UpdateId
 getDefaultUpdateId _ (BotUpdate.VkUpdate serverParams) = do
   return $ convert $ VkServer.ts serverParams
-getDefaultUpdateId _ _ = return 0
+getDefaultUpdateId _ (BotUpdate.TeleUpdate updateId) = do
+  return updateId
 
 changeUpdateId ::
   (MonadThrow m, Monad m) =>

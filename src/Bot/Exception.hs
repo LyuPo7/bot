@@ -12,6 +12,7 @@ data BotError
   | UploadedServerError
   | UploadedDocError
   | HelpMessageError
+  | FirstUpdateError
   | StartMessageError
   | ApiObjectError String
   | ApiMethodError
@@ -36,6 +37,7 @@ instance Show BotError where
   show UploadedServerError = "Incorrect API for uploading files!"
   show UploadedDocError = "Incorrect API for uploading documents!"
   show HelpMessageError = "This API hasn't '/help' message"
+  show FirstUpdateError = "No need first update for this API"
   show StartMessageError = "This API hasn't '/start' message"
   show (ApiObjectError err) = "Incorrect Object for this Api: " ++ err
   show ApiMethodError = "Incorrect Method for this Api!"
